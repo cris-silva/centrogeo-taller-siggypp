@@ -19,6 +19,6 @@ Puedes contactar a los profesores mediante correo electrónico:
 
 ---
 
-![](https://www.centrogeo.org.mx/templates/ja_resume/images/logo_centrogeo_wide.svg){ width=25% }
+![](https://www.centrogeo.org.mx/templates/ja_resume/images/logo_centrogeo_wide.svg =250x)
 
 Conoce más sobre CentroGeo en [su sitio oficial](https://www.centrogeo.org.mx).
