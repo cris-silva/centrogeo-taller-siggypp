@@ -17,4 +17,8 @@ Puedes contactar a los profesores mediante correo electrónico:
 * Ana J. Alegre ([jalegre@centrogeo.edu.mx](mailto:jalegre@centrogeo.edu.mx))
 * Cristian Silva ([csilva@centrogeo.edu.mx](mailto:csilva@centrogeo.edu.mx))
 
+---
+
+![](https://www.centrogeo.org.mx/templates/ja_resume/images/logo_centrogeo_wide.svg){ width=25% }
+
 Conoce más sobre CentroGeo en [su sitio oficial](https://www.centrogeo.org.mx).
