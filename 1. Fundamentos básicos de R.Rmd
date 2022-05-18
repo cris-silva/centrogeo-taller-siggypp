@@ -343,12 +343,17 @@ Visualiza el contenido completo de `mi_df` usando la función `View` (en RStudio
 View(***)
 ```
 
+También puedes visualizar los *dataframes* usando el panel *Environment* en RStudio.
+
 Visualiza rápidamente las primeras filas de `mi_df`, usando la función `head` para visualizar las primeras 5 filas especificando el parámetro `n = 5`:
 ```{r Cabeza del dataframe}
 head(***, n = ***) # Si se omite el parámetro n, la función head regresa las primeras 5 filas por defecto
 ```
 
-También puedes visualizar los *dataframes* usando el panel *Environment* en RStudio.
+Visualiza rápidamente las últimas filas de `mi_df`, usando la función `tail` para visualizar las últimas 5 filas especificando el parámetro `n = 5`:
+```{r Cola del dataframe}
+tail(***, n = ***) # Si se omite el parámetro n, la función tail regresa las últimas 5 filas por defecto
+```
 
 Para acceder a una fila en particular en *dataframe*, especifica la posición del elemento entre corchetes ([Fila, Columna]). Accede al contenido de la primera fila completa de `mi_df`, omitiendo el índice para la columna:
 ```{r Acceder a una fila en un dataframe}
