@@ -3,10 +3,6 @@ title: "1. Fundamentos básicos de R"
 author: "Ana J. Alegre (jalegre@centrogeo.edu.mx), Cristian Silva (csilva@centrogeo.edu.mx)"
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 ## Introducción
 
 *R* es un lenguaje de programación orientado principalmente a la computación estadística. Es un software libre ampliamente utilizado para el desarrollo de análisis de datos y más recientemente, para aplicaciones modernas como la ciencia de datos, el aprendizaje automático o la inteligencia artificial.
