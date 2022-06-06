@@ -1,0 +1,609 @@
+﻿"clave_ent","entidad","mes","homicidios_totales"
+1,"Aguascalientes","2018-12-01",25
+1,"Aguascalientes","2019-01-01",28
+1,"Aguascalientes","2019-02-01",24
+1,"Aguascalientes","2019-03-01",22
+1,"Aguascalientes","2019-04-01",25
+1,"Aguascalientes","2019-05-01",29
+1,"Aguascalientes","2019-06-01",20
+1,"Aguascalientes","2019-07-01",15
+1,"Aguascalientes","2019-08-01",13
+1,"Aguascalientes","2019-09-01",26
+1,"Aguascalientes","2019-10-01",23
+1,"Aguascalientes","2019-11-01",21
+1,"Aguascalientes","2019-12-01",23
+1,"Aguascalientes","2020-01-01",15
+1,"Aguascalientes","2020-02-01",16
+1,"Aguascalientes","2020-03-01",22
+1,"Aguascalientes","2020-04-01",21
+1,"Aguascalientes","2020-05-01",23
+1,"Aguascalientes","2020-06-01",20
+2,"Baja California","2018-12-01",273
+2,"Baja California","2019-01-01",271
+2,"Baja California","2019-02-01",217
+2,"Baja California","2019-03-01",215
+2,"Baja California","2019-04-01",217
+2,"Baja California","2019-05-01",268
+2,"Baja California","2019-06-01",274
+2,"Baja California","2019-07-01",314
+2,"Baja California","2019-08-01",280
+2,"Baja California","2019-09-01",256
+2,"Baja California","2019-10-01",261
+2,"Baja California","2019-11-01",266
+2,"Baja California","2019-12-01",226
+2,"Baja California","2020-01-01",226
+2,"Baja California","2020-02-01",206
+2,"Baja California","2020-03-01",262
+2,"Baja California","2020-04-01",243
+2,"Baja California","2020-05-01",270
+2,"Baja California","2020-06-01",226
+3,"Baja California Sur","2018-12-01",18
+3,"Baja California Sur","2019-01-01",18
+3,"Baja California Sur","2019-02-01",12
+3,"Baja California Sur","2019-03-01",18
+3,"Baja California Sur","2019-04-01",18
+3,"Baja California Sur","2019-05-01",13
+3,"Baja California Sur","2019-06-01",9
+3,"Baja California Sur","2019-07-01",8
+3,"Baja California Sur","2019-08-01",16
+3,"Baja California Sur","2019-09-01",17
+3,"Baja California Sur","2019-10-01",18
+3,"Baja California Sur","2019-11-01",11
+3,"Baja California Sur","2019-12-01",10
+3,"Baja California Sur","2020-01-01",11
+3,"Baja California Sur","2020-02-01",11
+3,"Baja California Sur","2020-03-01",7
+3,"Baja California Sur","2020-04-01",6
+3,"Baja California Sur","2020-05-01",7
+3,"Baja California Sur","2020-06-01",9
+4,"Campeche","2018-12-01",12
+4,"Campeche","2019-01-01",9
+4,"Campeche","2019-02-01",13
+4,"Campeche","2019-03-01",10
+4,"Campeche","2019-04-01",14
+4,"Campeche","2019-05-01",13
+4,"Campeche","2019-06-01",7
+4,"Campeche","2019-07-01",11
+4,"Campeche","2019-08-01",14
+4,"Campeche","2019-09-01",11
+4,"Campeche","2019-10-01",17
+4,"Campeche","2019-11-01",8
+4,"Campeche","2019-12-01",7
+4,"Campeche","2020-01-01",8
+4,"Campeche","2020-02-01",14
+4,"Campeche","2020-03-01",17
+4,"Campeche","2020-04-01",4
+4,"Campeche","2020-05-01",9
+4,"Campeche","2020-06-01",6
+5,"Coahuila de Zaragoza","2018-12-01",36
+5,"Coahuila de Zaragoza","2019-01-01",41
+5,"Coahuila de Zaragoza","2019-02-01",44
+5,"Coahuila de Zaragoza","2019-03-01",38
+5,"Coahuila de Zaragoza","2019-04-01",31
+5,"Coahuila de Zaragoza","2019-05-01",40
+5,"Coahuila de Zaragoza","2019-06-01",30
+5,"Coahuila de Zaragoza","2019-07-01",39
+5,"Coahuila de Zaragoza","2019-08-01",41
+5,"Coahuila de Zaragoza","2019-09-01",38
+5,"Coahuila de Zaragoza","2019-10-01",46
+5,"Coahuila de Zaragoza","2019-11-01",28
+5,"Coahuila de Zaragoza","2019-12-01",33
+5,"Coahuila de Zaragoza","2020-01-01",47
+5,"Coahuila de Zaragoza","2020-02-01",26
+5,"Coahuila de Zaragoza","2020-03-01",39
+5,"Coahuila de Zaragoza","2020-04-01",28
+5,"Coahuila de Zaragoza","2020-05-01",22
+5,"Coahuila de Zaragoza","2020-06-01",34
+6,"Colima","2018-12-01",55
+6,"Colima","2019-01-01",72
+6,"Colima","2019-02-01",57
+6,"Colima","2019-03-01",58
+6,"Colima","2019-04-01",60
+6,"Colima","2019-05-01",64
+6,"Colima","2019-06-01",58
+6,"Colima","2019-07-01",69
+6,"Colima","2019-08-01",69
+6,"Colima","2019-09-01",74
+6,"Colima","2019-10-01",60
+6,"Colima","2019-11-01",71
+6,"Colima","2019-12-01",67
+6,"Colima","2020-01-01",64
+6,"Colima","2020-02-01",65
+6,"Colima","2020-03-01",55
+6,"Colima","2020-04-01",64
+6,"Colima","2020-05-01",60
+6,"Colima","2020-06-01",51
+7,"Chiapas","2018-12-01",96
+7,"Chiapas","2019-01-01",90
+7,"Chiapas","2019-02-01",84
+7,"Chiapas","2019-03-01",98
+7,"Chiapas","2019-04-01",108
+7,"Chiapas","2019-05-01",109
+7,"Chiapas","2019-06-01",103
+7,"Chiapas","2019-07-01",104
+7,"Chiapas","2019-08-01",90
+7,"Chiapas","2019-09-01",104
+7,"Chiapas","2019-10-01",80
+7,"Chiapas","2019-11-01",100
+7,"Chiapas","2019-12-01",116
+7,"Chiapas","2020-01-01",100
+7,"Chiapas","2020-02-01",85
+7,"Chiapas","2020-03-01",92
+7,"Chiapas","2020-04-01",84
+7,"Chiapas","2020-05-01",78
+7,"Chiapas","2020-06-01",70
+8,"Chihuahua","2018-12-01",161
+8,"Chihuahua","2019-01-01",183
+8,"Chihuahua","2019-02-01",168
+8,"Chihuahua","2019-03-01",193
+8,"Chihuahua","2019-04-01",196
+8,"Chihuahua","2019-05-01",237
+8,"Chihuahua","2019-06-01",224
+8,"Chihuahua","2019-07-01",227
+8,"Chihuahua","2019-08-01",203
+8,"Chihuahua","2019-09-01",212
+8,"Chihuahua","2019-10-01",208
+8,"Chihuahua","2019-11-01",227
+8,"Chihuahua","2019-12-01",171
+8,"Chihuahua","2020-01-01",180
+8,"Chihuahua","2020-02-01",202
+8,"Chihuahua","2020-03-01",255
+8,"Chihuahua","2020-04-01",243
+8,"Chihuahua","2020-05-01",220
+8,"Chihuahua","2020-06-01",247
+9,"Ciudad de México","2018-12-01",209
+9,"Ciudad de México","2019-01-01",172
+9,"Ciudad de México","2019-02-01",159
+9,"Ciudad de México","2019-03-01",217
+9,"Ciudad de México","2019-04-01",166
+9,"Ciudad de México","2019-05-01",202
+9,"Ciudad de México","2019-06-01",151
+9,"Ciudad de México","2019-07-01",166
+9,"Ciudad de México","2019-08-01",146
+9,"Ciudad de México","2019-09-01",146
+9,"Ciudad de México","2019-10-01",148
+9,"Ciudad de México","2019-11-01",157
+9,"Ciudad de México","2019-12-01",167
+9,"Ciudad de México","2020-01-01",159
+9,"Ciudad de México","2020-02-01",145
+9,"Ciudad de México","2020-03-01",171
+9,"Ciudad de México","2020-04-01",162
+9,"Ciudad de México","2020-05-01",148
+9,"Ciudad de México","2020-06-01",145
+10,"Durango","2018-12-01",39
+10,"Durango","2019-01-01",20
+10,"Durango","2019-02-01",30
+10,"Durango","2019-03-01",25
+10,"Durango","2019-04-01",37
+10,"Durango","2019-05-01",38
+10,"Durango","2019-06-01",26
+10,"Durango","2019-07-01",40
+10,"Durango","2019-08-01",35
+10,"Durango","2019-09-01",24
+10,"Durango","2019-10-01",34
+10,"Durango","2019-11-01",24
+10,"Durango","2019-12-01",32
+10,"Durango","2020-01-01",18
+10,"Durango","2020-02-01",33
+10,"Durango","2020-03-01",32
+10,"Durango","2020-04-01",26
+10,"Durango","2020-05-01",23
+10,"Durango","2020-06-01",21
+11,"Guanajuato","2018-12-01",386
+11,"Guanajuato","2019-01-01",366
+11,"Guanajuato","2019-02-01",382
+11,"Guanajuato","2019-03-01",407
+11,"Guanajuato","2019-04-01",395
+11,"Guanajuato","2019-05-01",403
+11,"Guanajuato","2019-06-01",352
+11,"Guanajuato","2019-07-01",319
+11,"Guanajuato","2019-08-01",341
+11,"Guanajuato","2019-09-01",362
+11,"Guanajuato","2019-10-01",366
+11,"Guanajuato","2019-11-01",385
+11,"Guanajuato","2019-12-01",416
+11,"Guanajuato","2020-01-01",443
+11,"Guanajuato","2020-02-01",400
+11,"Guanajuato","2020-03-01",444
+11,"Guanajuato","2020-04-01",399
+11,"Guanajuato","2020-05-01",403
+11,"Guanajuato","2020-06-01",392
+12,"Guerrero","2018-12-01",208
+12,"Guerrero","2019-01-01",172
+12,"Guerrero","2019-02-01",171
+12,"Guerrero","2019-03-01",159
+12,"Guerrero","2019-04-01",156
+12,"Guerrero","2019-05-01",180
+12,"Guerrero","2019-06-01",179
+12,"Guerrero","2019-07-01",189
+12,"Guerrero","2019-08-01",181
+12,"Guerrero","2019-09-01",131
+12,"Guerrero","2019-10-01",158
+12,"Guerrero","2019-11-01",179
+12,"Guerrero","2019-12-01",176
+12,"Guerrero","2020-01-01",127
+12,"Guerrero","2020-02-01",102
+12,"Guerrero","2020-03-01",136
+12,"Guerrero","2020-04-01",133
+12,"Guerrero","2020-05-01",113
+12,"Guerrero","2020-06-01",96
+13,"Hidalgo","2018-12-01",69
+13,"Hidalgo","2019-01-01",77
+13,"Hidalgo","2019-02-01",61
+13,"Hidalgo","2019-03-01",59
+13,"Hidalgo","2019-04-01",58
+13,"Hidalgo","2019-05-01",55
+13,"Hidalgo","2019-06-01",60
+13,"Hidalgo","2019-07-01",46
+13,"Hidalgo","2019-08-01",54
+13,"Hidalgo","2019-09-01",44
+13,"Hidalgo","2019-10-01",52
+13,"Hidalgo","2019-11-01",29
+13,"Hidalgo","2019-12-01",51
+13,"Hidalgo","2020-01-01",48
+13,"Hidalgo","2020-02-01",41
+13,"Hidalgo","2020-03-01",55
+13,"Hidalgo","2020-04-01",41
+13,"Hidalgo","2020-05-01",37
+13,"Hidalgo","2020-06-01",42
+14,"Jalisco","2018-12-01",247
+14,"Jalisco","2019-01-01",254
+14,"Jalisco","2019-02-01",262
+14,"Jalisco","2019-03-01",218
+14,"Jalisco","2019-04-01",224
+14,"Jalisco","2019-05-01",213
+14,"Jalisco","2019-06-01",238
+14,"Jalisco","2019-07-01",233
+14,"Jalisco","2019-08-01",211
+14,"Jalisco","2019-09-01",217
+14,"Jalisco","2019-10-01",219
+14,"Jalisco","2019-11-01",232
+14,"Jalisco","2019-12-01",230
+14,"Jalisco","2020-01-01",229
+14,"Jalisco","2020-02-01",198
+14,"Jalisco","2020-03-01",253
+14,"Jalisco","2020-04-01",216
+14,"Jalisco","2020-05-01",210
+14,"Jalisco","2020-06-01",213
+15,"México","2018-12-01",365
+15,"México","2019-01-01",292
+15,"México","2019-02-01",278
+15,"México","2019-03-01",328
+15,"México","2019-04-01",298
+15,"México","2019-05-01",301
+15,"México","2019-06-01",279
+15,"México","2019-07-01",294
+15,"México","2019-08-01",279
+15,"México","2019-09-01",271
+15,"México","2019-10-01",257
+15,"México","2019-11-01",290
+15,"México","2019-12-01",305
+15,"México","2020-01-01",259
+15,"México","2020-02-01",259
+15,"México","2020-03-01",333
+15,"México","2020-04-01",315
+15,"México","2020-05-01",273
+15,"México","2020-06-01",288
+16,"Michoacán de Ocampo","2018-12-01",214
+16,"Michoacán de Ocampo","2019-01-01",195
+16,"Michoacán de Ocampo","2019-02-01",208
+16,"Michoacán de Ocampo","2019-03-01",195
+16,"Michoacán de Ocampo","2019-04-01",186
+16,"Michoacán de Ocampo","2019-05-01",210
+16,"Michoacán de Ocampo","2019-06-01",234
+16,"Michoacán de Ocampo","2019-07-01",190
+16,"Michoacán de Ocampo","2019-08-01",229
+16,"Michoacán de Ocampo","2019-09-01",255
+16,"Michoacán de Ocampo","2019-10-01",249
+16,"Michoacán de Ocampo","2019-11-01",249
+16,"Michoacán de Ocampo","2019-12-01",286
+16,"Michoacán de Ocampo","2020-01-01",250
+16,"Michoacán de Ocampo","2020-02-01",254
+16,"Michoacán de Ocampo","2020-03-01",284
+16,"Michoacán de Ocampo","2020-04-01",264
+16,"Michoacán de Ocampo","2020-05-01",236
+16,"Michoacán de Ocampo","2020-06-01",206
+17,"Morelos","2018-12-01",93
+17,"Morelos","2019-01-01",90
+17,"Morelos","2019-02-01",109
+17,"Morelos","2019-03-01",114
+17,"Morelos","2019-04-01",91
+17,"Morelos","2019-05-01",88
+17,"Morelos","2019-06-01",100
+17,"Morelos","2019-07-01",84
+17,"Morelos","2019-08-01",96
+17,"Morelos","2019-09-01",100
+17,"Morelos","2019-10-01",103
+17,"Morelos","2019-11-01",104
+17,"Morelos","2019-12-01",83
+17,"Morelos","2020-01-01",89
+17,"Morelos","2020-02-01",91
+17,"Morelos","2020-03-01",90
+17,"Morelos","2020-04-01",98
+17,"Morelos","2020-05-01",81
+17,"Morelos","2020-06-01",81
+18,"Nayarit","2018-12-01",26
+18,"Nayarit","2019-01-01",23
+18,"Nayarit","2019-02-01",17
+18,"Nayarit","2019-03-01",15
+18,"Nayarit","2019-04-01",15
+18,"Nayarit","2019-05-01",32
+18,"Nayarit","2019-06-01",24
+18,"Nayarit","2019-07-01",26
+18,"Nayarit","2019-08-01",22
+18,"Nayarit","2019-09-01",25
+18,"Nayarit","2019-10-01",25
+18,"Nayarit","2019-11-01",23
+18,"Nayarit","2019-12-01",23
+18,"Nayarit","2020-01-01",28
+18,"Nayarit","2020-02-01",22
+18,"Nayarit","2020-03-01",18
+18,"Nayarit","2020-04-01",19
+18,"Nayarit","2020-05-01",24
+18,"Nayarit","2020-06-01",22
+19,"Nuevo León","2018-12-01",141
+19,"Nuevo León","2019-01-01",143
+19,"Nuevo León","2019-02-01",144
+19,"Nuevo León","2019-03-01",107
+19,"Nuevo León","2019-04-01",107
+19,"Nuevo León","2019-05-01",125
+19,"Nuevo León","2019-06-01",120
+19,"Nuevo León","2019-07-01",123
+19,"Nuevo León","2019-08-01",125
+19,"Nuevo León","2019-09-01",118
+19,"Nuevo León","2019-10-01",118
+19,"Nuevo León","2019-11-01",93
+19,"Nuevo León","2019-12-01",131
+19,"Nuevo León","2020-01-01",113
+19,"Nuevo León","2020-02-01",114
+19,"Nuevo León","2020-03-01",127
+19,"Nuevo León","2020-04-01",118
+19,"Nuevo León","2020-05-01",109
+19,"Nuevo León","2020-06-01",125
+20,"Oaxaca","2018-12-01",142
+20,"Oaxaca","2019-01-01",148
+20,"Oaxaca","2019-02-01",132
+20,"Oaxaca","2019-03-01",139
+20,"Oaxaca","2019-04-01",158
+20,"Oaxaca","2019-05-01",168
+20,"Oaxaca","2019-06-01",146
+20,"Oaxaca","2019-07-01",170
+20,"Oaxaca","2019-08-01",174
+20,"Oaxaca","2019-09-01",129
+20,"Oaxaca","2019-10-01",169
+20,"Oaxaca","2019-11-01",139
+20,"Oaxaca","2019-12-01",181
+20,"Oaxaca","2020-01-01",172
+20,"Oaxaca","2020-02-01",131
+20,"Oaxaca","2020-03-01",172
+20,"Oaxaca","2020-04-01",150
+20,"Oaxaca","2020-05-01",139
+20,"Oaxaca","2020-06-01",105
+21,"Puebla","2018-12-01",184
+21,"Puebla","2019-01-01",131
+21,"Puebla","2019-02-01",176
+21,"Puebla","2019-03-01",178
+21,"Puebla","2019-04-01",138
+21,"Puebla","2019-05-01",160
+21,"Puebla","2019-06-01",128
+21,"Puebla","2019-07-01",138
+21,"Puebla","2019-08-01",110
+21,"Puebla","2019-09-01",124
+21,"Puebla","2019-10-01",136
+21,"Puebla","2019-11-01",114
+21,"Puebla","2019-12-01",131
+21,"Puebla","2020-01-01",116
+21,"Puebla","2020-02-01",101
+21,"Puebla","2020-03-01",121
+21,"Puebla","2020-04-01",119
+21,"Puebla","2020-05-01",98
+21,"Puebla","2020-06-01",90
+22,"Querétaro","2018-12-01",43
+22,"Querétaro","2019-01-01",38
+22,"Querétaro","2019-02-01",48
+22,"Querétaro","2019-03-01",51
+22,"Querétaro","2019-04-01",40
+22,"Querétaro","2019-05-01",43
+22,"Querétaro","2019-06-01",31
+22,"Querétaro","2019-07-01",40
+22,"Querétaro","2019-08-01",43
+22,"Querétaro","2019-09-01",47
+22,"Querétaro","2019-10-01",30
+22,"Querétaro","2019-11-01",46
+22,"Querétaro","2019-12-01",46
+22,"Querétaro","2020-01-01",36
+22,"Querétaro","2020-02-01",38
+22,"Querétaro","2020-03-01",49
+22,"Querétaro","2020-04-01",35
+22,"Querétaro","2020-05-01",44
+22,"Querétaro","2020-06-01",32
+23,"Quintana Roo","2018-12-01",97
+23,"Quintana Roo","2019-01-01",130
+23,"Quintana Roo","2019-02-01",114
+23,"Quintana Roo","2019-03-01",137
+23,"Quintana Roo","2019-04-01",136
+23,"Quintana Roo","2019-05-01",110
+23,"Quintana Roo","2019-06-01",122
+23,"Quintana Roo","2019-07-01",133
+23,"Quintana Roo","2019-08-01",138
+23,"Quintana Roo","2019-09-01",129
+23,"Quintana Roo","2019-10-01",114
+23,"Quintana Roo","2019-11-01",116
+23,"Quintana Roo","2019-12-01",121
+23,"Quintana Roo","2020-01-01",123
+23,"Quintana Roo","2020-02-01",131
+23,"Quintana Roo","2020-03-01",143
+23,"Quintana Roo","2020-04-01",98
+23,"Quintana Roo","2020-05-01",94
+23,"Quintana Roo","2020-06-01",101
+24,"San Luis Potosí","2018-12-01",70
+24,"San Luis Potosí","2019-01-01",62
+24,"San Luis Potosí","2019-02-01",66
+24,"San Luis Potosí","2019-03-01",96
+24,"San Luis Potosí","2019-04-01",70
+24,"San Luis Potosí","2019-05-01",62
+24,"San Luis Potosí","2019-06-01",70
+24,"San Luis Potosí","2019-07-01",67
+24,"San Luis Potosí","2019-08-01",75
+24,"San Luis Potosí","2019-09-01",77
+24,"San Luis Potosí","2019-10-01",60
+24,"San Luis Potosí","2019-11-01",75
+24,"San Luis Potosí","2019-12-01",73
+24,"San Luis Potosí","2020-01-01",63
+24,"San Luis Potosí","2020-02-01",71
+24,"San Luis Potosí","2020-03-01",83
+24,"San Luis Potosí","2020-04-01",69
+24,"San Luis Potosí","2020-05-01",85
+24,"San Luis Potosí","2020-06-01",89
+25,"Sinaloa","2018-12-01",119
+25,"Sinaloa","2019-01-01",110
+25,"Sinaloa","2019-02-01",112
+25,"Sinaloa","2019-03-01",91
+25,"Sinaloa","2019-04-01",124
+25,"Sinaloa","2019-05-01",128
+25,"Sinaloa","2019-06-01",108
+25,"Sinaloa","2019-07-01",117
+25,"Sinaloa","2019-08-01",119
+25,"Sinaloa","2019-09-01",124
+25,"Sinaloa","2019-10-01",111
+25,"Sinaloa","2019-11-01",121
+25,"Sinaloa","2019-12-01",142
+25,"Sinaloa","2020-01-01",100
+25,"Sinaloa","2020-02-01",117
+25,"Sinaloa","2020-03-01",120
+25,"Sinaloa","2020-04-01",97
+25,"Sinaloa","2020-05-01",90
+25,"Sinaloa","2020-06-01",125
+26,"Sonora","2018-12-01",106
+26,"Sonora","2019-01-01",115
+26,"Sonora","2019-02-01",66
+26,"Sonora","2019-03-01",96
+26,"Sonora","2019-04-01",90
+26,"Sonora","2019-05-01",98
+26,"Sonora","2019-06-01",158
+26,"Sonora","2019-07-01",109
+26,"Sonora","2019-08-01",125
+26,"Sonora","2019-09-01",137
+26,"Sonora","2019-10-01",135
+26,"Sonora","2019-11-01",148
+26,"Sonora","2019-12-01",144
+26,"Sonora","2020-01-01",136
+26,"Sonora","2020-02-01",129
+26,"Sonora","2020-03-01",119
+26,"Sonora","2020-04-01",122
+26,"Sonora","2020-05-01",152
+26,"Sonora","2020-06-01",134
+27,"Tabasco","2018-12-01",90
+27,"Tabasco","2019-01-01",68
+27,"Tabasco","2019-02-01",82
+27,"Tabasco","2019-03-01",103
+27,"Tabasco","2019-04-01",107
+27,"Tabasco","2019-05-01",97
+27,"Tabasco","2019-06-01",86
+27,"Tabasco","2019-07-01",66
+27,"Tabasco","2019-08-01",59
+27,"Tabasco","2019-09-01",78
+27,"Tabasco","2019-10-01",94
+27,"Tabasco","2019-11-01",89
+27,"Tabasco","2019-12-01",67
+27,"Tabasco","2020-01-01",75
+27,"Tabasco","2020-02-01",74
+27,"Tabasco","2020-03-01",89
+27,"Tabasco","2020-04-01",41
+27,"Tabasco","2020-05-01",42
+27,"Tabasco","2020-06-01",66
+28,"Tamaulipas","2018-12-01",140
+28,"Tamaulipas","2019-01-01",118
+28,"Tamaulipas","2019-02-01",111
+28,"Tamaulipas","2019-03-01",119
+28,"Tamaulipas","2019-04-01",121
+28,"Tamaulipas","2019-05-01",130
+28,"Tamaulipas","2019-06-01",121
+28,"Tamaulipas","2019-07-01",136
+28,"Tamaulipas","2019-08-01",119
+28,"Tamaulipas","2019-09-01",133
+28,"Tamaulipas","2019-10-01",129
+28,"Tamaulipas","2019-11-01",104
+28,"Tamaulipas","2019-12-01",107
+28,"Tamaulipas","2020-01-01",100
+28,"Tamaulipas","2020-02-01",132
+28,"Tamaulipas","2020-03-01",104
+28,"Tamaulipas","2020-04-01",107
+28,"Tamaulipas","2020-05-01",99
+28,"Tamaulipas","2020-06-01",95
+29,"Tlaxcala","2018-12-01",14
+29,"Tlaxcala","2019-01-01",16
+29,"Tlaxcala","2019-02-01",10
+29,"Tlaxcala","2019-03-01",15
+29,"Tlaxcala","2019-04-01",23
+29,"Tlaxcala","2019-05-01",22
+29,"Tlaxcala","2019-06-01",24
+29,"Tlaxcala","2019-07-01",8
+29,"Tlaxcala","2019-08-01",13
+29,"Tlaxcala","2019-09-01",20
+29,"Tlaxcala","2019-10-01",14
+29,"Tlaxcala","2019-11-01",13
+29,"Tlaxcala","2019-12-01",15
+29,"Tlaxcala","2020-01-01",19
+29,"Tlaxcala","2020-02-01",17
+29,"Tlaxcala","2020-03-01",16
+29,"Tlaxcala","2020-04-01",8
+29,"Tlaxcala","2020-05-01",8
+29,"Tlaxcala","2020-06-01",9
+30,"Veracruz de Ignacio de la Llave","2018-12-01",198
+30,"Veracruz de Ignacio de la Llave","2019-01-01",192
+30,"Veracruz de Ignacio de la Llave","2019-02-01",186
+30,"Veracruz de Ignacio de la Llave","2019-03-01",216
+30,"Veracruz de Ignacio de la Llave","2019-04-01",199
+30,"Veracruz de Ignacio de la Llave","2019-05-01",214
+30,"Veracruz de Ignacio de la Llave","2019-06-01",227
+30,"Veracruz de Ignacio de la Llave","2019-07-01",220
+30,"Veracruz de Ignacio de la Llave","2019-08-01",217
+30,"Veracruz de Ignacio de la Llave","2019-09-01",193
+30,"Veracruz de Ignacio de la Llave","2019-10-01",182
+30,"Veracruz de Ignacio de la Llave","2019-11-01",155
+30,"Veracruz de Ignacio de la Llave","2019-12-01",192
+30,"Veracruz de Ignacio de la Llave","2020-01-01",170
+30,"Veracruz de Ignacio de la Llave","2020-02-01",162
+30,"Veracruz de Ignacio de la Llave","2020-03-01",206
+30,"Veracruz de Ignacio de la Llave","2020-04-01",183
+30,"Veracruz de Ignacio de la Llave","2020-05-01",147
+30,"Veracruz de Ignacio de la Llave","2020-06-01",208
+31,"Yucatán","2018-12-01",5
+31,"Yucatán","2019-01-01",8
+31,"Yucatán","2019-02-01",7
+31,"Yucatán","2019-03-01",8
+31,"Yucatán","2019-04-01",9
+31,"Yucatán","2019-05-01",8
+31,"Yucatán","2019-06-01",15
+31,"Yucatán","2019-07-01",9
+31,"Yucatán","2019-08-01",7
+31,"Yucatán","2019-09-01",16
+31,"Yucatán","2019-10-01",13
+31,"Yucatán","2019-11-01",17
+31,"Yucatán","2019-12-01",16
+31,"Yucatán","2020-01-01",10
+31,"Yucatán","2020-02-01",19
+31,"Yucatán","2020-03-01",20
+31,"Yucatán","2020-04-01",7
+31,"Yucatán","2020-05-01",4
+31,"Yucatán","2020-06-01",17
+32,"Zacatecas","2018-12-01",62
+32,"Zacatecas","2019-01-01",52
+32,"Zacatecas","2019-02-01",47
+32,"Zacatecas","2019-03-01",60
+32,"Zacatecas","2019-04-01",50
+32,"Zacatecas","2019-05-01",62
+32,"Zacatecas","2019-06-01",55
+32,"Zacatecas","2019-07-01",57
+32,"Zacatecas","2019-08-01",48
+32,"Zacatecas","2019-09-01",53
+32,"Zacatecas","2019-10-01",57
+32,"Zacatecas","2019-11-01",62
+32,"Zacatecas","2019-12-01",63
+32,"Zacatecas","2020-01-01",47
+32,"Zacatecas","2020-02-01",62
+32,"Zacatecas","2020-03-01",69
+32,"Zacatecas","2020-04-01",65
+32,"Zacatecas","2020-05-01",76
+32,"Zacatecas","2020-06-01",87
