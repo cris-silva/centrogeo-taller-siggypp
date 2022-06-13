@@ -1,5 +1,5 @@
 ---
-title: "4. Web scraping y automatización"
+title: "4. Web scraping y automatización de páginas web"
 author: "Ana J. Alegre (jalegre@centrogeo.edu.mx), Cristian Silva (csilva@centrogeo.edu.mx)"
 ---
 
