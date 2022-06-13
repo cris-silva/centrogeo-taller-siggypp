@@ -663,4 +663,5 @@ puntos_venta_liconsa_geo %>%
 * Engel, C. (2019). *Using Spatial Data with R.* cengel.github.io. Recuperado el 8 de septiembre, 2021, desde [https://cengel.github.io/R-spatial/](https://cengel.github.io/R-spatial).
 * Wickham H. (2022). *rvest*. Recuperado el 11 de junio, 2022 desde [https://rvest.tidyverse.org/index.html](https://rvest.tidyverse.org/index.html).
 * *RSelenium*.  Recuperado el 11 de junio, 2022 desde [https://docs.ropensci.org/RSelenium/index.html](https://docs.ropensci.org/RSelenium/index.html).
+* *Web Scraping Reference: Cheat Sheet for Web Scraping using R*. Recuperado el 11 de junio, 2022 desde  [https://github.com/yusuzech/r-web-scraping-cheat-sheet](https://github.com/yusuzech/r-web-scraping-cheat-sheet)
 * *hereR*. Recuperado el 11 de junio, 2022 desde [https://munterfi.github.io/hereR/index.html](https://munterfi.github.io/hereR/index.html).
