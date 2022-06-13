@@ -1,0 +1,666 @@
+---
+title: "4. Web scraping y automatización"
+author: "Ana J. Alegre (jalegre@centrogeo.edu.mx), Cristian Silva (csilva@centrogeo.edu.mx)"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introducción
+
+Existen técnicas que nos permiten automatizar los procesos que se requieren para extraer y procesar información que proviene de diferentes fuentes de información, y una de las principales fuentes donde podemos acceder a diferentes tipos de información es Internet. Aunque algunas veces los datos que necesitamos están publicados en páginas web de acceso abierto, regularmente el formato en que las consultamos no es el más apropiado o sencillo de manejar.
+
+En esta sesión se utilizarán dos técnicas que sirven para automatizar la extracción y la geocodificación de datos provenientes de Internet, la primera el raspado web (*web scraping*) que permite extraer contenidos de una página web y automatizar el uso del explorador web para controlar y cambiar los parámetros que usan las páginas dinámicas de consulta.
+
+## Objetivo
+
+Durante el transcurso de esta sesión, realizarás un ejercicio sencillo para extraer una tabla de datos económicos de una página de Wikipedia usando el paquete `rvest`, usarás *Selenium* para controlar el explorador *Firefox* y hacer una búsqueda en una página usando las funcionesdel paquete *RSelenium*, y convertirás una lista de direcciones en una capa geográfica usando el servicio web de *Here*.
+
+Finalmente, aplicarás todos las técnicas anteriores para automatizar la extracción de datos de la página de consulta de puntos de venta de Liconsa y obtener una capa geográfica con sus ubicaciones, utilizando únicamente programación en *R*.
+
+
+## Preparación del entorno
+
+**Importante:** Para trabajar con este cuaderno, será necesario que tengas instalado el explorador *Firefox* que se puede instalar desde su [página oficial](https://www.mozilla.org). También se requerirá crear una cuenta de desarrollador del servicio de `Here` en la página [https://developer.here.com](https://developer.here.com) y crear una llave de *API REST* para un nuevo proyecto.
+
+Elimina todos los objetos del entorno usando la función `rm`:
+```{r Limpiar entorno}
+rm(list = ls())
+```
+
+Para esta sesión nos aseguraremos de tener instalados y actualizados todos los paquetes necesarios (descomenta la siguiente instrucción para instalar o actualizar los paquetes necesarios en caso de no tenerlos):
+```{r Instalar paquetes requeridos (opcional)}
+# install.packages(c("tidyverse",
+#                    "janitor",
+#                    "rvest",
+#                    "RSelenium",
+#                    "tmap",
+#                    "hereR"))
+```
+
+Carga el paquete `tidyverse` que será usado en esta sesión (recuerda que `tidyverse` incluye los paquetes `dplyr` y `tidyr` para manipulación de datos y `ggplot2` para visualización):
+```{r Carga de paquetes}
+library(tidyverse)
+library(janitor)
+library(rvest)
+library(RSelenium)
+library(hereR)
+library(tmap)
+```
+
+## Raspado web (*Web scraping*)
+
+El *raspado web* es una técnica utilizada frecuentemente en el análisis de datos que permite extraer diferentes elementos que componen una página web, por ejemplo textos, imágenes y principalmente tablas de datos. Esta herramienta aprovecha la estructura en que están construidas las páginas web usando el lenguaje de marcado *HTML* para identificar sus elementos por separado y extraerlos de manera sencilla.
+
+Extrae la tabla de indicadores económicos básicos de México (PIB anual) que está publicada en la *Wikipedia* en la página [https://es.wikipedia.org/wiki/Econom%C3%ADa_de_México](https://es.wikipedia.org/wiki/Econom%C3%ADa_de_México).
+
+Lee la página de *Wikipedia* donde se encuentran los datos que se necesitan usando la función `read_html` del paquete `rvest`:
+
+```{r Leer página de Wikipedia}
+html <- read_html("https://es.wikipedia.org/wiki/Econom%C3%ADa_de_México")
+
+# Visualiza el contenido:
+html
+```
+
+A partir de la página leída, identifica los títulos de nivel 2 que contiene usando la función `html_elements` para buscar los elementos *HTML* con etiqueta `h2`, guárdala en una nueva variable llamada `titulos` y visualiza los resultados:
+
+```{r Identificar títulos en la página}
+titulos <-
+  html %>% 
+  html_elements("h2")
+
+titulos
+```
+
+Puedes observar que la función `html_elements` regresa una lista con todos los elementos de títulos de nivel 2 de la página. Es posible ver únicamente los títulos sin las etiquetas *HTML* que los acompañan agregando la función `html_text` para extraer el texto correspondiente:
+
+```{r Extrar títulos de la página}
+titulos <-
+  html %>% 
+  html_elements("h2") %>% 
+  html_text() # Extraer el texto de los títulos
+
+titulos
+```
+
+Otros elementos que se pueden extraer de la página son los que están etiquetados como párrafos (`p`). Realiza la siguiente manipulación de datos para obtener los textos de los párrafos de la página y guárdalos en una nueva variable llamada `parrafos`:
+
+1. Toma como base la página extraída en `html`.
+2. Usa la función `html_elements` para extraer los párrafos etiquetados en *HTML* como `p`.
+3. Extrae el texto de los elementos de párrafo usando la función `html_text`.
+
+Finalmente visualiza la lista de párrafos extraídos de la página: 
+
+```{r Extraer párrafos de la página}
+parrafos <- 
+  html %>% 
+  html_elements("p") %>% 
+  html_text()
+
+parrafos
+```
+
+Uno de los elementos más útiles que se pueden extraer de la página son los que están etiquetados como tablas (`table`). Realiza la siguiente manipulación de datos para obtener las tablas de la página y guárdalos en una nueva variable llamada `tablas`:
+
+1. Toma como base la página extraída en `html`.
+2. Usa la función `html_elements` para extraer los párrafos etiquetados en *HTML* como `table`.
+3. Extrae las tablas como *tibble* usando la función `html_table`.
+
+Finalmente visualiza la lista de tablas extraídas de la página: 
+
+```{r Extraer tablas de la página}
+tablas <-
+  html %>% 
+  html_elements("table") %>% 
+  html_table() # Extrae como tibble
+
+tablas
+```
+
+La tabla que contiene la información sobre el PIB es la quinta. Selecciona la tabla correspondiente de la lista de `tablas` y guárdala en una nueva variable llamada `pib_mexico`:
+
+1. Toma como base el quinto elemento de la lista `tablas`.
+2. Visualiza la estructura de la tabla usando la función `glimpse`.
+
+```{r Extraer tabla de PIB}
+pib_mexico <-
+  tablas[[5]] %>% # Usamos la quinta tabla de la página
+  glimpse()
+```
+
+La tabla obtenida tiene nombres de variables que no son convenientes por que tienen mayúsculas y espacios, además las variables tienen tipo de datos de texto. Antes de poder usar estos datos en un análisis es necesario hacer un proceso de limpieza, realiza la siguiente manipulación de datos y asigna el resultado a la variable `pib_mexico`:
+
+1. Toma como base la quinta tabla de `tablas`.
+2. Limpia los nombres de las variables usando la función `clean_names`.
+3. Convierte el tipo de datos de las variables 2 a 7 a numérico aplicandoles la función `parse_numeric` y usando la función `mutate_at`.
+4. Divide entre 100 el valor de las variables 4 a 7 aplicándoles la función `function(x) x/100` y usando la función `mutate_at`.
+5. Visualiza la estructura de la tabla resultante usando la función `glimpse`.
+
+```{r Extraer y limpiar la tabla de PIB}
+pib_mexico <-
+  tablas[[5]] %>% # Usamos la quinta tabla de la página
+  clean_names() %>% # Limpia los nombres de las variables
+  mutate_at(2:7, parse_number) %>% # Convierte las variables 2 a 7 en número
+  mutate_at(4:7, function(x) x/100) %>% # Divide la variables 4 a 7 entre 100
+  glimpse()
+```
+
+Guarda el resultado de `pib_mexico` en un archivo llamado `pib_mexico.csv` en la carpeta `Datos` usando la función `write_excel_csv` para asegurarnos de que se pueda leer correctamente en *Excel*.
+
+```{r Guardar archivo con datos del PIB}
+pib_mexico %>% 
+  write_excel_csv("Datos/pib_mexico.csv")
+```
+
+
+## Automatización de páginas
+
+Muchas fuentes de información en Internet están publicadas en páginas web dinámicas, que requieren interactuar con ellas para hacer consultas de información que nos permitan ver los datos que necesitamos. Para estos casos, es posible controlar un explorador web como *Firefox* o *Chrome*  mediante instrucciones de R. Para lograrlo, usaremos un servidor de *Selenium* que permite controlar de manera remota el explorador mediante el paquete `RSelenium`.
+
+En este ejercicio, obtendrás las coordenadas de la dirección de la sede de CentroGeo en la CDMX usando la página web [LatLong.net](https://www.latlong.net).
+
+El primer paso para empezar a controlar *Firefox* desde R es iniciar el servidor de *Selenium*. Para ello, usa la función `rsDriver` y especifica el parámetro `browser = "firefox"` y guarda la *instancia del servidor* en la variable `servidor_selenium`:
+
+```{r Iniciar servidor de Selenium}
+servidor_selenium <- rsDriver(browser = "firefox")
+# wdman::selenium() # Otra manera de iniciar Selenium
+```
+
+A continuación, es necesario conectar el controlador de *R* al servidor de *Selenium* que acabas de iniciar. Para ello, usa la función `remoteDriver` con el parámetro `port = 4567` para conectarse al puerto por defecto en que se inició el servidor de *Selenium*. 
+
+```{r Iniciar controlador de Selenium}
+controlador <- remoteDriver(port = 4567)
+```
+
+A partir de este momento, ya es posible empezar a usar las funciones de *RSelenium* para controlar el explorador web. Abre una ventana nueva de *Firefox*, usando el método `open` de `controlador`:
+
+```{r Abrir ventana de Firefox}
+controlador$open()
+```
+
+Abre la dirección de la página web del servicio de LatLong.net ([https://www.latlong.net](https://www.latlong.net)) usando el método `navigate` del `controlador`:
+
+```{r Abrir dirección de latlong.net}
+controlador$navigate("https://www.latlong.net")
+```
+
+Para hacer la consulta de las coordenadas, es necesario que identifiquemos los elementos de la página con los que tenemos que interactuar para hacer la consulta. Usa el *inspector web* del explorador para identificar los siguientes elementos de la página web:
+
+| Elemento | xpath | css |
+| -------- | -------- | ------- |
+| Caja de texto "Place Name" | //*[@id="place"] | input#place |
+| Botón de búsqueda "Find" | //*[@id="btnfind"] | button#btnfind.button |
+
+Identifica el elemento de la caja de texto *"Place Name"* usando el método `findElement` con los parámetros `using = "xpath"` y `value = '//*[@id="place"]'` y guarda el control en la variable `caja_lugar`:
+
+```{r Identificar caja de texto de lugar}
+caja_lugar <- controlador$findElement(using = "xpath",
+                                      value = '//*[@id="place"]')
+```
+
+Ordena a *Firefox* que envie la dirección de la sede de CDMX de CentroGeo (`"Chemax 137 Tlalpan Ciudad de México"`) como lista a través del método `sendKeysToElement` del control `caja_lugar`:
+
+```{r Escribir en la caja de texto de lugar}
+caja_lugar$sendKeysToElement(list("Chemax 137 Tlalpan Ciudad de México"))
+```
+
+Identifica el elemento del botón *"Find"* usando el método `findElement` con los parámetros `using = "css selector"` y `value = "button#btnfind.button"` y guarda el control en la variable `boton_busqueda`:
+
+```{r Identificar el botón de búsqueda de lugar}
+boton_busqueda <- controlador$findElement(using = "css selector",
+                                          value = "button#btnfind.button")
+```
+
+Ordena a *Firefox* que presione el botón *Find* a través del método `clickElement` del elemento `boton_busqueda`:
+
+```{r Presionar botón de búsqueda de lugar}
+boton_busqueda$clickElement()
+```
+
+Obtén el código fuente de la página generada dinámicamente usando el método `getPageSource` del `controlador` y guárdalo en el archivo `latlong_net.html` en la carpeta `Datos` usando la función `write_file`:
+
+```{r Guardar código fuente de Latlong.net}
+codigo_fuente_pagina <- controlador$getPageSource()
+
+codigo_fuente_pagina[[1]] %>% 
+  write_file("Datos/latlong_net.html")
+```
+
+Ordena a *Firefox* que abra la página de CentroGeo ([https://www.centrogeo.org.mx](https://www.centrogeo.org.mx)) usando el método `navigate` de `controlador`:
+
+```{r Abrir página web de CentroGeo}
+controlador$navigate("https://www.centrogeo.org.mx")
+```
+
+Ordena a *Firefox* que regrese a la página anterior (*Atrás*), usando el método `goBack` del `controlador`:
+
+```{r Ir a la página anterior}
+controlador$goBack()
+```
+
+Ordena a *Firefox* que vaya la página siguiente (*Adelante*), usando el método `goForward` del `controlador`:
+
+```{r Ir a la página siguiente}
+controlador$goForward()
+```
+
+Cierra todas las ventanas abiertas de *Firefox* y el servidor de *Selenium*, usando los métodos `closeAll` y `closeServer` del `controlador`:
+
+```{r Cerrar ventanas de Firefox}
+controlador$closeall()
+controlador$closeServer()
+```
+
+
+## Geocodificación
+
+La geocodificación es el proceso que nos permite obtener la ubicación geográfica a partir de direcciones y referencias en texto. Para realizar este proceso es posible usar servicios web ofrecidos por *Google*, *OpenStreetMaps*, *Bing* o *Here* (el cual utilizaremos en esta sesión).
+
+Para este ejercicio usaremos el servicio web de geocodificación de *Here* para obtener una capa geográfica a partir de las direcciones de las cuatro sedes de CentroGeo en el país.
+
+Para utilizar los servicios de geocodificación de *Here* es necesario que establezcas la llave de la *REST API* que obtuviste en la página de desarrolladores de *Here* en [https://developer.here.com](https://developer.here.com). Usa la función `set_key` para establecer tu llave:
+
+```{r Establecer llave REST API de Here}
+set_key("(Escribe tu clave de API de Here)")
+```
+
+Lee el archivo `sedes_centrogeo.txt` en la carpeta `Datos`, usando la función `read_lines` y visualiza su contenido:
+
+```{r Leer archivo de sedes de CentroGeo}
+sedes_centrogeo <-
+  read_lines("Datos/sedes_centrogeo.txt")
+
+sedes_centrogeo # Visualiza el contenido del archivo
+```
+
+Envía la lista de direcciones al servicio de geocodificación de *Here* para obtener una capa geográfica con las ubicaciones, realizando la siguiente manipulación de datos y guardando el resultado en la variable `sedes_centrogeo_geocodificadas`:
+
+1. Toma como base los datos de `sedes_centrogeo`.
+2. Envia los datos para geocodificar al servicio de *Here* usando la función `geocode`.
+3. Visualiza la estructura resultante usando la función `glimpse`.
+
+```{r Geocodificación de sedes de CentroGeo}
+sedes_centrogeo_geocodificadas <-
+  sedes_centrogeo %>% 
+  geocode() %>% 
+  glimpse()
+```
+
+Visualiza en un mapa los resultados de la geocodificación, estableciendo el modo de visualización interactiva `"view"` de la función `tmap_mode` y usa la función `qtm` para construir el mapa:
+
+```{r Mapa de sedes geocodificadas}
+# Cambiar modo de visualización a interactivo:
+tmap_mode("view")
+
+# Visualizar en un mapa rápido:
+sedes_centrogeo_geocodificadas %>% 
+  qtm()
+```
+
+## Caso práctico. Análisis de puntos de venta de Leche Liconsa (Parte I)
+
+En esta sesión, prepararás los datos principales que se requieren para hacer una evaluación de la localización de puntos de venta de leche Liconsa en el país. Para ello es necesario obtener una capa geográfica con las ubicaciones de estos puntos de venta, antes de poder compararlos o empezar a hacer análisis más específicos. Como no se cuenta con descarga directa de estos datos, será necesario extraer los datos de la página y geocodificarlos.
+
+### Raspado web de datos oficiales
+
+El Gobierno de México publica los puntos de venta de leche en la página dinámica de *Puntos de venta de Liconsa* ubicada en [http://www.liconsa.gob.mx/padron/puntosdeventa.php](http://www.liconsa.gob.mx/padron/puntosdeventa.php). 
+
+Aunque los datos publicados incluyen la calle, colonia, código postal, municipio y estado de la República donde se encuentran los puntos de venta, se trata de una página dinámica que no permite la descarga directa de datos, y que además requiere la interacción directa para consultar por estado y municipio. Por esta razón, para poder extraer los datos de la página será necesario usar una técnica de *raspado web (web scraping)* combinada con automatización de páginas web.
+
+### Exploración de los componentes de la página
+
+Sigue los siguientes pasos para identificar los componentes de la página web de consulta de puntos de venta de Liconsa:
+
+1. Abre con el explorador web que usas regularmente (puede ser cualquiera) la dirección web de la página de consulta [http://invprov.liconsa.gob.mx:8080/ConsultaWEB/](http://invprov.liconsa.gob.mx:8080/ConsultaWEB/).
+
+2. Busca el *inspector web* de tu explorador web y ábrelo.
+
+3. Usa el *inspector web* para identificar las etiquetas que identifican al *selector de Estado*, al *selector de Municipio* y al *botón "Consultar"*. Estas son las etiquetas que debes encontrar:
+
+| Componente            | Etiqueta          |
+| --------------------- | ----------------- |
+| Selector de Estado    | select#seledo     |
+| Selector de Municipio | select#selmun     |
+| Botón Consultar       | input#btnConsulta |
+| Tabla de resultados   | table#GridArea    |
+
+Estas etiquetas servirán más adelante para controlar la página y cambiar los datos de la tabla que se descargarán.
+
+### Automatización de la página
+
+Inicia el servidor de *Selenium* usando la función `rsDriver` con el parámetro `browser = "firefox"` y asígnalo a una nueva variable llamada `servidor_selenium`:
+
+```{r Iniciar el servidor de Selenium}
+servidor_selenium <- rsDriver(browser = "firefox")
+```
+
+Conecta a *R* con *Firefox* a través de *Selenium* creando un controlador usando la función `remoteDriver` con el parámetro `port = 4567` y asignándolo a la nueva variable `controlador`:
+
+```{r Conectar el controlador a Selenium}
+controlador <- remoteDriver(port = 4567)
+```
+
+Abre una nueva ventana de *Firefox* usando el método `open` del `controlador`:
+
+```{r Abrir Firefox}
+controlador$open()
+```
+
+Ordena a *Firefox* que abra la página de consulta de puntos de venta de Liconsa, usando el método `open` de `controlador` para abrir la dirección `http://invprov.liconsa.gob.mx:8080/ConsultaWEB/`:
+
+```{r Abrir la dirección web de puntos de venta}
+controlador$navigate("http://invprov.liconsa.gob.mx:8080/ConsultaWEB/")
+```
+
+Usando como referencia la tabla de nombres de componentes que se obtuvo anteriormente usando el inspector web del explorador, ordena a *Firefox* que identifique los siguientes elementos de la página web y que los asigne a la variable correspondiente (para las menús desplegables agrega la etiqueta `option` después del nombre del elemento para que incluya todas las opciones de la lista de opciones):
+
+1. **Selector de estado**, identificado con el código *CSS* `#seledo option`.
+2. **Selector de municipio**, identificado con el código *CSS* `#selmun option`.
+3. **Botón de consulta**, identificado con el código *CSS* `input#btnConsulta`.
+
+Usa el método `findElements` para las opciones múltiples de los selectores de estado y municipios y `findElement` para el botón de consulta y la tabla de resultados:
+
+```{r Asignar componentes para controlar}
+# Selector de estado:
+selector_estado <- controlador$findElements(using = "css", value = "select#seledo option")
+
+# Botón de consulta:
+boton_consulta <- controlador$findElement(using = "css", value = "input#btnConsulta")
+```
+
+Ordena a Firefox que dé clic en el segundo elemento de la lista de `selector_estado` usando el método `clickElement`:
+
+```{r Dar clic en el selector de estado}
+selector_estado[[2]]$clickElement()
+```
+
+Recupera la opción de estado que se seleccionó usando el método `getElementText` de `selector_estado` (como el resultado es una lista, es necesario extraer el primer elemento):
+
+```{r Obtener el estado del selector de estado}
+selector_estado[[2]]$getElementText()[[1]]
+```
+
+Identifica cuántas opciones tiene la lista del selector de estado usando la función `length` y guarda el valor en la variable `opciones_estado`:
+
+```{r Número de elementos en el selector de estado}
+opciones_estado <- length(selector_estado)
+
+opciones_estado
+```
+
+Asigna el elemento del selector de municipio a la variable `selector_municipio` usando el método `findElements` con los parámetros `using = "css"` y `value = "select#selmun option"`:
+
+```{r Asignar componentes para controlar el selector de municipio}
+# Selector de municipio:
+selector_municipio <- controlador$findElements(using = "css", value = "select#selmun option")
+```
+
+Ordena a Firefox que dé clic en el tercer elemento de la lista de `selector_municipio` usando el método `clickElement`:
+
+```{r Dar clic en el selector de municipio}
+selector_municipio[[3]]$clickElement()
+```
+
+Recupera la opción de municipio que se seleccionó usando el método `getElementText` de `selector_municipio` (como el resultado es una lista, es necesario extraer el primer elemento):
+
+```{r Obtener el municipio del selector de municipio}
+selector_municipio[[3]]$getElementText()[[1]]
+```
+
+Ordena a Firefox que dé clic en el botón de consulta `boton_consulta` usando el método `clickElement`:
+
+```{r Dar clic en el botón de consulta}
+boton_consulta$clickElement()
+```
+
+La página web devuelve los resultados para el estado y municipio seleccionados. Guarda el código fuente de la página generada con la consulta en la variable `codigo_html` usando el método `getPageSource` del `controlador`: 
+
+```{r Obtener código fuente de la página de puntos de venta}
+codigo_html <- controlador$getPageSource()
+```
+
+Como `codigo_html` es una lista de un elemento, para visualizar el código fuente de la página debes seleccionar el primer elemento:
+
+```{r Ver código fuente de la página}
+codigo_html[[1]]
+```
+
+Ahora usa el paquete `rvest` para extraer la tabla del código fuente de la página, guarda en una nueva variable llamada `puntos_venta_liconsa` el resultado de la siguiente manipulación de datos:
+
+1. Lee como *HTML* el código fuente de la página extraída por el `controlador`, usando la función `read_html` en el primer elemento de la lista `codigo_html`.
+2. Extrae el componente `table#GridArea` de la página completa usando la función `html_element`.
+3. Convierte la tabla *HTML* extraída en un *tibble* usando la función `html_table`.
+
+Finalmente, visualiza los datos extraídos.
+
+```{r Extraer la tabla de datos del código HTML}
+tabla_datos <-
+  read_html(codigo_html[[1]]) %>% 
+  html_element("table#GridArea") %>% 
+  html_table()
+
+# Visualizar los datos extraídos
+tabla_datos
+```
+
+Para obtener todos los datos de la página será necesario repetir los pasos anteriores para cada opción posible de Estado y Municipio, para lo cual será necesario construir una función con la que podamos ejecutar las instrucciones anteriores todas las veces que sea necesario.
+
+```{r Función para extraer la tabla de un estado}
+# Borrar las variables que se usaron anteriormente para evitar confusión con las de la función:
+rm(list = c("selector_estado", 
+            "selector_municipio", 
+            "boton_consulta", 
+            "tabla_datos"))
+
+extrae_tabla <- function(opcion_estado, controlador_remoto, tiempo_espera = 2) {
+  
+  # Especificar los paquetes que requiere la función (por si se ocupa en otro script):
+  require(tidyverse)
+  require(rvest)
+  require(RSelenium)
+  
+  # Buscar y asignar a variables los componentes de la página que se van a controlar:
+  selector_estado <- controlador_remoto$findElements(using = "css", value = "select#seledo option")
+  boton_consulta <- controlador_remoto$findElement(using = "css", value = "input#btnConsulta")
+  
+  # Obtener el nombre del estado seleccionado:
+  estado_seleccionado <- selector_estado[[opcion_estado]]$getElementText()[[1]]
+  
+  # Dar clic en el estado deseado y hacer un pausa para esperar la respuesta de la página:
+  selector_estado[[opcion_estado]]$clickElement()
+  Sys.sleep(tiempo_espera) # Tiempo de espera deseado en segundos
+  
+  selector_municipio <- controlador_remoto$findElements(using = "css", value = "select#selmun option")
+  
+  # Obtener el número de opciones que hay en la lista desplegable de municipios:
+  opciones_municipio <- length(selector_municipio)
+  
+  # Eliminar la variable tabla_datos del entorno si existe antes de empezar a acumular los resultados:
+  if(exists("tabla_datos")) rm("tabla_datos")
+  
+  # Seleccionar cada una de las opciones del selector de municipios, extraer y acumular los datos:
+  for(opcion_municipio in 2:opciones_municipio) { # Comienza en 2 por que el primer elemento del selector es "Seleccione..."
+    
+    selector_municipio[[opcion_municipio]]$clickElement() # Dar clic en el municipio
+    municipio_seleccionado <- selector_municipio[[opcion_municipio]]$getElementText()[[1]] # Obtener el nombre del municipio seleccionado
+    boton_consulta$clickElement() # Dar clic en el botón "Consultar"
+    Sys.sleep(tiempo_espera) # Esperar la respuesta de la página
+    
+    # Intentar cerrar la ventana de alerta que avisa cuando no hay registros (si aparece), para evitar que el proceso se detenga:
+    try(controlador_remoto$acceptAlert(), silent = TRUE) 
+    
+    # Guardar el código fuente de la página que regresó la consulta:
+    codigo_html <- controlador$getPageSource()[[1]]
+    
+    # Extraer los datos y guardarlos en una tabla:
+    tabla_datos_extraida <-
+      codigo_html %>% 
+      read_html() %>% 
+      html_element("table#GridArea") %>% 
+      html_table() %>% 
+      mutate(estado = estado_seleccionado, # Agregar el estado seleccionado
+             municipio = municipio_seleccionado) # Agregar el municipio seleccionado
+    
+    # Acumular los resultados de cada municipio del estado seleccionado en tabla_datos:
+    if(exists("tabla_datos")) {
+      tabla_datos <- tabla_datos %>% bind_rows(tabla_datos_extraida) # Unir los datos extraídos a la tabla acumulada
+    } else {
+      tabla_datos <- tabla_datos_extraida # Para el primer municipio (cuando tabla_datos no existe aún)
+    }
+    
+  }
+  
+# Hacer que la función regrese la tabla acumulada como resultado: 
+return(tabla_datos)
+
+}
+```
+
+Aplica la función a cada uno de los estados aplicando el siguiente procedimiento:
+
+1. Elimina la variable `datos_extraidos` si existe para que inicializarla.
+2. Repite las siguientes instrucciones usando la estructura `for` para cada uno de los valores de `estado` de 2 hasta `opciones_estado` (se omite el primer elemento que corresponde al texto "Seleccione..." de la lista desplegable).
+3. Usa la función `extrae_tabla` con los parámetros `opcion_estado = estado`, `controlador_remoto = controlador` y `tiempo_espera = 2` para extraer los datos de la tabla generada en la página y asignala a la variable `datos_extraidos`.
+4. Acumula la tabla de `datos_extraidos` en la variable `puntos_venta_liconsa`
+
+Finalmente, visualiza la tabla completa de `puntos_venta_liconsa`.
+
+```{r Ejecutar la extracción para todos los estados}
+# Borrar datos_extraidos si existe para inicializar el proceso:
+if(exists("datos_extraidos")) rm("datos_extraidos")
+
+# Extraer las tablas para cada estado y acumularlas en una tabla (puedes cambiar la secuencia de estados para hacer pruebas de algunos estados únicamente):
+for(estado in 2:opciones_estado) {
+  
+  # Extraer la tabla para el estado:
+  datos_extraidos <- extrae_tabla(opcion_estado = estado,
+                                  controlador_remoto = controlador,
+                                  tiempo_espera = 2)
+  
+  
+  # Acumular los datos extraidos en una tabla:
+  if(exists("puntos_venta_liconsa")) {
+    puntos_venta_liconsa <- puntos_venta_liconsa %>% bind_rows(datos_extraidos)
+  } else {
+    puntos_venta_liconsa <- datos_extraidos
+  }
+  
+}
+
+# Visualizar la tabla acumulada:
+puntos_venta_liconsa
+```
+
+Realiza un proceso de limpieza a los datos extraidos, aplicando la siguiente manipulación de datos:
+
+1. Toma como base la tabla original `puntos_venta_liconsa`.
+2. Limpia los nombres de las variables usando la función `clean_names`.
+3. Renombra las variables `x1` como `colonia`, `x2` como `calle` y `x3` como `cp` usando la función `rename`.
+4. Agrega una variable de identificación usando la función `rowid_to_column`.
+5. Visualiza la estructura de la tabla transformada con la función `glimpse`.
+
+```{r Limpieza de la tabla de puntos de venta}
+puntos_venta_liconsa <-
+  puntos_venta_liconsa %>% 
+  clean_names() %>% 
+  rename(colonia = x1,
+         calle = x2,
+         cp = x3) %>% 
+  rowid_to_column() %>% 
+  glimpse()
+```
+
+Guarda la tabla resultante `puntos_venta_liconsa` en un archivo llamado `puntos_venta_liconsa.csv` en la carpeta `Datos` usando la función `write_excel_csv`:
+
+```{r Guardar archivo de puntos de venta extraídos}
+# Guardar los resultados en un archivo CSV:
+puntos_venta_liconsa %>% 
+  write_excel_csv("Datos/puntos_venta_liconsa.csv")
+```
+
+Cierra las ventanas de *Firefox* y el servidor de *Selenium*:
+
+```{r Cerrar Firefox y Selenium de puntos de venta}
+# Cerrar la ventana de Firefox y el servidor de Selenium:
+controlador$closeall()
+controlador$closeServer()
+```
+
+Una gran ventaja de este proceso de *web scraping* es que si los datos de la página se actualizan o cambian, sólo será necesario volver a correr este proceso para tener los datos actuales.
+
+### Geocodificación inversa de los datos
+
+Para continuar con el procesamiento de datos, ahora que contamos con un directorio de todos los puntos de venta de leche Liconsa será necesario georreferenciarlos.
+
+Usa el servicio de *Here* para realizar la geocodificación de las direcciones de puntos de venta de leche que extrajiste de la página oficial. Anteriormente ya estableciste tu llave de la *REST API* de *Here* usando la función `set_key`.
+
+Crea una nueva tabla de direcciones que contenga sólo los campos de identificador y de dirección, aplicando la siguiente manipulación de datos para guardar el resultado en una nueva variable llamada `direcciones`:
+
+1. Toma como base los datos de la tabla `puntos_venta_liconsa`.
+2. Usa la función `transmutep` para construir la tabla incluyendo sólamente las variables `rowid` y una nueva variable llamada `direccion` construida concatenando las variables `calle`, `colonia`, `cp`, `municipio`, `estado` e incluye el texto `"MEXICO"` al final, usando la función `str_c`.
+3. Visualiza la estructura de la tabla transformada usando la función `glimpse`.
+
+```{r Transformar tabla de direcciones de puntos de venta}
+direcciones <-
+  puntos_venta_liconsa %>% 
+  transmute(rowid,
+            direccion = str_c(calle, colonia, cp, municipio, estado, "MEXICO", sep = ", ")) %>% 
+  glimpse()
+```
+
+Geocodifica las direcciones para obtener la capa geográfica con las ubicaciones de los puntos de venta de leche, aplicando la siguiente transformación de datos y guardando el resultado en una nueva variable llamada `puntos_venta_liconsa_geo`:
+
+1. Toma como base el resultado de la geocodificación de la variable `direccion` de la tabla `direcciones` usando la función `geocode`.
+2. Visualiza el resultado de la geocodificación usando la función `glimpse`.
+
+```{r Geocodificar puntos de venta}
+puntos_venta_liconsa_geo <-
+  geocode(address = direcciones$direccion) %>% 
+  glimpse()
+```
+
+Agrega las direcciones originales de `direcciones` a los datos geocodificados de `puntos_venta_licons_geo` aplicando la siguiente manipulación de datos:
+
+1. Toma como base los datos geocodificados de `puntos_venta_liconsa_geo`.
+2. Une los datos de `direcciones` usando la función `left_join` donde coincidan las variables `"id" = "rowid"`.
+3. Visualiza la estructura de los datos transformados usando la función `glimpse`.
+
+```{r Agregar direcciones originales a tabla geocodificada}
+puntos_venta_liconsa_geo <-
+  puntos_venta_liconsa_geo %>% 
+  left_join(direcciones, by = c("id" = "rowid")) %>% 
+  glimpse()
+```
+
+
+### Visualización de los datos
+
+Visualiza los datos georeferenciados de `puntos_venta_liconsa_geo`, cambiando el modo de visualización como mapa web interactivo (`"view"`) usando la función `tmap_mode` y construye el mapa con la función `qtm`:
+
+```{r Mapa de puntos de venta geocodificados}
+tmap_mode("view")
+
+puntos_venta_liconsa_geo %>% 
+  qtm()
+```
+
+Omite la variable `street` que tiene un tipo de datos de lista para evitar problemas de compatibilidad y guarda la capa geográfica `puntos_venta_liconsa_geo` como `Shapefile` en el archivo `puntos_venta_liconsa.shp` en la carpeta `Datos` usando la función `sf::st_write`:
+
+```{r Guardar capa de puntos de venta}
+puntos_venta_liconsa_geo %>% 
+  select(-street) %>% # Para evitar problemas al guardar el archivo, quitar la variable street que es de tipo lista
+  sf::st_write("Datos/puntos_venta_liconsa.shp",
+               delete_dsn = TRUE) # Sobreescribir el archivo si existe 
+```
+
+
+## Referencias
+
+* Lovelace, R., Nowosad, J., & Muenchow, J. (2019), *Geocomputation with R. [https://geocompr.robinlovelace.net](https://geocompr.robinlovelace.net)*. CRC Press.
+* Tennekes, M., Nowosad, J. (2018). *tmap: Thematic Maps in R*. Journal of Statistical Software. Recuperado el 8 de septiembre, 2021, from [https://www.researchgate.net/publication/324652152_tmap_Thematic_Maps_in_R/fulltext/5ad9e7eb0f7e9b28593cf867/tmap-Thematic-Maps-in-R.pdf](https://www.researchgate.net/publication/324652152_tmap_Thematic_Maps_in_R/fulltext/5ad9e7eb0f7e9b28593cf867/tmap-Thematic-Maps-in-R.pdf).
+* Engel, C. (2019). *Using Spatial Data with R.* cengel.github.io. Recuperado el 8 de septiembre, 2021, desde [https://cengel.github.io/R-spatial/](https://cengel.github.io/R-spatial).
+* Wickham H. (2022). *rvest*. Recuperado el 11 de junio, 2022 desde [https://rvest.tidyverse.org/index.html](https://rvest.tidyverse.org/index.html).
+* *RSelenium*.  Recuperado el 11 de junio, 2022 desde [https://docs.ropensci.org/RSelenium/index.html](https://docs.ropensci.org/RSelenium/index.html).
+* *hereR*. Recuperado el 11 de junio, 2022 desde [https://munterfi.github.io/hereR/index.html](https://munterfi.github.io/hereR/index.html).
