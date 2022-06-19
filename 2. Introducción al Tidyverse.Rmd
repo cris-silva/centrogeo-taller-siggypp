@@ -27,6 +27,14 @@ rm(list = ls())
 
     Recuerda que para limpiar el entorno actual de R, también puedes utilizar el botón de la escoba en el panel *Environment*.
 
+Para esta sesión nos aseguraremos de tener instalados y actualizados todos los paquetes necesarios (descomenta la siguiente instrucción para instalar o actualizar los paquetes necesarios en caso de no tenerlos):
+
+```{r Instalar paquetes}
+# install.packages(c("tidyverse")
+```
+
+    Recuerda que también puedes instalar o actualizar los paquetes necesarios para la sesión usando el panel "Packages" de RStudio.
+
 Carga el conjunto de datos de muestra `iris` en el entorno de R usando la función `data` y visualízalo en la siguiente línea:
 
 ```{r Cargar datos de muestra}
