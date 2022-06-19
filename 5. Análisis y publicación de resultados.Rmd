@@ -1,0 +1,320 @@
+---
+title: "5. Caso práctico"
+author: "Ana J. Alegre (jalegre@centrogeo.edu.mx), Cristian Silva (csilva@centrogeo.edu.mx)"
+date: '2022-06-17'
+output:
+  html_document: default
+    toc: true
+  pdf_document: default
+  always_allow_html: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introducción
+
+El proceso de toma de decisiones basado en datos nos permite en primer lugar contar con un diagnóstico más preciso y confiable en comparación con el uso de la intuición, la observación o la experiencia empírica y después estar en posibilidades de proponer soluciones y elaborar escenarios de factibilidad. Esto es necesario para identificar de manera confiable una problemática específica y así encontrar áreas de oportunidad que nos permitan plantear propuestas de política pública eficaces para su atención.
+
+## Objetivo
+
+En esta sesión del taller, analizarás los datos de puntos de venta de leche obtenidos durante la sesión anterior en conjunto con datos relacionados al grado de rezago social georreferenciados a nivel de Área Geoestadística Básica (AGEB), con la finalidad de comprobar si los puntos de venta se encuentran ubicados dentro o cerca de las zonas con mayores grados de rezago social en la Ciudad de México (CONEVAL, 2010). 
+
+Finalmente, publicarás la metodología de trabajo que seguiste, los resultados que obtuviste y la conclusiones a las que llegaste en un documento (en formatos *HTML* y *PDF*) que se pueda compartir con otras personas. 
+
+## Preparación del entorno
+
+Elimina todos los objetos del entorno usando la función `rm`:
+```{r Limpiar entorno}
+***(list = ls())
+```
+
+Para esta sesión nos aseguraremos de tener instalados y actualizados todos los paquetes necesarios (descomenta la siguiente instrucción para instalar o actualizar los paquetes necesarios en caso de no tenerlos):
+```{r Instalar paquetes requeridos (opcional)}
+# install.packages(c("tidyverse",
+#                    "readxl",
+#                    "janitor",
+#                    "sf",
+#                    "tmap",
+#                    "DT",
+#                    "RMarkdown",
+#                    "tinytex"))
+```
+
+    Recuerda que también puedes instalar o actualizar los paquetes necesarios para la sesión usando el panel "Packages" de RStudio.
+
+```{r Cargar los paquetes necesarios}
+library(tidyverse)
+library(readxl)
+library(janitor)
+library(sf)
+library(tmap)
+library(DT)
+```
+
+Para esta práctica, también es necesario que cuentes con una distribución de *[LaTeX](https://www.latex-project.org/get/)* instalada. Si no cuentas con ella, más adelante encontrarás instrucciones para instalar una.
+
+## Caso práctico. Análisis de puntos de venta de leche Liconsa (Parte II)
+
+En esta práctica realizarás un análisis para determinar si la ubicación de los puntos de venta de leche Liconsa obtenidos durante la sesión anterior están ubicados en las zonas de alto rezago social en la Ciudad de México. Para ello será necesario usar una división territorial que nos permita realizar esta comparación, por lo que para este ejercicio se propone el uso de las áreas geoestadísticas básicas (AGEBs) que son definidas por el **INEGI** en su *Marco Geoestadístico* ([https://www.inegi.org.mx/temas/mg/](https://www.inegi.org.mx/temas/mg/)) y que permiten agrupar diferentes datos estadísticos provenientes de censos, encuestas, registros administrativos, etc.
+
+### Procesamiento de datos
+
+#### AGEBs
+
+Guarda las AGEBs de la Ciudad de México en una nueva variable llamada `agebs_urbanas`, realizando la siguiente manipulación de datos:
+
+1. Lee el archivo `inegi_ageb_urbanas.gpkg` de la carpeta `Datos` usando la función `st_read`.
+2. Filtra los registros que pertenecen a la Ciudad de México (`id_estado == 9`) usando la función `filter`.
+3. Visualiza la estructura de los datos leídos, usando la función `glimpse`.
+
+```{r Leer capa de AGEBs}
+*** <-
+  ***("Datos/inegi_ageb_urbanas.gpkg") %>% 
+  filter(*** == 9) %>% 
+  ***()
+```
+
+Para visualizar en esta práctica usarás el paquete `tmap`. Cambia el modo de visualización a mapa web interactivo (`"view"`) usando la función `tmap_mode`:
+
+```{r Cambiar modo de visualización de mapas}
+***("view")
+```
+
+Visualiza el contenido de la capa `agebs_urbanas` en un mapa usando la función `qtm`:
+
+```{r Mapa de AGEBs}
+***(***)
+```
+
+#### Grado de Rezago Social por AGEB
+
+Para identificar las zonas de rezago, será necesario que uses la información sobre grados de rezago social por AGEB (GRS) publicada por el **Consejo Nacional de Evaluación de la Política de Desarrollo Social (CONEVAL)** en la página [https://www.coneval.org.mx/Medicion/IRS/Paginas/Rezago_social_AGEB_2010.aspx](https://www.coneval.org.mx/Medicion/IRS/Paginas/Rezago_social_AGEB_2010.aspx).
+
+El archivo `Rezago Social en AGEB 2010 vf.xls` que contiene los datos necesarios ya se descargó previamente de la página web indicada a la carpeta `Datos`. Ábrelo usando *Excel* y observa su contenido y cómo está estructurado. La variable que usarás en este ejercicio es `Grado de rezago social (clases latentes)` que categórica y se clasifica en `Bajo`, `Medio` y `Alto`.
+
+A continuación, realiza la siguiente manipulación de datos para leer los datos y guardarlos en una nueva variable llamada `rezago_social_ageb`:
+
+1. Lee el archivo `Datos/Rezago Social en AGEB 2010 vf.xls` usando la función `read_excel`. Usa los parámetros `sheet = 1` para abrir los datos de la primera hoja, y `skip = 2` para omitir las dos primeras filas que contienen títulos que no se usarán. 
+2. Limpia los nombres de las variables para facilitar su uso con *R*, usando la función `clean_names`.
+3. Elimina las filas y columnas que no tienen ningún dato, usando la función `remove_empty`.
+4. Convierte la variable `grado_de_rezago_social_clases_latentes` que viene como caracter en un factor ordenado. Usando la función `mutate_at` para aplicarle a la variable `grado_de_rezago_social_clases_latentes` la función `factor` usando los parámetros `ordered = TRUE` para indicar que las categorías estarán ordenadas y `levels = c("Bajo", "Medio", "Alto")` para definir el orden correcto (Bajo < Medio < Alto).
+5. Filtra los datos pertenecientes a la Ciudad de México (`clave_de_la_entidad == "09"`), usando la función `filter`.
+6. Visualiza la estructura de los datos transformados usando la función `glimpse`.
+
+```{r Leer datos de rezago social por AGEB}
+rezago_social_ageb <-
+  read_excel(***,
+             sheet = ***,
+             skip = ***) %>% 
+  ***() %>% # Limpia los nombres de las variables
+  remove_empty() %>% # Elimina filas y columnas completamente vacías
+  mutate_at("***", 
+            factor, 
+            ordered = ***, 
+            levels = c("***", "***", "***")) %>%
+  ***(clave_de_la_entidad == "09") %>% 
+  ***()
+```
+
+    Ignora la advertencia `value for "which" not specified, defaulting to c("rows", "cols")`, sólo es un aviso de que la función `remove_empty` elimina por defecto filas como columnas completamente vacíos.
+
+#### Puntos de venta de leche Liconsa
+
+Retoma los datos geocodificados de puntos de venta de leche Liconsa en el país que obtuviste mediante *web scraping* durante la sesión anterior. Para este ejercicio puedes utilizar cualquiera de estos archivos:
+
+* El archivo `puntos_venta_liconsa.shp` de la carpeta `Datos` y que contiene los datos completos a nivel nacional que se obtuvo de procesar los datos durante la sesión anterior.
+* El archivo `puntos_venta_liconsa_cdmx.gpkg`, que se incluye por conveniencia para esta sesión y es un extracto de `puntos_venta_liconsa.shp` que fue previamente procesado y sólo contiene los datos para la Ciudad de México.
+
+Realiza la siguiente manipulación de datos para leer la capa geográfica y guardar su contenido en una nueva variable llamada `puntos_venta_liconsa`:
+
+1. Lee el archivo `puntos_venta_liconsa.shp` o `puntos_venta_liconsa_cdmx.gpkg` de la carpeta `Datos` usando la función `st_read`.
+2. Filtra los registros que pertenecen a la Ciudad de México (`stat_cd == "CMX"`) usando la función `filter` (aunque este paso no es necesario si usas el archivo `puntos_venta_liconsa_cdmx.gpkg`, realízalo por fines ilustrativos).
+3. Visualiza la estructura de los datos leídos, usando la función `glimpse`.
+
+```{r Leer puntos de venta de lecha Liconsa}
+*** <-
+  ***("Datos/puntos_venta_liconsa_cdmx.gpkg") %>% # Puedes usar puntos_venta_liconsa.shp o puntos_venta_liconsa_cdmx.gpkg
+  filter(***) %>% # Filtrar los datos de la Ciduad de México
+  ***() # Visualizar la estructura de los datos
+```
+
+Visualiza el contenido de la capa `puntos_venta_liconsa` en un mapa usando la función `qtm`:
+
+```{r Mapa de puntos de venta de leche}
+***(puntos_venta_liconsa)
+```
+
+#### Cruces de datos
+
+Agrega los datos de GRS por AGEB obtenidos de CONEVAL a la capa de AGEBs obtenida de INEGI. Realiza la siguiente manipulación de datos y guarda los datos transformados en una nueva variable llamada `agebs_con_datos`:
+
+1. Toma como base los datos de `agebs_urbanas`.
+2. Selecciona sólo las variables `folio_de_la_ageb` y `grado_de_rezago_social_clases_latentes` de `rezago_social_ageb` y únelas usando la función `left_join` donde coincidan las claves de AGEB en ambos conjuntos de datos (`by = c("cvegeo" = "folio_de_la_ageb")`).
+3. Visualiza la estructura de la capa transformada.
+
+```{r Cruce de AGEBs con rezago social}
+agebs_con_datos <-
+  *** %>% 
+  left_join(*** %>% ***(folio_de_la_ageb, grado_de_rezago_social_clases_latentes), 
+            by = ***) %>% 
+  ***() # Visualizar la estructura de los datos
+```
+
+Visualiza el contenido de la capa `agebs_con_datos` en un mapa de coropletas usando la función `qtm` con los parámetros `fill = "grado_de_rezago_social_clases_latentes"` para colorear los polígonos según el valor de `grado_de_rezago_social_clases_latentes` y `fill.palette = "Blues"` para usar una paleta de colores continuos en azul:
+
+```{r Mapa de grado de rezago social por AGEB}
+agebs_con_datos %>%
+  ***(fill = "***",
+      fill.palette = "***")
+```
+
+    Observa que las AGEBs coloreadas en gris se clasifican automáticamente como "Missing" e indican las AGEBs para las que no se determinó un grado de rezago social.
+    
+Para visualizar si los puntos de venta de leche Liconsa están en las AGEBs con mayor GRS, será necesario conocer el número de puntos de venta por cada AGEB para hacer la comparación. Debido a que en los datos de `puntos_venta_liconsa` no se especifica a qué AGEB pertenece cada punto, será necesario hacer un cruce de datos espaciales para determinar en qué polígono de la capa `agebs_con_datos` se intersecta cada uno de los puntos de las ubicaciones de los `puntos_venta_liconsa`.  
+
+Agrega los datos de `agebs_con_datos` a los puntos de `puntos_venta_liconsa` donde se intersecten espacialmente, realizando la siguiente manipulación de datos y guarda la capa resultante en una nueva variable llamada `puntos_venta_con_agebs`:
+
+1. Toma como base la capa de puntos `puntos_venta_liconsa`.
+2. Agrega los datos de la capa `agebs_con_datos` donde existan intersecciones, usando la función `st_intersection`.
+3. Conserva únicamente con las variables relevantes `id`, `cvegeo` y `grado_de_rezago_social_clases_latentes` usando la función `select`.
+4. Visualiza la estructura de los datos transformados usando la función `glimpse`.
+
+```{r Intersección de puntos de venta de leche con AGEBs}
+puntos_venta_con_agebs <-
+  *** %>% 
+  st_intersection(***) %>% # Intersectar los datos
+  ***(id, cvegeo, grado_de_rezago_social_clases_latentes) %>% # Seleccionar las variables necesarias
+  ***() # Visualizar la estructura resultante
+```
+
+    Observa que después de la intersección tienes 544 filas en la nueva capa, cuando originalmente tenías 546. Esto se debe a que hay dos puntos de venta que están ubicados en lugares donde no está definida una AGEB y se excluyeron durante al final del cruce de datos.
+
+Ya cuentas con una capa de puntos de venta de leche que tiene una variable `cvegeo` que indica la AGEB en la que se ubica. El siguiente paso es contar el número de puntos de venta por cada AGEB. Para ello realiza la siguiente manipulación de datos y asigna el resultado a una nueva variable llamada `puntos_venta_por_ageb`:
+
+1. Toma como base los datos de `puntos_venta_con_agebs`.
+2. Convierte la capa geográfica en un *tibble* sin geometrías usando la función `as_tibble` (las capas `sf` que tienen geometrías no se pueden sumarizar para obtener el conteo, sumatoria, promedio, etc.).
+3. Cuenta el número de filas por cada AGEB (`cvegeo`) usando la función `count` y usa el parámetro `name = "puntos_de_venta"` para asignar el nombre `puntos_de_venta` al resultado.
+4. Ordena los datos de mayor a menor cantidad de puntos de venta por AGEB (orden descendente) usando la función `arrange` indicando la variable que se usa para ordenar en forma descendente con `desc(puntos_de_venta)`.
+
+Visualiza los datos transformados y observa los resultados.
+
+```{r Conteo de puntos de venta de leche por AGEB}
+puntos_venta_por_ageb <-
+  *** %>% 
+  ***() %>% # Convertir en tabla normal (tibble) sin geometrías
+  count(***,
+        name = "***") %>% # Conteo por clave de AGEB
+  ***(desc(***)) # Ordenar los datos de manera descendente
+
+# Visualizar el contenido de los datos transformados:
+*** 
+```
+
+Un modo de representar la cantidad de puntos de venta de leche en cada AGEB es sobreponer a las AGEBs una capa de "burbujas", es decir círculos que representen con mayor tamaño y una escala de colores el total de puntos de venta.
+
+Para lograr esto, necesitarás convertir los polígonos de la capa de AGEBs en puntos. Un medio para hacer esto es determinando los centroides de cada polígono y unirles los datos de puntos de venta por AGEB.
+
+Realiza la siguiente manipulación de datos para obtener la capa necesaria y guárdala en una nueva variable llamada `ageb_centroides`:
+
+1. Toma como base la capa `agebs_con_puntos_de_venta`.
+2. Convierte la capa de polígonos en puntos determinando sus centroides, usa la función `st_centroid`.
+3. Agrega los datos de la tabla `puntos_venta_por_ageb` donde coincidan las claves de AGEB (`by = "cvegeo"`).
+4. Visualiza la estructura de la capa transformada usando la función `glimpse`.
+
+```{r Centroides de AGEBs con puntos de venta}
+agebs_con_puntos_de_venta <-
+  *** %>% 
+  st_centroid() %>% # Convertir en centroides
+  left_join(***,
+            by = "***") %>% # Unir los datos de puntos_venta_por_ageb
+  ***() # Visualizar la estructura de los datos
+```
+
+#### Visualización del cruce de datos espaciales
+
+Combina en un mismo mapa, las coropletas obtenidas de la capa de AGEBs con las burbujas obtenidas de los puntos de venta. Ejecuta el siguiente *chunk* y observa los parámetros utilizados en cada elemento que compone el mapa completo, almacenado como `mapa_grs_vs_puntos_venta_liconsa` :
+
+```{r Mapa de grado de rezago social y puntos de venta de leche}
+mapa_grs_vs_puntos_venta_liconsa <-
+  tm_shape(agebs_con_datos) + # Agregar la capa de polígonos de AGEBs con GRS
+  tm_polygons(col = "grado_de_rezago_social_clases_latentes", # Asignar un color a cada valor de grado_de_rezago_social_clases_latentes
+              alpha = 0.5, # 50% de transparencia
+              palette = "Blues", # Usar colores de una paleta continua de azules
+              border.alpha = 0.3) + # Opacidad de los bordes de los polígonos al 30%
+  tm_shape(agebs_con_puntos_de_venta) + # Agregar una nueva capa de puntos de venta por AGEB
+  tm_bubbles(size = "puntos_de_venta", # Asignar un tamaño según el valor del total de puntos de venta
+             col = "puntos_de_venta", # Asignar un color  según el valor del total de puntos de venta
+             scale = 0.2, # Reducir el tamaño original de los círculos al 20%
+             palette = "Reds") # Usar colores de una paleta continua de rojos
+
+# Visualizar el mapa:
+mapa_grs_vs_puntos_venta_liconsa
+```
+
+Guarda el mapa almacenado en `mapa_grs_vs_puntos_venta_liconsa` en un archivo *HTML* llamado  `mapa_grs_vs_puntos_venta_liconsa.html` en la carpeta `Datos`, usando la función `tmap_save`:
+
+```{r Guardar el mapa}
+mapa_grs_vs_puntos_venta_liconsa %>% 
+  ***("Datos/mapa_grs_vs_puntos_venta_liconsa.html")
+```
+
+Por último, verifica cómo se distribuyen los puntos de venta por AGEB según su GRS mediante la siguiente manipulación de datos:
+
+1. Toma como base los datos de `agebs_centroides`.
+2. Convierte los datos geográficos en un *tibble* sin geometrías usando la función `as_tibble`.
+3. Construye una tabla cruzada usando la función `tabyl` con las variables `grado_de_rezago_social_clases_latentes` y `puntos_de_venta`.
+
+```{r Distribución de puntos de venta por AGEB}
+agebs_con_puntos_de_venta %>% 
+  ***() %>% # Convertir a tibble sin geometrías
+  tabyl(***, 
+        ***) # Construir la tabla cruzada
+```
+
+A partir de lo anterior podemos observar que en zonas de alto GRS no existen puntos de venta de leche, y la mayor parte se distribuyen en zonas de bajo GRS.
+
+Calcula el total y porcentaje en que están distribuidos los puntos de venta de leche para cada nivel de GRS, convirtiendo la capa `agebs_con_puntos_de_venta` en *tibble* usando la función `as_tibble` y agrupando las cifras mediante la variable `grado_de_rezago_social_clases_latentes` usando la función `tabyl`:
+
+```{r Porcentaje de puntos de venta por nivel de rezago en AGEB}
+agebs_con_puntos_de_venta %>% 
+  ***() %>% # Convertir a tibble sin geometría
+  ***(grado_de_rezago_social_clases_latentes) # Agrupar las cifras por GRS
+```
+
+    Observa que `tabyl` cuenta el número de registros por cada `grado_de_rezago_social_clases_latentes` incluyendo aquellos que se ubican en AGEBs que no tienen un GRS definido (se identifican como `<NA>`). Además calcula el porcentaje de participación para cada GRS contando aquellos casos donde no hay un GRS definido en la variable `percent` y omitiéndolos en la variable `valid_percent`.
+
+A partir de los datos obtenidos, podemos observar que el **93.8% de los puntos de venta de leche se ubican en AGEBs de bajo grado de rezago social**, mientras que únicamente el **4.6% de los puntos de venta de leche se encuentran en AGEBs con un grado de rezago social medio o alto**.
+
+### Conclusiones del análisis
+
+A partir del análisis de los datos recopilados acerca de la ubicación de los puntos de venta de leche Liconsa y de las zonas con mayores de GRS, es posible observar que:
+
+* La mayoría de las zonas con GRS medio o alto no cuentan con puntos de venta de leche Liconsa, sin embargo en sus alrededores existe más de una lechería. 
+* Es importante revisar el contexto de los datos, en este caso es necesario considerar cómo se construyen los indicadores ya que existen zonas no habitadas como parques, deportivos, cerros o barrancas que se consideran de alto rezago social, y una mala interpretación de estos puede sesgar el análisis.
+* Para profundizar en el diagnóstico, es necesario revisar otro tipo de indicadores como población, alimentación o salud para complementar el análisis.
+
+### Publicación del resultado del análisis
+
+Presiona el botón *Knit* de *RStudio* para exportar este cuaderno en formato *HTML*. Una vez terminado el proceso abre el archivo resultante y observa cómo se construyó el documento.
+
+Es posible exportar este cuaderno también en formato *PDF*, sin embargo es necesario instalar antes alguna distribución de *LaTeX* desde [https://www.latex-project.org/get/](https://www.latex-project.org/get/). Opcionalmente se puede instalar una versión reducida desde *R* usando la función `install_tinytex` del paquete *tinytex*.
+
+Descomenta la siguiente instrucción y ejecuta el siguiente *chunk* para instalar la distribución *tinytex* de *LaTeX* desde *R* (puedes omitir este paso si ya tienes instalada alguna otra versión de *LaTeX*:
+
+```{r Instalación de LaTeX}
+# Descomenta para instalar una versión liviana de LaTeX desde R:
+# tinytex::install_tinytex()
+```
+
+Una vez instalado *LaTeX*, presiona nuevamente el botón *Knit* de *RStudio* para exportar este cuaderno en formato *PDF*. Una vez terminado el proceso abre el archivo resultante y observa cómo se construyó el documento.
+
+## Referencias
+
+* Wickham, H., & Grolemund, G. (2017). *R for data science: Import, tidy, transform, visualize and model data. [https://r4ds.had.co.nz](https://r4ds.had.co.nz)*. O'Reilly.
+* Lovelace, R., Nowosad, J., & Muenchow, J. (2019), *Geocomputation with R. [https://geocompr.robinlovelace.net](https://geocompr.robinlovelace.net)*. CRC Press.
+* Tennekes, M., Nowosad, J. (2021). *Elegant and informative maps with tmap.* Recuperado el 8 de septiembre, 2021, desde [https://r-tmap.github.io/tmap-book/](https://r-tmap.github.io/tmap-book/)
+* Engel, C. (2019). *Using Spatial Data with R.* cengel.github.io. Recuperado el 8 de septiembre, 2021, desde [https://cengel.github.io/R-spatial/](https://cengel.github.io/R-spatial).
+* Firke S. (2022). *Janitor*. Recuperado el 17 de junio, 2022 desde [http://sfirke.github.io/janitor/](http://sfirke.github.io/janitor/).
+* Xie, Y., Allaire, J. J., & Grolemund, G. (2018). *R markdown: The definitive guide.  [https://bookdown.org/yihui/rmarkdown/](https://bookdown.org/yihui/rmarkdown/)*. CRC Press.
