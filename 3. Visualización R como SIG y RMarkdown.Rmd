@@ -5,8 +5,11 @@ author: "Ana J. Alegre (jalegre@centrogeo.edu.mx), Cristian Silva (csilva@centro
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+```
 
-# Para esta sesión nos aseguraremos de tener instalados y actualizados todos los paquetes necesarios:
+Para esta sesión nos aseguraremos de tener instalados y actualizados todos los paquetes necesarios (descomenta la siguiente instrucción para instalar o actualizar los paquetes necesarios en caso de no tenerlos):
+
+```{r}
 # install.packages(c("tidyverse",
 #                    "lubridate",
 #                    "janitor",
@@ -16,6 +19,8 @@ knitr::opts_chunk$set(echo = TRUE)
 #                    "leaflet",
 #                    "raster"))
 ```
+
+    Recuerda que también puedes instalar o actualizar los paquetes necesarios para la sesión usando el panel "Packages" de RStudio.
 
 ## Introducción
 
