@@ -534,7 +534,7 @@ Finalmente, visualiza la tabla completa de `puntos_venta_liconsa`.
 if(exists("datos_extraidos")) rm("datos_extraidos")
 
 # Extraer las tablas para cada estado y acumularlas en una tabla (puedes cambiar la secuencia de estados para hacer pruebas de algunos estados únicamente):
-for(estado in 17:33) {
+for(estado in 2:opciones_estado) {
   
   # Extraer la tabla para el estado:
   datos_extraidos <- extrae_tabla(opcion_estado = estado,
