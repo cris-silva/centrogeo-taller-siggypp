@@ -20,11 +20,13 @@ Para esta sesión nos aseguraremos de tener instalados y actualizados todos los 
 #                    "raster"))
 ```
 
-    Recuerda que también puedes instalar o actualizar los paquetes necesarios para la sesión usando el panel "Packages" de RStudio.
+```         
+Recuerda que también puedes instalar o actualizar los paquetes necesarios para la sesión usando el panel "Packages" de RStudio.
+```
 
 ## Introducción
 
-La visualización de datos hace posible comunicar lo que significa la información en una manera clara a otras personas. Mediante el uso de contextos visuales, el aprendizaje a partir de los resultados se vuelve útil para llamar a la acción y hacer toma de decisiones basada en datos. Existen paquetes diferentes en *R* que nos permiten construir diferentes tipos de visualizaciones como son las gráficas, diagramas o mapas en una manera eficiente y simple. 
+La visualización de datos hace posible comunicar lo que significa la información en una manera clara a otras personas. Mediante el uso de contextos visuales, el aprendizaje a partir de los resultados se vuelve útil para llamar a la acción y hacer toma de decisiones basada en datos. Existen paquetes diferentes en *R* que nos permiten construir diferentes tipos de visualizaciones como son las gráficas, diagramas o mapas en una manera eficiente y simple.
 
 ## Objetivo
 
@@ -33,11 +35,13 @@ En esta sesión, construiremos algunas visualizaciones a partir de datos de ejem
 ## Preparación del entorno
 
 Primeramente, elimina todos los objetos del entorno usando la función `rm`:
+
 ```{r Limpiar entorno}
 **(list = ***)
 ```
 
 Carga el paquete `tidyverse` que será usado en esta sesión (recuerda que `tidyverse` incluye los paquetes `dplyr` y `tidyr` para manipulación de datos y `ggplot2` para visualización):
+
 ```{r Carga de paquetes}
 ***(***)
 ***(***)
@@ -45,7 +49,7 @@ Carga el paquete `tidyverse` que será usado en esta sesión (recuerda que `tidy
 
 ## Visualización básica usando ggplot2
 
-Para empezar a construir algunas visualizaciones a partir de datos, usaremos los datos de muestra llamados  `mtcars` que se incluyen con la distribución base de *R*. Para saber más acerca de la fuente y del contenido de este conjunto de datos, usa la función `help` para consultar la documentación de `mtcars` en el panel *Help* de *RStudio*:
+Para empezar a construir algunas visualizaciones a partir de datos, usaremos los datos de muestra llamados `mtcars` que se incluyen con la distribución base de *R*. Para saber más acerca de la fuente y del contenido de este conjunto de datos, usa la función `help` para consultar la documentación de `mtcars` en el panel *Help* de *RStudio*:
 
 ```{r Ayuda sobre los datos de muestra}
 ***(mtcars)
@@ -97,13 +101,13 @@ grafica_mpg_vs_wt <-
 *** # Visualizar la gráfica
 ```
 
-Agrega un título, un subtítulo y etiquetas los ejes *x* y *y* a la gráfica `grafica_mpg_vs_wt`  sumándole la función `labs` con los siguientes parámetros:
+Agrega un título, un subtítulo y etiquetas los ejes *x* y *y* a la gráfica `grafica_mpg_vs_wt` sumándole la función `labs` con los siguientes parámetros:
 
-* `title = "Correlación entre peso y millas por galón"` para incluir el título de la gráfica.
-* `subtitle = "Conjunto de datos mtcars"` para incluir un subtítulo.
-* `x = "Millas por galón"` para incluir la etiqueta del eje *x*.
-* `y = "Peso (1000 lb)"` para incluir la etiqueta del eje *y*.
-* `caption = "Fuente: 1974 Motor Trend US magazine"` para agregar una nota al pie.
+-   `title = "Correlación entre peso y millas por galón"` para incluir el título de la gráfica.
+-   `subtitle = "Conjunto de datos mtcars"` para incluir un subtítulo.
+-   `x = "Millas por galón"` para incluir la etiqueta del eje *x*.
+-   `y = "Peso (1000 lb)"` para incluir la etiqueta del eje *y*.
+-   `caption = "Fuente: 1974 Motor Trend US magazine"` para agregar una nota al pie.
 
 ```{r Gráfica de dispersión con etiquetas}
 grafica_mpg_vs_wt <-
@@ -144,7 +148,7 @@ Repite desde el principio el ejercicio anterior incluyendo todas las capas pero 
   theme_classic()
 ```
 
-A veces es más conveniente usar diferentes gráficas por separado para cada categoría, a estas gráficas separadas pero vinculadas por la escala y los datos se les conoce como *facetas*. Repite el ejercicio anterior pero sin incluir `color = cyl"` en la estética `aes` ni `color = "Cilindros"` en las etiquetas `labs`, para comparar las correlaciones de millas por galón (`mpg`) y peso (`wt`) pero ahora usa la función `facet_wrap(~cyl)` para crear facetas por cilindraje: 
+A veces es más conveniente usar diferentes gráficas por separado para cada categoría, a estas gráficas separadas pero vinculadas por la escala y los datos se les conoce como *facetas*. Repite el ejercicio anterior pero sin incluir `color = cyl"` en la estética `aes` ni `color = "Cilindros"` en las etiquetas `labs`, para comparar las correlaciones de millas por galón (`mpg`) y peso (`wt`) pero ahora usa la función `facet_wrap(~cyl)` para crear facetas por cilindraje:
 
 ```{r Gráfica de dispersión por facetas}
 ***(***, aes(x = ***, y = ***)) + # Ya no es necesario incluir "cyl" como color
@@ -235,6 +239,7 @@ precios_oro <-
 ```
 
 Ejecuta el siguiente *chunk* para construir una línea de tiempo de la tendencia de los precios del oro en dólares estadounidenses a lo largo del tiempo, poniendo la variable `date` en el eje *x* y la variable `united_states_usd` en el eje *y* como estética (`aes`) y usa la geometría `geom_line`:
+
 ```{r Gráfica de línea básica}
 ggplot(precios_oro, aes(x = date, y = united_states_usd)) +
   geom_line()
@@ -245,7 +250,6 @@ ggplot(precios_oro, aes(x = date, y = united_states_usd)) +
 ```{r Ejercicio línea de tiempo}
 # Escribe aquí el código
 ```
-
 
 ## Usando R como SIG. Caso práctico: Homicidios dolosos a nivel nacional
 
@@ -261,10 +265,10 @@ homicidios_por_estado <-
 
 Para visualizar la tendencia nacional de homicidios, es necesario preparar una serie de datos por mes con el total sumarizado de homicidios. Construye la serie de datos necesaria haciendo la siguiente secuencia de operaciones usando *pipas*:
 
-1. Toma como base los datos de `homicidios_por_estado`.
-2. Agrupa usando la variable `mes` usando la función `group_by`.
-3. Sumariza la variable `homicidios_totales` y guarda el resultado en una nueva variable llamada `homicidios_total` usando las funciones `summarize` y `sum` (omite los valores vacíos si existen usando el parámetro `na.rm = TRUE`).
-4. Desagrupa los datos usando la función `ungroup`.
+1.  Toma como base los datos de `homicidios_por_estado`.
+2.  Agrupa usando la variable `mes` usando la función `group_by`.
+3.  Sumariza la variable `homicidios_totales` y guarda el resultado en una nueva variable llamada `homicidios_total` usando las funciones `summarize` y `sum` (omite los valores vacíos si existen usando el parámetro `na.rm = TRUE`).
+4.  Desagrupa los datos usando la función `ungroup`.
 
 Visualiza el contenido de la serie `homicidios_por_mes` para comprobar que la transformación está correcta.
 
@@ -281,11 +285,11 @@ homicidios_por_mes <-
 
 Construye una gráfica de línea para visualizar la tendencia mensual de los homicidios siguiendo la siguiente secuencia de operaciones:
 
-1. Toma como base los datos de `homicidios_por_mes`.
-2. Define los campos que se usarán en los ejes *x* y *y* en la estética que usará la gráfica con `aes(x = mes, y = homicidios_totales)` dentro de la función `ggplot`.
-3. Agrega una geometría de líneas sumando la función `geom_line`.
-4. Agrega un modelo de regresión con la función `geom_smooth` (por esta ocasión usaremos los parámetros por defecto).
-5. Incluye el título, subtítulo y las etiquetas de los ejes usando la función `labs`.
+1.  Toma como base los datos de `homicidios_por_mes`.
+2.  Define los campos que se usarán en los ejes *x* y *y* en la estética que usará la gráfica con `aes(x = mes, y = homicidios_totales)` dentro de la función `ggplot`.
+3.  Agrega una geometría de líneas sumando la función `geom_line`.
+4.  Agrega un modelo de regresión con la función `geom_smooth` (por esta ocasión usaremos los parámetros por defecto).
+5.  Incluye el título, subtítulo y las etiquetas de los ejes usando la función `labs`.
 
 ```{r Gráfica de líneas con datos nacionales}
 homicidios_por_mes %>% 
@@ -301,12 +305,12 @@ homicidios_por_mes %>%
 
 Repite los pasos anteriores para crear una línea de tendencia usando ahora sólo los datos de la CDMX para compararlos con la tendencia nacional. Para ello, sigue la siguiente secuencia de operaciones:
 
-1. Toma como base los datos de `homicidios_por_estado`.
-2. Filtra los datos donde `entidad == "Ciudad de México` usando la función `filter`.
-3. Define los campos que se usarán en los ejes *x* y *y* en la estética que usará la gráfica con `aes(x = mes, y = homicidios_totales)` dentro de la función `ggplot`.
-4. Agrega una geometría de líneas sumando la función `geom_line`.
-5. Agrega un modelo de regresión con la función `geom_smooth` (por esta ocasión usaremos los parámetros por defecto).
-6. Incluye el título, subtítulo y las etiquetas de los ejes usando la función `labs`.
+1.  Toma como base los datos de `homicidios_por_estado`.
+2.  Filtra los datos donde `entidad == "Ciudad de México` usando la función `filter`.
+3.  Define los campos que se usarán en los ejes *x* y *y* en la estética que usará la gráfica con `aes(x = mes, y = homicidios_totales)` dentro de la función `ggplot`.
+4.  Agrega una geometría de líneas sumando la función `geom_line`.
+5.  Agrega un modelo de regresión con la función `geom_smooth` (por esta ocasión usaremos los parámetros por defecto).
+6.  Incluye el título, subtítulo y las etiquetas de los ejes usando la función `labs`.
 
 ```{r Gráfica de líneas con datos de CDMX}
 homicidios_por_estado %>%
@@ -325,7 +329,7 @@ Como puede observarse en ambas gráficas, durante el periodo de diciembre 2018 a
 
 ### Mapa de coropletas
 
-Los mapas de coropletas se usan para visualizar de manera sencilla las variaciones en cantidades al colorear polígonos. En este caso, este tipo de mapas pueden ser útiles para comparar las tasas de homicidios por cada 10,000 habitantes para cada estado en México. 
+Los mapas de coropletas se usan para visualizar de manera sencilla las variaciones en cantidades al colorear polígonos. En este caso, este tipo de mapas pueden ser útiles para comparar las tasas de homicidios por cada 10,000 habitantes para cada estado en México.
 
 Para construir un mapa de coropletas, necesitaremos un conjunto de datos por estado donde podamos calcular la tasa de homicidios por cada 10 mil habitantes a partir el total de homicidios y la población total.
 
@@ -359,10 +363,10 @@ Crea un mapa temático rápido para el contenido de la capa usando la función `
 
 El siguiente paso es contar con datos sobre el total de homicidios por estado ocurridos durante el periodo de estudio. Agrupa los datos de homicidios totales por estado en una nueva variable llamada `homicidios_totales_por_estado` mediante la siguiente manipulación de datos:
 
-1. Toma como base los datos de `homicidios_por_estado`.
-2. Agrupa los datos usando la clave de INEGI de cada estado (`clave_ent`).
-3. Suma los homicidios totales (`homicidios_totales`) de cada estado y guarda el resultado en una variable llamada `homicidios`, usando la función `summarize`.
-4. Desagrupa los datos usando la función `ungroup`.
+1.  Toma como base los datos de `homicidios_por_estado`.
+2.  Agrupa los datos usando la clave de INEGI de cada estado (`clave_ent`).
+3.  Suma los homicidios totales (`homicidios_totales`) de cada estado y guarda el resultado en una variable llamada `homicidios`, usando la función `summarize`.
+4.  Desagrupa los datos usando la función `ungroup`.
 
 Visualiza los datos transformados en `homicidios_totales_por_estado`.
 
@@ -378,13 +382,13 @@ homicidios_totales_por_estado <-
 
 #### Datos de población
 
-A continuación, necesitamos obtener los datos de población por estado que publica el *Instituto Nacional de Estadística, Geografía e Informática (INEGI)* en su Censo de Población y Vivienda 2020, disponible en  [https://www.inegi.org.mx/programas/ccpv/2020/default.html#Resultados_generales](https://www.inegi.org.mx/programas/ccpv/2020/default.html#Resultados_generales). Para conveniencia de este taller, los datos ya están procesados en el archivo `inegi_mexico_poblacion_2020.csv` que está en la carpeta `Datos`. 
+A continuación, necesitamos obtener los datos de población por estado que publica el *Instituto Nacional de Estadística, Geografía e Informática (INEGI)* en su Censo de Población y Vivienda 2020, disponible en <https://www.inegi.org.mx/programas/ccpv/2020/default.html#Resultados_generales>. Para conveniencia de este taller, los datos ya están procesados en el archivo `inegi_mexico_poblacion_2020.csv` que está en la carpeta `Datos`.
 
 Lee los datos de población por estados y asignalos a una nueva variable llamada `poblacion`, mediante la siguiente manipulación de datos:
 
-1. Lee los datos del archivo `inegi_mexico_poblacion_2020.csv` de la carpeta `Datos`.
-2. El conjunto de datos tiene muchas variables. Para hacer los datos más legibles selecciona sólo los campos de clave de entidad (`cve_ent`) y de poblacion (`total`), renombrando ésta última como `poblacion` usando la función `select`.
-3. Visualiza la estructura de los datos procesados usando la función `glimpse`.
+1.  Lee los datos del archivo `inegi_mexico_poblacion_2020.csv` de la carpeta `Datos`.
+2.  El conjunto de datos tiene muchas variables. Para hacer los datos más legibles selecciona sólo los campos de clave de entidad (`cve_ent`) y de poblacion (`total`), renombrando ésta última como `poblacion` usando la función `select`.
+3.  Visualiza la estructura de los datos procesados usando la función `glimpse`.
 
 ```{r Leer población de México por estados}
 poblacion <-
@@ -397,11 +401,11 @@ poblacion <-
 
 Une los datos de `homicidios_totales_por_estado` y `poblacion` a la capa `estados` siguiendo la siguiente manipulación de datos y guarda el resultado en una nueva variable llamada `estados_con_homicidios`:
 
-1. Toma como base la capa geográfica `estados`.
-2. Une los datos de `homicidios_totales_por_estado` donde su variable `clave_ent` coincida con la variable `id_estado` de `estados` usando la función `left_join`.
-3. Une los datos de `poblacion` donde su variable `cve_ent` coincida con la variable `id_estado` de `estados` usando la función `left_join`.
-4. Calcula la tasa de homicidios por cada 10 mil habitantes, dividiendo `homicidios` entre `poblacion` dividida entre `10000`, asignando el resultado a la nueva variable `tasa_homicidios` usando la funcoón `mutate`.
-5. Visualiza la estructura de los datos transformados para comprobar que el resultado es correcto.
+1.  Toma como base la capa geográfica `estados`.
+2.  Une los datos de `homicidios_totales_por_estado` donde su variable `clave_ent` coincida con la variable `id_estado` de `estados` usando la función `left_join`.
+3.  Une los datos de `poblacion` donde su variable `cve_ent` coincida con la variable `id_estado` de `estados` usando la función `left_join`.
+4.  Calcula la tasa de homicidios por cada 10 mil habitantes, dividiendo `homicidios` entre `poblacion` dividida entre `10000`, asignando el resultado a la nueva variable `tasa_homicidios` usando la funcoón `mutate`.
+5.  Visualiza la estructura de los datos transformados para comprobar que el resultado es correcto.
 
 ```{r Unir datos a la capa de estados}
 estados_con_homicidios <-
@@ -414,7 +418,7 @@ estados_con_homicidios <-
 
 #### Construir el mapa de coropletas
 
-Finalmente, construye el mapa de coropletas con los resultados y compara las tasas de homicidio entre estados. Para construir el mapa ejecuta y observa el siguiente `*chunk*:
+Finalmente, construye el mapa de coropletas con los resultados y compara las tasas de homicidio entre estados. Para construir el mapa ejecuta y observa el siguiente \`*chunk*:
 
 ```{r Mapa de coropletas con tasas de homicidios}
 estados_con_homicidios %>% 
@@ -467,6 +471,7 @@ Usando la tabla interactiva anterior es posible ordenar los datos usando cualqui
 Ahora que aprendimos sobre los homicidios a nivel nacional, será necesario ir a detalle con los datos para la CDMX. Para encontrar patrones que puedan ser útiles para aprender más acerca del problema de los homicidios en la ciudad, se pueden construir mapas con mayor detalle gracias a que los registros están georeferenciados.
 
 Carga la capa `murders_cdmx.gpkg` que se procesó anteriormente y que está en la carpeta `Data` usando la función `st_read`, visualiza la estructura de los datos con la función `glimpse` y asigna el contenido a una nueva variable llamada `homicidios_cdmx`:
+
 ```{r Leer datos de puntos de homicidios}
 homicidios_cdmx <-
   ***(***) %>% 
@@ -474,6 +479,7 @@ homicidios_cdmx <-
 ```
 
 Cambia el modo de visualización de `tmaps` a `"view"` con la función `tmap_mode` y crea un mapa rápido con los puntos geográficos de `homicidios_cdmx` usando la función:
+
 ```{r Previsualizar puntos de homicidios}
 tmap_mode(***) # Configura el mapa como interactivo
 
@@ -481,14 +487,14 @@ tmap_mode(***) # Configura el mapa como interactivo
   ***() # Mapa rápido con puntos de homicidios
 ```
 
-*Leaflet* es una librería de javascript que se usa para construir mapas web interactivos que también puede usarse en R, de hecho, los mapas interactivos que el paquete `tmap` construye la utilizan. Leaflet nos ofrece otra alternativa para construir mapas directamente en R usando el paquete `leaflet`. 
+*Leaflet* es una librería de javascript que se usa para construir mapas web interactivos que también puede usarse en R, de hecho, los mapas interactivos que el paquete `tmap` construye la utilizan. Leaflet nos ofrece otra alternativa para construir mapas directamente en R usando el paquete `leaflet`.
 
 Ejecuta y observa el siguiente *chunk* para visualizar los puntos de homicidios en un mapa, usando ahora el paquete `leaflet`, con la siguiente manipulación de datos:
 
-1. Toma como base los datos geográficos de `homicidios_cdmx`.
-2. Crea un mapa vacío con los datos usando la función `leaflet`.
-3. Agrega un mapa base (basado en *OpenStreetMaps*) usando la función `addTiles`.
-4. Agrega los puntos como círculos usando la función `addCircles`.
+1.  Toma como base los datos geográficos de `homicidios_cdmx`.
+2.  Crea un mapa vacío con los datos usando la función `leaflet`.
+3.  Agrega un mapa base (basado en *OpenStreetMaps*) usando la función `addTiles`.
+4.  Agrega los puntos como círculos usando la función `addCircles`.
 
 ```{r Mapa de puntos con Leaflet}
 homicidios_cdmx %>% 
@@ -497,7 +503,9 @@ homicidios_cdmx %>%
   addCircles() # Agrega una capa de puntos como círculos
 ```
 
-    Explora el mapa y trata de identificar zonas de concentración de homicidios en CDMX. Te resulta complicado encontrar patrones claros de acumulación?
+```         
+Explora el mapa y trata de identificar zonas de concentración de homicidios en CDMX. Te resulta complicado encontrar patrones claros de acumulación?
+```
 
 *Leaflet* puede ser usado para agrupar puntos de manera sencilla, repite el ejemplo anterior pero usando ahora el parámetro `clusterOptions = markerClusterOptions()` de la función `addMarkers` en vez de la función `addCircle`:
 
@@ -514,7 +522,7 @@ Estos mapas de clusters interativos son útiles para encontrar áreas específic
 
 ## Mapa de calor (hotspots)
 
-Los mapas de calor usan una escala de color para contrastar las zonas con valores más bajos (fríos) y altos (calientes). En este ejemplo usaremos un archivo raster con la estimación de densidad de Kernel (KDE) que se construyó previamente a partir de los puntos de `homicidios_cdmx` para visualizar las áreas con mayor densidad de incidencia de homicidios en la ciudad. 
+Los mapas de calor usan una escala de color para contrastar las zonas con valores más bajos (fríos) y altos (calientes). En este ejemplo usaremos un archivo raster con la estimación de densidad de Kernel (KDE) que se construyó previamente a partir de los puntos de `homicidios_cdmx` para visualizar las áreas con mayor densidad de incidencia de homicidios en la ciudad.
 
 Lee el archivo raster llamado `homicidios_kde.tif` en la carpeta `Datos` usando la función `raster` del paquete `raster`. En esta sesión sólo usaremos una vez esta función, así que usa la función con la sintaxis `raster::raster` y guarda el contenido en una nueva variable llamada `homicidios_cdmx_raster`. Visualiza el contenido de `homicidios_cdmx_raster`:
 
@@ -528,10 +536,10 @@ homicidios_cdmx_raster <-
 
 Visualiza la capa raster `homicidios_cdmx_raster` en un mapa mediante la siguiente manipulación de datos:
 
-1. Toma como base la capa `homicidios_cdmx_raster`.
-2. Crea un mapa vacío con los datos usando la función `tm_shape`.
-3. Agrega un mapa base con la función `tm_basemap` (sólo funciona cuando `tmap_mode` está en modo `"view"`).
-4. Agrega la geometría tipo ráster con la función `tm_raster` y con los parámetros `palette = "YlOrRd"` para establecer una paleta de colores para la rampa y `alpha = 0.5` para hacer que la capa raster sea transparente al 50%.
+1.  Toma como base la capa `homicidios_cdmx_raster`.
+2.  Crea un mapa vacío con los datos usando la función `tm_shape`.
+3.  Agrega un mapa base con la función `tm_basemap` (sólo funciona cuando `tmap_mode` está en modo `"view"`).
+4.  Agrega la geometría tipo ráster con la función `tm_raster` y con los parámetros `palette = "YlOrRd"` para establecer una paleta de colores para la rampa y `alpha = 0.5` para hacer que la capa raster sea transparente al 50%.
 
 ```{r Mapa de hotspot}
 *** %>% 
@@ -545,10 +553,10 @@ El mapa resultante muestra varias zonas de alta concentración en rojo. Los valo
 
 ## Referencias
 
-* Wickham, H., & Grolemund, G. (2017). *R for data science: Import, tidy, transform, visualize and model data. [https://r4ds.had.co.nz](https://r4ds.had.co.nz)*. O'Reilly.
-* Wickham, H. (2021). *ggplot2: Elegant Graphics for Data Analysis.* Recuperado el 8 de octubre, 2021, desde [https://ggplot2-book.org/index.html](https://ggplot2-book.org/index.html)
-* Chang W. (2022). *R Graphics Cookbook*. Recuperado el 3 de junio, 2022, desde [https://r-graphics.org](https://r-graphics.org)
-* *Spatial data manipulation*. Recuperado el 3 de junio, 2022, desde [https://rspatial.org/raster/spatial/index.html](https://rspatial.org/raster/spatial/index.html)
-* Tennekes, M., Nowosad, J. (2018). *tmap: Thematic Maps in R*. Journal of Statistical Software. Recuperado el 8 de septiembre, 2021, from [https://www.researchgate.net/publication/324652152_tmap_Thematic_Maps_in_R/fulltext/5ad9e7eb0f7e9b28593cf867/tmap-Thematic-Maps-in-R.pdf](https://www.researchgate.net/publication/324652152_tmap_Thematic_Maps_in_R/fulltext/5ad9e7eb0f7e9b28593cf867/tmap-Thematic-Maps-in-R.pdf)
-* Tennekes, M., Nowosad, J. (2021). *Elegant and informative maps with tmap.* Recuperado el 8 de  Septiembre, 2021, desde [https://r-tmap.github.io/tmap-book/](https://r-tmap.github.io/tmap-book/)
-* *DT: An R interface to the DataTables library.* Recuperado el 8 de Septiembre, 2021, desde [https://rstudio.github.io/DT/](https://rstudio.github.io/DT/)
+-   Wickham, H., & Grolemund, G. (2017). *R for data science: Import, tidy, transform, visualize and model data. <https://r4ds.had.co.nz>*. O'Reilly.
+-   Wickham, H. (2021). *ggplot2: Elegant Graphics for Data Analysis.* Recuperado el 8 de octubre, 2021, desde <https://ggplot2-book.org/index.html>
+-   Chang W. (2022). *R Graphics Cookbook*. Recuperado el 3 de junio, 2022, desde <https://r-graphics.org>
+-   *Spatial data manipulation*. Recuperado el 3 de junio, 2022, desde <https://rspatial.org/raster/spatial/index.html>
+-   Tennekes, M., Nowosad, J. (2018). *tmap: Thematic Maps in R*. Journal of Statistical Software. Recuperado el 8 de septiembre, 2021, from <https://www.researchgate.net/publication/324652152_tmap_Thematic_Maps_in_R/fulltext/5ad9e7eb0f7e9b28593cf867/tmap-Thematic-Maps-in-R.pdf>
+-   Tennekes, M., Nowosad, J. (2021). *Elegant and informative maps with tmap.* Recuperado el 8 de Septiembre, 2021, desde <https://r-tmap.github.io/tmap-book/>
+-   *DT: An R interface to the DataTables library.* Recuperado el 8 de Septiembre, 2021, desde <https://rstudio.github.io/DT/>

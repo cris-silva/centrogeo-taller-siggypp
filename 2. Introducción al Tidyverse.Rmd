@@ -25,7 +25,9 @@ Siempre es recomendable limpiar el entorno antes de comenzar a trabajar. Ejecuta
 rm(list = ls())
 ```
 
-    Recuerda que para limpiar el entorno actual de R, también puedes utilizar el botón de la escoba en el panel *Environment*.
+```         
+Recuerda que para limpiar el entorno actual de R, también puedes utilizar el botón de la escoba en el panel *Environment*.
+```
 
 Para esta sesión nos aseguraremos de tener instalados y actualizados todos los paquetes necesarios (descomenta la siguiente instrucción para instalar o actualizar los paquetes necesarios en caso de no tenerlos):
 
@@ -33,7 +35,9 @@ Para esta sesión nos aseguraremos de tener instalados y actualizados todos los 
 # install.packages(c("tidyverse")
 ```
 
-    Recuerda que también puedes instalar o actualizar los paquetes necesarios para la sesión usando el panel "Packages" de RStudio.
+```         
+Recuerda que también puedes instalar o actualizar los paquetes necesarios para la sesión usando el panel "Packages" de RStudio.
+```
 
 Carga el conjunto de datos de muestra `iris` en el entorno de R usando la función `data` y visualízalo en la siguiente línea:
 
@@ -151,13 +155,13 @@ Para crear grupos categóricos usando variables se usa la función `group_by`. A
 
 Este conjunto de datos no tiene cambios visibles, pero se crearon grupos para calcular en ellos estadísticos como estos:
 
-* Número de observaciones (n, cuenta)
-* Sumatoria
-* Media
-* Mínimo
-* Máximo
-* Mediana
-* Desviación estándar
+-   Número de observaciones (n, cuenta)
+-   Sumatoria
+-   Media
+-   Mínimo
+-   Máximo
+-   Mediana
+-   Desviación estándar
 
 Crea nuevas columnas con los estadísticos de la variable `Petal.Length` agrupados por cada valor único de la variable `Species`, usando la función `summarize` después de la función `group_by` y definiendo cada uno de los estadísticos con las funciones `n` (conteo), `sum` (sumatoria), `min` (mínimo), `max` (máximo), `mean` (promedio), `median` (mediana) y `sd` (desviación estándar):
 
@@ -188,12 +192,11 @@ Después de sumarizar los datos se conservan *agrupados*, es por eso que regular
   ungroup()
 ```
 
-
 ## Caso práctico: Homicidios a nivel nacional
 
 ### Importar los datos
 
-En esta sesión, usaremos los datos abiertos de incidencia delictiva que publica el *Secretariado Ejecutivo del Sistema Nacional de seguridad Pública (SESNSP)* que están disponibles en el portal de datos abiertos del Gobierno de México en [https://www.datos.gob.mx/busca/dataset/incidencia-delictiva-del-fuero-comun](https://www.datos.gob.mx/busca/dataset/incidencia-delictiva-del-fuero-comun). Estos datos contienen la información de delitos cometidos a nivel estatal y serán usados en el taller más adelante para comparar los niveles de homicidios que ocurrieron en la CDMX y en los demás estados del país.
+En esta sesión, usaremos los datos abiertos de incidencia delictiva que publica el *Secretariado Ejecutivo del Sistema Nacional de seguridad Pública (SESNSP)* que están disponibles en el portal de datos abiertos del Gobierno de México en <https://www.datos.gob.mx/busca/dataset/incidencia-delictiva-del-fuero-comun>. Estos datos contienen la información de delitos cometidos a nivel estatal y serán usados en el taller más adelante para comparar los niveles de homicidios que ocurrieron en la CDMX y en los demás estados del país.
 
 Carga el paquete `lubridate` para manejar más fácilmente los tipos de datos fecha-hora del conjunto de datos, y también carga el paquete `janitor` para realizar algunos procesos de limpieza a los datos:
 
@@ -217,19 +220,18 @@ delitos <-
 
 En el *chunk* anterior, puedes observar lo siguiente:
 
-* En la instrucción `read_csv` se incluye un parámetro `locale = locale(encoding = "WINDOWS-1252")`. Esto se usa por que los datos originales se crearon en Windows, y aunque se puede omitir, no especificar esto puede provocar que aparezcan caracteres incorrectos en los datos al importarlos en otros sistemas operativos como macOS o Linux que usan el tipo de codificación *UTF-8*.
-# La función `clean_names` del paquete `janitor` convierte los nombres de las columnas a minúsculas, reemplaza los espacios con '_' y reemplaza caracteres especiales y con acentos para evitar problemas al escribir códigos.
+-   En la instrucción `read_csv` se incluye un parámetro `locale = locale(encoding = "WINDOWS-1252")`. Esto se usa por que los datos originales se crearon en Windows, y aunque se puede omitir, no especificar esto puede provocar que aparezcan caracteres incorrectos en los datos al importarlos en otros sistemas operativos como macOS o Linux que usan el tipo de codificación *UTF-8*. \# La función `clean_names` del paquete `janitor` convierte los nombres de las columnas a minúsculas, reemplaza los espacios con '\_' y reemplaza caracteres especiales y con acentos para evitar problemas al escribir códigos.
 
 ### Preparar los datos
 
 Los datos agrupan los totales de delitos en 12 columnas para cada mes, pero esta estructura no es útil para filtrar los datos por rangos de fecha. Para poder filtrar los datos por fecha, será necesario tener una columna `mes` de tipo de datos *fecha* en una forma de tabla *larga*. El siguiente bloque ejecutará en cadena las siguientes operaciones:
 
-1. Transformar la estructura a una forma *larga*, guardando los nombres de cada columna de mes en una nueva columna llamada `mes_nombre` y sus valores en una nueva columna llamada `total` usando la función `pivot_longer`.
-2. Obtener el número del mes a partir de `mes_nombre` usando la función `case_when` para guardar el valor numérico correspondiente en una nueva columna llamada `mes_numero`.
-3. Construir el mes en formato *fecha* usando las columnas `ano`, `mes_numero` y el número 1 para asumir el primer día del mes, para lo que se usa la función `make_date` para crear una nueva columna llamada `mes`.
-4. Finalmente quitar las columnas `mes_nombre`, `mes_numero`, `ano` que ya son innecesarias usando la función `select` y el signo `-` para excluirlas del *tibble* resultante.
+1.  Transformar la estructura a una forma *larga*, guardando los nombres de cada columna de mes en una nueva columna llamada `mes_nombre` y sus valores en una nueva columna llamada `total` usando la función `pivot_longer`.
+2.  Obtener el número del mes a partir de `mes_nombre` usando la función `case_when` para guardar el valor numérico correspondiente en una nueva columna llamada `mes_numero`.
+3.  Construir el mes en formato *fecha* usando las columnas `ano`, `mes_numero` y el número 1 para asumir el primer día del mes, para lo que se usa la función `make_date` para crear una nueva columna llamada `mes`.
+4.  Finalmente quitar las columnas `mes_nombre`, `mes_numero`, `ano` que ya son innecesarias usando la función `select` y el signo `-` para excluirlas del *tibble* resultante.
 
-Observa cómo se construyó ésta secuencia usando las *pipas* en el siguiente *chunk*, ejecútalo y observa el resultado: 
+Observa cómo se construyó ésta secuencia usando las *pipas* en el siguiente *chunk*, ejecútalo y observa el resultado:
 
 ```{r Limpiar y transformar datos nacionales}
 delitos <-
@@ -256,9 +258,9 @@ delitos <-
 
 Para conocer la clasificación de los delitos a partir de los datos, crea una lista de los tipos de delitos a partir de los datos. Para ello construye con *pipas* la siguiente secuencia de operaciones y guarda el resultado en una nueva variable llamada `lista_delitos`:
 
-1. Toma como base los datos del *tibble* `delitos`.
-2. Usa la función `distinct` para obtener las categorías únicas de las columnas `bien_juridico_afectado`, `tipo_de_delito`, `subtipo_de_delito` y `modalidad`.
-3. Ordena los datos usando los campos `bien_juridico_afectado`, `tipo_de_delito`, `subtipo_de_delito` y `modalidad` en ése orden con la función `arrange`.
+1.  Toma como base los datos del *tibble* `delitos`.
+2.  Usa la función `distinct` para obtener las categorías únicas de las columnas `bien_juridico_afectado`, `tipo_de_delito`, `subtipo_de_delito` y `modalidad`.
+3.  Ordena los datos usando los campos `bien_juridico_afectado`, `tipo_de_delito`, `subtipo_de_delito` y `modalidad` en ése orden con la función `arrange`.
 
 En la línea siguiente visualiza el contenido del *tibble* `lista_delitos` resultante.
 
@@ -273,6 +275,7 @@ lista_delitos <-
 ```
 
 Obtén los datos de homicidios que ocurrieron **desde diciembre 2018 hasta junio 2020**. Primero, es necesario definir las fechas de inicio y fin del periodo que necesitamos. Usa la función `make_date` del paquete `lubridate` para construir las variables `mes_inicial` y `mes_final` con tipo de datos de fecha:
+
 ```{r Definir el periodo requerido}
 mes_inicial <- make_date(2018, 12, 1) # 2018-12-01
 mes_final <- ***(***, ***, ***) # 2020-06-31
@@ -280,9 +283,9 @@ mes_final <- ***(***, ***, ***) # 2020-06-31
 
 Después, usa las *pipas* para arreglar los datos y guardar en una nueva variable llamada `homicidios` el resultado de la siguiente secuencia de operaciones:
 
-1. Toma el *tibble* `delitos` como base.
-2. Filtra los datos usando las condiciones `tipo_de_delito == "Homicidio"` y `mes %>% between(mes_inicial, mes_final)` para mantener sólo los datos de homicidios y sus subcategorías en el periodo indicado usando la función `filter`. 
-3. Visualiza la estructura del *tibble* resultante usando la función `glimpse`.
+1.  Toma el *tibble* `delitos` como base.
+2.  Filtra los datos usando las condiciones `tipo_de_delito == "Homicidio"` y `mes %>% between(mes_inicial, mes_final)` para mantener sólo los datos de homicidios y sus subcategorías en el periodo indicado usando la función `filter`.
+3.  Visualiza la estructura del *tibble* resultante usando la función `glimpse`.
 
 ```{r Filtrar datos nacionales}
 homicidios <-
@@ -293,11 +296,11 @@ homicidios <-
 
 Para conocer la evolución de los homicidios en cada estado y en el tiempo, agrupa y sumariza los totales de homicidios por entidad y mes. Asigna a una variable llamada `homicidios_por_estado` el resultado de las siguientes operaciones:
 
-1. Toma el *tibble* homicidios como base.
-2. Agrupa los datos por cada `clave_ent`, `entidad`, y `mes`.
-3. Obtén la suma del total de homicidios (usando el parámetro `na.rm = TRUE` para omitir los registros vacíos o `NA`) y guárdala en una nueva columna llamada `homicidios_totales`.
-4. Desagrupa los datos.
-5. Visualiza la estructura resultante.
+1.  Toma el *tibble* homicidios como base.
+2.  Agrupa los datos por cada `clave_ent`, `entidad`, y `mes`.
+3.  Obtén la suma del total de homicidios (usando el parámetro `na.rm = TRUE` para omitir los registros vacíos o `NA`) y guárdala en una nueva columna llamada `homicidios_totales`.
+4.  Desagrupa los datos.
+5.  Visualiza la estructura resultante.
 
 ```{r Agrupar y sumarizar datos nacionales}
 homicidios_por_estado <-
@@ -328,7 +331,7 @@ homicidios_por_estado %>%
 
 ### Delitos en la CDMX por puntos
 
-Los datos que usaremos para estudiar los homicidios en la CDMX se obtienen del portal de datos abiertos de la CDMX en (https://datos.cdmx.gob.mx/dataset/carpetas-de-investigacion-fgj-de-la-ciudad-de-mexico)[https://datos.cdmx.gob.mx/dataset/carpetas-de-investigacion-fgj-de-la-ciudad-de-mexico]. Los registros de los delitos de este conjunto de datos están desagregados a nivel de detalle y tienen las coordenadas del lugar donde ocurrieron, lo cual nos permite usar esta información para crear una capa geográfica de puntos que será útil para el análisis geoespacial que realizaremos más adelante en este taller. 
+Los datos que usaremos para estudiar los homicidios en la CDMX se obtienen del portal de datos abiertos de la CDMX en (<https://datos.cdmx.gob.mx/dataset/carpetas-de-investigacion-fgj-de-la-ciudad-de-mexico>)[<https://datos.cdmx.gob.mx/dataset/carpetas-de-investigacion-fgj-de-la-ciudad-de-mexico>]. Los registros de los delitos de este conjunto de datos están desagregados a nivel de detalle y tienen las coordenadas del lugar donde ocurrieron, lo cual nos permite usar esta información para crear una capa geográfica de puntos que será útil para el análisis geoespacial que realizaremos más adelante en este taller.
 
 Existen diferentes paquetes para cargar, construir, manipular y visualizar datos espaciales. Para este ejercicio, carga los paquetes `sf` y `tmap`:
 
@@ -339,9 +342,9 @@ Existen diferentes paquetes para cargar, construir, manipular y visualizar datos
 
 El paquete `sf` nos permite leer datos con geometrías como coordenadas o codificadas como *well-known-text* (*WKT*) para convertirlas a *simple features* (datos espaciales) siguiendo las siguientes instrucciones. Importa los datos *CSV* que servirán como base en una nueva variable llamada `delitos_cdmx` realizando la siguiente secuencia de operaciones:
 
-1. Lee el archivo `.zip` de la carpeta `Datos` usando la función `read_csv` (el archivo *CSV* está comprimido en formato *ZIP* para ahorrar espacio).
-2. Limpia los nombres de las columnas usando la función `clean_names`.
-3. Visualiza la estructura resultante usando la función `glimpse`.
+1.  Lee el archivo `.zip` de la carpeta `Datos` usando la función `read_csv` (el archivo *CSV* está comprimido en formato *ZIP* para ahorrar espacio).
+2.  Limpia los nombres de las columnas usando la función `clean_names`.
+3.  Visualiza la estructura resultante usando la función `glimpse`.
 
 ```{r Leer los datos para espacializar}
 sf_fuente_de_datos <- "Datos/carpetas_ss_junio2020.csv.zip" # La función read_csv puede leer archivos CSV comprimidos con ZIP
@@ -354,11 +357,11 @@ delitos_cdmx <-
 
 A diferencia de los datos de incidencia delictiva a nivel nacional que publica el SESNSP, la FGJCDMX utiliza una clasificación de delitos diferente en sus datos, por lo tanto será necesario identificar las categorías de homicidios a partir de estos datos.
 
-Construye una lista de delitos y guárdala en una nueva variable llamada ´lista_delitos_cdmx`, realizando la siguiente secuencia de operaciones:
+Construye una lista de delitos y guárdala en una nueva variable llamada ´lista_delitos_cdmx\`, realizando la siguiente secuencia de operaciones:
 
-1. Toma como base los datos de `delitos_cdmx`.
-2. Obtén los valores únicos del campo `categoria_delito` usando la función `distinct`.
-3. Ordena los valores en orden ascendente a partir de la variable `categoria_delito` usando la función `arrange`.
+1.  Toma como base los datos de `delitos_cdmx`.
+2.  Obtén los valores únicos del campo `categoria_delito` usando la función `distinct`.
+3.  Ordena los valores en orden ascendente a partir de la variable `categoria_delito` usando la función `arrange`.
 
 Finalmente visualiza el contenido del *tibble* `lista_delitos_cdmx`.
 
@@ -371,14 +374,14 @@ lista_delitos_cdmx <-
 *** # Visualizar el contenido de la lista resultante
 ```
 
-Para poder comparar los datos nacionales y los de la CDMX, es necesario filtrar los datos de homicidios para el mismo periodo de tiempo. 
+Para poder comparar los datos nacionales y los de la CDMX, es necesario filtrar los datos de homicidios para el mismo periodo de tiempo.
 
 Construye una nueva variable llamada `homicidios_cdmx` con la siguiente secuencia de operaciones:
 
-1. Toma como base los datos de `delitos_cdmx`.
-2. Crea una nueva columna llamada `fecha` extrayendo sólo la fecha del campo `fecha_hechos` (que es de tipo fecha-hora), usando la función `date`.
-3. Filtra las filas usando las condiciones `categoria_delito == "HOMICIDIO DOLOSO"` y `fecha %>% between(mes_inicial, mes_final)` usando la función `filter`.
-4. Visualiza la estructura resultante con la función `glimpse`.
+1.  Toma como base los datos de `delitos_cdmx`.
+2.  Crea una nueva columna llamada `fecha` extrayendo sólo la fecha del campo `fecha_hechos` (que es de tipo fecha-hora), usando la función `date`.
+3.  Filtra las filas usando las condiciones `categoria_delito == "HOMICIDIO DOLOSO"` y `fecha %>% between(mes_inicial, mes_final)` usando la función `filter`.
+4.  Visualiza la estructura resultante con la función `glimpse`.
 
 ```{r Filtrar datos para CDMX}
 homicidios_cdmx <-
@@ -388,14 +391,14 @@ homicidios_cdmx <-
   ***()
 ```
 
-Este conjunto de datos usa un sistema de coordenadas (CRS) con proyección geográfica *WGS84*, para mayor información sobre las proyecciones geográficas y códigos EPSG con que se representan, puedes consultar [https://epsg.io](https://epsg.io). 
+Este conjunto de datos usa un sistema de coordenadas (CRS) con proyección geográfica *WGS84*, para mayor información sobre las proyecciones geográficas y códigos EPSG con que se representan, puedes consultar <https://epsg.io>.
 
 Modifica el valor de la variable `homicidios_cdmx` para convertirlo en una tabla espacial (*simple features*), siguiendo la siguiente secuencia de operaciones
 
-1. Toma como base el valor original de `homicidios_cdmx`.
-2. Convierte los datos en *sf (simple features)* usando la función `st_as_sf` con los parámetros `coords = c("longitud", "latitud")` para especificar los nombres de las variables que contienen las coordenadas, `na.fail = FALSE` para permitir que las filas sin coordenadas se conviertan en geometrías vacías y `remove = FALSE` para conservar las variables de las coordenadas.
-3. Establece el sistema de coordenadas en que vienen las coordenadas, en este caso *WGS84 (que le corresponde el código EPSG 4326)* usando la función `st_set_crs`.
-4. Visualiza la nueva estructura con la función `glimpse`.
+1.  Toma como base el valor original de `homicidios_cdmx`.
+2.  Convierte los datos en *sf (simple features)* usando la función `st_as_sf` con los parámetros `coords = c("longitud", "latitud")` para especificar los nombres de las variables que contienen las coordenadas, `na.fail = FALSE` para permitir que las filas sin coordenadas se conviertan en geometrías vacías y `remove = FALSE` para conservar las variables de las coordenadas.
+3.  Establece el sistema de coordenadas en que vienen las coordenadas, en este caso *WGS84 (que le corresponde el código EPSG 4326)* usando la función `st_set_crs`.
+4.  Visualiza la nueva estructura con la función `glimpse`.
 
 ```{r Convertir datos a espaciales}
 homicidios_cdmx <-
@@ -407,7 +410,9 @@ homicidios_cdmx <-
   ***()
 ```
 
-    Observa en el resultado que `homicidios_cdmx` ahora tiene una nueva columna llamada `geometry` con el tipo de datos `POINT` que indica que los datos tienen una geometría de puntos.
+```         
+Observa en el resultado que `homicidios_cdmx` ahora tiene una nueva columna llamada `geometry` con el tipo de datos `POINT` que indica que los datos tienen una geometría de puntos.
+```
 
 Una vez que has convertido los datos a *sf*, es posible usar cualquier función de *data wrangling* de *Tidyverse* en ellos, como `filter`, `mutate`, `arrange`, etc.
 
@@ -458,18 +463,21 @@ Observa que en éste caso, el tipo de geometría es de clase `MULTIPOLYGON`, lo 
 ***(***)
 ```
 
-    Opcionalmente, puedes cambiar el modo de visualización del mapa para impresión como lo hiciste anteriormente, para comparar cómo se ven.
+```         
+Opcionalmente, puedes cambiar el modo de visualización del mapa para impresión como lo hiciste anteriormente, para comparar cómo se ven.
+```
 
 ## Formatos espaciales disponibles para leer/escribir
 
 El paquete `sf` usa las librerías del sistema llamadas *GDAL/OGR* para guardar datos espaciales en cualquier formato disponible en sus controladores. Para ver una lista de los formatos en que se puede leer y escribir con el paquete `sf` usa la función `st_drivers`:
+
 ```{r Listar formatos espaciales disponibles}
 ***()
 ```
 
 ## Referencias
 
-* Wickham, H., & Grolemund, G. (2017). *R for data science: Import, tidy, transform, visualize and model data. [https://r4ds.had.co.nz](https://r4ds.had.co.nz)*. O'Reilly.
-* Lovelace, R., Nowosad, J., & Muenchow, J. (2019), *Geocomputation with R. [https://geocompr.robinlovelace.net](https://geocompr.robinlovelace.net)*. CRC Press.
-* Tennekes, M., Nowosad, J. (2021). *Elegant and informative maps with tmap.* Recuperado el 8 de septembiembre, 2021, desde [https://r-tmap.github.io/tmap-book/](https://r-tmap.github.io/tmap-book/)
-* Engel, C. (2019). *Using Spatial Data with R.* cengel.github.io. Recuperado el 8 de septembiembre, 2021, desde [https://cengel.github.io/R-spatial/](https://cengel.github.io/R-spatial).
+-   Wickham, H., & Grolemund, G. (2017). *R for data science: Import, tidy, transform, visualize and model data. <https://r4ds.had.co.nz>*. O'Reilly.
+-   Lovelace, R., Nowosad, J., & Muenchow, J. (2019), *Geocomputation with R. <https://geocompr.robinlovelace.net>*. CRC Press.
+-   Tennekes, M., Nowosad, J. (2021). *Elegant and informative maps with tmap.* Recuperado el 8 de septembiembre, 2021, desde <https://r-tmap.github.io/tmap-book/>
+-   Engel, C. (2019). *Using Spatial Data with R.* cengel.github.io. Recuperado el 8 de septembiembre, 2021, desde [https://cengel.github.io/R-spatial/](https://cengel.github.io/R-spatial).
