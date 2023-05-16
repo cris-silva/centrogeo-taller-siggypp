@@ -1,50 +1,95 @@
 ---
 title: "1. Fundamentos básicos de R"
 author: "Ana J. Alegre (jalegre@centrogeo.edu.mx), Cristian Silva (csilva@centrogeo.edu.mx)"
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ## Introducción
 
-*R* es un lenguaje de programación orientado principalmente a la computación estadística. Es un software libre ampliamente utilizado para el desarrollo de análisis de datos y más recientemente, para aplicaciones modernas como la ciencia de datos, el aprendizaje automático o la inteligencia artificial.
+*R* es un lenguaje de programación orientado principalmente a la
+computación estadística. Es un software libre ampliamente utilizado para
+el desarrollo de análisis de datos y más recientemente, para
+aplicaciones modernas como la ciencia de datos, el aprendizaje
+automático o la inteligencia artificial.
 
-Una gran parte de su versatilidad y potencia proviene de las contribuciones de las comunidades científicas y de desarrolladores de software que crean y publican paquetes que extienden las capacidades básicas del lenguaje *R* y que están rigurosamente documentados. El ecosistema de *R* permite el reaprovechamiento continuo del conocimiento y de la técnica para facilitar las tareas de procesamiento de información en prácticamente cualquier campo de trabajo.
+Una gran parte de su versatilidad y potencia proviene de las
+contribuciones de las comunidades científicas y de desarrolladores de
+software que crean y publican paquetes que extienden las capacidades
+básicas del lenguaje *R* y que están rigurosamente documentados. El
+ecosistema de *R* permite el reaprovechamiento continuo del conocimiento
+y de la técnica para facilitar las tareas de procesamiento de
+información en prácticamente cualquier campo de trabajo.
 
 ## Objetivo
 
-El objetivo de esta sesión es repasar las funciones básicas del lenguaje R para familiarizarse con su entorno y sintaxis, explicar cómo se instalan paquetes en *R* y *RStudio* y proporcionar ejemplos mediante cuadernos interactivos en formato *RMarkdown*.
+El objetivo de esta sesión es repasar las funciones básicas del lenguaje
+R para familiarizarse con su entorno y sintaxis, explicar cómo se
+instalan paquetes en *R* y *RStudio* y proporcionar ejemplos mediante
+cuadernos interactivos en formato *RMarkdown*.
 
 ## Cómo funcionan los cuadernos en *RMarkdown (.Rmd)*?
 
-Los cuadernos interactivos en formato RMarkdown nos permiten combinar en un mismo documento texto, imágenes, ecuaciones y código interactivo que se puede ejecutar para mostrar su resultado. *RStudio* sirve para crear cuadernos como éste y ejecutar de manera interactiva su código en lenguaje *R* (entre otros), además de que podemos documentar nuestros ejercicios para comunicar lo que hemos desarrollado a otras personas ya que un cuaderno *RMarkdown* se puede exportar en otros formatos más compatibles como *HTML*, *PDF* o *Word*.
+Los cuadernos interactivos en formato *RMarkdown* nos permiten combinar
+en un mismo documento texto, imágenes, ecuaciones y código interactivo
+que se puede ejecutar para mostrar su resultado. *RStudio* sirve para
+crear cuadernos como éste y ejecutar de manera interactiva su código en
+lenguaje *R* (entre otros), además de que podemos documentar nuestros
+ejercicios para comunicar lo que hemos desarrollado a otras personas ya
+que un cuaderno *RMarkdown* se puede exportar en otros formatos más
+compatibles como *HTML*, *PDF* o *Word*.
 
-En un cuaderno de *RMarkdown*, los códigos en lenguaje R se escriben dentro de bloques llamados *chunks*. En RStudio podemos ejecutar el contenido de un *chunk* presionando el botón verde de reproducción llamado `Run Current Chunk` ó situando el cursor dentro del *chunk* y presionando las teclas `Ctrl+Enter`.
+En un cuaderno de *RMarkdown*, los códigos en lenguaje R se escriben
+dentro de bloques llamados *chunks*. En RStudio podemos ejecutar el
+contenido de un *chunk* presionando el botón verde de reproducción
+llamado `Run Current Chunk` ó situando el cursor dentro del *chunk* y
+presionando las teclas `Ctrl+Enter`.
 
 ## Un repaso de R
 
-Sigue las indicaciones y ejecuta los siguientes *chunks* para obtener el resultado. En los casos necesarios, completa el código escribiendo sobre los asteriscos (\*\*\*) y ejecuta el *chunk* para comprobar el resultado.  
+Sigue las indicaciones y ejecuta los siguientes *chunks* para obtener el
+resultado. En los casos necesarios, completa el código escribiendo sobre
+los asteriscos (\*\*\*) y ejecuta el *chunk* para comprobar el
+resultado.
 
 ### Obtención de ayuda
 
-*R* es un lenguaje de programación que está completamente documentado. Es importante aprender a consultar la ayuda para entender mejor cómo utilizar las funciones de *R* de la mejor manera posible.
+*R* es un lenguaje de programación que está completamente documentado.
+Es importante aprender a consultar la ayuda para entender mejor cómo
+utilizar las funciones de *R* de la mejor manera posible.
 
-Ejecuta el siguiente *chunk* para obtener ayuda sobre la función `for` usando la función `help` (la ayuda aparecerá en el panel *Help*):
+Ejecuta el siguiente *chunk* para obtener ayuda sobre la función `for`
+usando la función `help` (la ayuda aparecerá en el panel *Help*):
+
 ```{r Ayuda sobre una función}
 help("for")
 ```
 
-Existe otra forma común de consultar la ayuda. Selecciona o ubica el cursor en la función `R.Version()` y presiona la tecla **F1**  (no es necesario correr este *chunk*, la ayuda aparecerá en el panel *Help*):
+Existe otra forma común de consultar la ayuda. Selecciona o ubica el
+cursor en la función `R.Version()` y presiona la tecla **F1** (no es
+necesario correr este *chunk*, la ayuda aparecerá en el panel *Help*):
+
 ```{r Otra forma de buscar en la ayuda}
 R.Version()
 ```
 
-Ejecuta el siguiente *chunk* para buscar documentación relacionada con estructuras de control buscando el término `"control flow"` usando la función `help.search` (el índice de temas relacionados aparecerá en el panel *Help*):
+Ejecuta el siguiente *chunk* para buscar documentación relacionada con
+estructuras de control buscando el término `"control flow"` usando la
+función `help.search` (el índice de temas relacionados aparecerá en el
+panel *Help*):
+
 ```{r Buscar en la ayuda}
 help.search("control flow")
 ```
 
 ### Comentar el código
 
-Se pueden agregar notas y comentarios a los códigos sin que se ejecuten anteponiendo `#`. Ejecuta la siguiente instrucción para que aparezca el mensaje `"Puedo ver este texto!"` sin que aparezcan los comentarios que están en la misma línea y en la siguiente:
+Se pueden agregar notas y comentarios a los códigos sin que se ejecuten
+anteponiendo `#`. Ejecuta la siguiente instrucción para que aparezca el
+mensaje `"Puedo ver este texto!"` sin que aparezcan los comentarios que
+están en la misma línea y en la siguiente:
+
 ```{r}
 print("Puedo ver este texto!") # Este es un comentario que no se ve
 # No puedo ver este texto!
@@ -52,17 +97,23 @@ print("Puedo ver este texto!") # Este es un comentario que no se ve
 
 ### Operadores básicos
 
-Ejecuta el siguiente *chunk* para obtener el resultado de la suma de `34 + 56`:
+Ejecuta el siguiente *chunk* para obtener el resultado de la suma de
+`34 + 56`:
+
 ```{r Suma}
 34 + 56
 ```
 
-Completa el siguiente bloque para obtener la resta de `45 - 13` (sustituye los asteriscos \*\*\* con el valor necesario):
+Completa el siguiente bloque para obtener la resta de `45 - 13`
+(sustituye los asteriscos \*\*\* con el valor necesario):
+
 ```{r Resta}
 45 - ***
 ```
 
-Obtén los resultados de la multiplicación de `34 * 0.14` y la división de `89.4 / 5`:
+Obtén los resultados de la multiplicación de `34 * 0.14` y la división
+de `89.4 / 5`:
+
 ```{r Multiplicación y división}
 34 *** ***
 *** / ***
@@ -70,23 +121,36 @@ Obtén los resultados de la multiplicación de `34 * 0.14` y la división de `89
 
 ### Asignación de variables
 
-Para crear variables y asignarles un valor se usan los operadores `<-` o `=`. Asigna el valor numérico de `45` a la variable `mi_numero`:
+Para crear variables y asignarles un valor se usan los operadores `<-` o
+`=`. Asigna el valor numérico de `45` a la variable `mi_numero`:
+
 ```{r Asignar una variable numérica}
 mi_numero <- *** # Más común en R
 ```
 
-Para ver el valor de una variable, escribe su nombre y ejecuta el código. Ejecuta el siguiente *chunk* para visualizar el valor de la variable `mi_numero`:
+Para ver el valor de una variable, escribe su nombre y ejecuta el
+código. Ejecuta el siguiente *chunk* para visualizar el valor de la
+variable `mi_numero`:
+
 ```{r Visualizar el valor de una variable}
 mi_numero
 ```
 
-La asignación de valores a una variable también se puede hacer de manera inversa usando la flecha `->` en vez de `<-` y especificando primero el valor y luego el nombre de la variable. Asigna nuevamente el valor `36` a la variable `otro_numero`, usando ahora la asignación inversa, y visualiza el valor de la variable `otro_numero` en la siguiente línea:
+La asignación de valores a una variable también se puede hacer de manera
+inversa usando la flecha `->` en vez de `<-` y especificando primero el
+valor y luego el nombre de la variable. Asigna nuevamente el valor `36`
+a la variable `otro_numero`, usando ahora la asignación inversa, y
+visualiza el valor de la variable `otro_numero` en la siguiente línea:
+
 ```{r}
 36 -> ***
 otro_numero
 ```
 
-Para asignar una variable de tipo texto o caracter, el valor tiene que escribirse entre comillas dobles `"` o simples `'`. Asigna el valor `"Este es un texto!"` a la variable `mi_texto`:
+Para asignar una variable de tipo texto o caracter, el valor tiene que
+escribirse entre comillas dobles `"` o simples `'`. Asigna el valor
+`"Este es un texto!"` a la variable `mi_texto`:
+
 ```{r Asignar una variable de caracter}
 mi_texto <- ***
 *** # Visualizar el valor de la variable
@@ -94,11 +158,17 @@ mi_texto <- ***
 
 ### Tipos de datos
 
-Al igual que otros lenguajes de programación, *R* maneja diferentes tipos de datos básicos para almacenar datos. Es importante entender estos tipos de datos para poder utilizar las funciones de *R* correctamente.
+Al igual que otros lenguajes de programación, *R* maneja diferentes
+tipos de datos básicos para almacenar datos. Es importante entender
+estos tipos de datos para poder utilizar las funciones de *R*
+correctamente.
 
 #### Numérico
 
-Son números que tienen un valor decimal o son una fracción. Asigna el valor númerico de `1.5` a la variable `a` y en la siguiente línea visualiza su valor:
+Son números que tienen un valor decimal o son una fracción. Asigna el
+valor númerico de `1.5` a la variable `a` y en la siguiente línea
+visualiza su valor:
+
 ```{r Ejemplo de tipo de datos numérico}
 a <- ***
 
@@ -106,70 +176,105 @@ a <- ***
 ***
 ```
 
-La función `class` se usa para comprobar el tipo de dato de una variable. Comprueba el tipo de dato de la variable `a`:
+La función `class` se usa para comprobar el tipo de dato de una
+variable. Comprueba el tipo de dato de la variable `a`:
+
 ```{r Comprobar tipo de datos numérico}
 ***(a)
 ```
 
 #### Entero
 
-Los números que no contienen valores decimales tienen un tipo de datos *entero*. Por defecto, si se escribe un número sin valor decimal, *R* lo interpreta como *numérico*, por lo que es necesario declararlo explícitamente como entero utilizando la función `as.integer`. Cambia el valor numérico de la variable `a` por el valor entero de `1` convirtiendo `1.5` con la función `as.integer` y visualiza el nuevo valor de `a`:
+Los números que no contienen valores decimales tienen un tipo de datos
+*entero*. Por defecto, si se escribe un número sin valor decimal, *R* lo
+interpreta como *numérico*, por lo que es necesario declararlo
+explícitamente como entero utilizando la función `as.integer`. Cambia el
+valor numérico de la variable `a` por el valor entero de `1`
+convirtiendo `1.5` con la función `as.integer` y visualiza el nuevo
+valor de `a`:
+
 ```{r Tipo de dato entero}
 a <- as.integer(***) # Cuando se convierte el número a entero se trunca la parte decimal
 ***
 ```
 
 Ahora, comprueba el nuevo tipo de datos de la variable `a`:
+
 ```{r Comprobar el tipo de datos entero}
 ***(***)
 ```
 
 #### Caracter
 
-Una letra, número o una combinación de letras encerrada entre comillas simples `'` o dobles `"` es considerada como un tipo de datos de caracter por *R*. Cambia el valor de la variable entera `a` por el texto `"Me gusta este taller! (O no?)"` y visualiza el nuevo valor de `a`:
+Una letra, número o una combinación de letras encerrada entre comillas
+simples `'` o dobles `"` es considerada como un tipo de datos de
+caracter por *R*. Cambia el valor de la variable entera `a` por el texto
+`"Me gusta este taller! (O no?)"` y visualiza el nuevo valor de `a`:
+
 ```{r Tipo de dato caracter}
 a <- *** 
 *** # Visualizar el valor de la variable
 ```
 
 Ahora, comprueba el nuevo tipo de dato de la variable `a`:
+
 ```{r Comprobar el tipo de datos caracter}
 ***(***)
 ```
 
-Los tipos de datos de tipo caracter también se conocen como *cadenas de texto*.
+Los tipos de datos de tipo caracter también se conocen como *cadenas de
+texto*.
 
 #### Lógico
 
-Una variable que sólo puede tener los valores `TRUE` (verdadero) y `FALSE` (falso) es conocida como *variable lógica* o *booleana*. Cambia el valor de la variable de caracter `a` con el valor `FALSE` (con mayúsculas) y visualiza su valor:
+Una variable que sólo puede tener los valores `TRUE` (verdadero) y
+`FALSE` (falso) es conocida como *variable lógica* o *booleana*. Cambia
+el valor de la variable de caracter `a` con el valor `FALSE` (con
+mayúsculas) y visualiza su valor:
+
 ```{r Tipo de datos lógico}
 a <- ***
 ***
 ```
 
 Ahora, comprueba el nuevo tipo de dato de la variable `a`:
+
 ```{r Comprobar el tipo de dato lógico}
 ***(***)
 ```
 
 #### Vectores
 
-Los vectores son estructuras básicas de datos que se usan en *R* para computar múltiples valores a la vez y para almacenar elementos con el mismo tipo de datos. Completa los valores necesarios para crear un vector con los elementos `(5, 2, 4, 9, 8, 9, 1, 2, 2)` usando `c()`, asignalo a la variable `mi_vector` y visualiza el valor de la variable en la siguiente línea:
+Los vectores son estructuras básicas de datos que se usan en *R* para
+computar múltiples valores a la vez y para almacenar elementos con el
+mismo tipo de datos. Completa los valores necesarios para crear un
+vector con los elementos `(5, 2, 4, 9, 8, 9, 1, 2, 2)` usando `c()`,
+asignalo a la variable `mi_vector` y visualiza el valor de la variable
+en la siguiente línea:
+
 ```{r Crear un vector}
 mi_vector <- c(5, 2, 4, ***, ***, ***, ***, ***, ***)
 ***
 ```
 
 Ahora, comprueba el nuevo tipo de dato de la variable `mi_vector`:
+
 ```{r Comprobar el tipo de datos del vector}
 ***(***) # Tipo de datos de los elementos del vector
 ```
 
 #### Listas
 
-Las listas son estructuras que permiten almacenar múltiples *componentes* de cualquier tipo que *R* pueda manejar, como las *variables*, los *vectores* u otras *listas*. A diferencia de los vectores, las listas permiten almacenar diferentes tipos de datos y estructuras.
+Las listas son estructuras que permiten almacenar múltiples
+*componentes* de cualquier tipo que *R* pueda manejar, como las
+*variables*, los *vectores* u otras *listas*. A diferencia de los
+vectores, las listas permiten almacenar diferentes tipos de datos y
+estructuras.
 
-Asigna los valores de texto `("A", "B", "C")` a la variable `b`, y crea una lista llamada `mi_lista` que contenga como componentes el valor `TRUE` y las variables `mi_vector` y `otro_vector` usando la función `list`. Visualiza el contenido de `mi_lista`:
+Asigna los valores de texto `("A", "B", "C")` a la variable `b`, y crea
+una lista llamada `mi_lista` que contenga como componentes el valor
+`TRUE` y las variables `mi_vector` y `otro_vector` usando la función
+`list`. Visualiza el contenido de `mi_lista`:
 
 ```{r Crear una lista}
 otro_vector <- c("A", ***, ***) # Crear otro vector con valores
@@ -177,7 +282,9 @@ mi_lista <- list(TRUE, ***, ***) # Construir la lista
 *** # Visualizar el contenido de la lista
 ```
 
-Crea otra lista llamada `otra_lista` que contenga como componentes el valor `456.123` y la lista `mi_lista` y visualiza el contenido de `otra_lista`:
+Crea otra lista llamada `otra_lista` que contenga como componentes el
+valor `456.123` y la lista `mi_lista` y visualiza el contenido de
+`otra_lista`:
 
 ```{r Crear otra lista}
 otra_lista <- ***(***, ***)
@@ -185,111 +292,154 @@ otra_lista <- ***(***, ***)
 ```
 
 Ahora, comprueba el tipo de dato de la variable `otra_lista`:
+
 ```{r Comprobar el tipo de datos de la lista}
 ***(***)
 ```
 
 #### Factores
 
-Se usan para crear variables categóricas como por ejemplo *colores*, *bueno y malo*, *calificaciones de cursos o películas*, que son muy útiles para el modelado estadístico. Cambia el valor de la variable lógica `a` por un factor construido a partir de los valores  `c("bajo", "bajo", "alto", "medio", "alto", "medio", "bajo")` usando la función `factor` y visualiza el nuevo valor de la variable `a` en la siguiente línea:
+Se usan para crear variables categóricas como por ejemplo *colores*,
+*bueno y malo*, *calificaciones de cursos o películas*, que son muy
+útiles para el modelado estadístico. Cambia el valor de la variable
+lógica `a` por un factor construido a partir de los valores
+`c("bajo", "bajo", "alto", "medio", "alto", "medio", "bajo")` usando la
+función `factor` y visualiza el nuevo valor de la variable `a` en la
+siguiente línea:
+
 ```{r Crear un factor}
 a <- factor(c("bajo", "bajo", ***, ***, ***, ***, ***))
 ***
 ```
 
-Un factor permite agrupar los valores por categorías llamadas `niveles`. Comprueba los niveles en los que se pueden agrupar los valores del factor `a`, usando la función `levels`:
+Un factor permite agrupar los valores por categorías llamadas `niveles`.
+Comprueba los niveles en los que se pueden agrupar los valores del
+factor `a`, usando la función `levels`:
+
 ```{r Comprobar los niveles de un factor}
 levels(***)
 ```
 
 Ahora, comprueba el nuevo tipo de dato de la variable `a`:
+
 ```{r Comprobar el tipo de datos del factor}
 ***(***)
 ```
 
 ### Operaciones con vectores
 
-Crea un vector con una secuencia de números enteros del 2 al 10, usando la instrucción `2:10`:
+Crea un vector con una secuencia de números enteros del 2 al 10, usando
+la instrucción `2:10`:
+
 ```{r Crear una secuencia}
 ***:***
 ```
 
-Crea un vector que contenga la secuencia de 0 a 10 con pasos de 2.5 usando la función `seq`:
+Crea un vector que contenga la secuencia de 0 a 10 con pasos de 2.5
+usando la función `seq`:
+
 ```{r Vector de secuencia compleja}
 seq(from = ***, to = ***, by = 2.5)
 ```
 
-Repite 4 veces los elementos del vector `1:3` usando la función `rep`, especificando el parámetro `times`:
+Repite 4 veces los elementos del vector `1:3` usando la función `rep`,
+especificando el parámetro `times`:
+
 ```{r Repetir elementos en un vector - times}
 rep(***, times = 4) # Repetir un vector n veces
 ```
 
-Repite 3 veces cada uno de los valores del vector `1:2` usando la función `rep`, especificando el parámetro `each`:
+Repite 3 veces cada uno de los valores del vector `1:2` usando la
+función `rep`, especificando el parámetro `each`:
+
 ```{r Repetir elementos en un vector - each}
 rep(***, each = 3) # Repetir cada valor de un vector n veces
 ```
 
-Ordena de manera ascendente los valores de `mi_vector` usando la función `sort`:
+Ordena de manera ascendente los valores de `mi_vector` usando la función
+`sort`:
+
 ```{r Ordenar un vector}
 sort(***)
 ```
 
-Ordena de manera descendente los valores de `mi_vector` usando la función `sort`, ahora especificando el parámetro `decreasing = TRUE`:
+Ordena de manera descendente los valores de `mi_vector` usando la
+función `sort`, ahora especificando el parámetro `decreasing = TRUE`:
+
 ```{r Ordenar descendente un vector}
 sort(***, decreasing = ***) # Orden descendente
 ```
 
-Invierte el orden de los elementos de `mi_vector` usando la función `rev`:
+Invierte el orden de los elementos de `mi_vector` usando la función
+`rev`:
+
 ```{r Invertir un vector}
 rev(***)
 ```
 
-Obtén una tabla con el conteo de cada elemento de `mi_vector` usando `table`:
+Obtén una tabla con el conteo de cada elemento de `mi_vector` usando
+`table`:
+
 ```{r Conteo de valores de un vector}
 table(***)
 ```
 
-Obtén los valores únicos del vector `mi_vector` usando la función `unique`:
+Obtén los valores únicos del vector `mi_vector` usando la función
+`unique`:
+
 ```{r Valores únicos en un vector}
 unique(***)
 ```
 
-Usa los corchetes `[]` para seleccionar el cuarto elemento de `mi_vector` (el índice empieza desde 1):
+Usa los corchetes `[]` para seleccionar el cuarto elemento de
+`mi_vector` (el índice empieza desde 1):
+
 ```{r Selecciona por índice}
 ***[4] # Selecciona el 4to. elemento en mi_vector
 ```
 
-Selecciona todos los elementos de `mi_vector` excepto el cuarto usando el índice negativo `-4`:
+Selecciona todos los elementos de `mi_vector` excepto el cuarto usando
+el índice negativo `-4`:
+
 ```{r Selecciona todo excepto un elemento}
 ***[-4] # Selecciona todo excepto el 4to. elemento en mi_vector
 ```
 
 Selecciona los elementos 2 al 5 de `mi_vector`:
+
 ```{r Selecciona por rango}
 ***[***:5] # Selecciona del 2do. al 5to. elemento en mi_vector
 ```
 
-Selecciona todos los elementos de `mi_vector` excepto los del 2 al 5 usando el índice negativo `-(2:5)`:
+Selecciona todos los elementos de `mi_vector` excepto los del 2 al 5
+usando el índice negativo `-(2:5)`:
+
 ```{r Selecciona todos excepto un rango}
 ***[-(2:***)] # Selecciona todos los elementos excepto los elementos del 2do. al 5to. en mi_vector
 ```
 
-Selecciona sólo los elementos 1 y 5 de `mi_vector` usando el vector `c(1,5)`:
+Selecciona sólo los elementos 1 y 5 de `mi_vector` usando el vector
+`c(1,5)`:
+
 ```{r Seleccionar por índices en particular}
 ***[c(***,5)] # Selecciona sólo el 1ro. y 5to. elementos en mi_vector
 ```
 
 Seleccionar elementos de `mi_vector` que son iguales a 2:
+
 ```{r Seleccionar por valor}
 ***[mi_vector == ***] # Seleccionar elementos iguales a 2 en mi_vector
 ```
 
 Selecciona elementos de `mi_vector` que sean menores a 3:
+
 ```{r Seleccionar con una condición}
 ***[*** < 3] # Selecciona los elementos menores a 3 en mi_vector
 ```
 
-Selecciona los elementos de `mi_vector` que sean iguales a 1, 2 ó 5 usando el operador `%in%` y un vector con los valores `c(1, 2, 5)`:
+Selecciona los elementos de `mi_vector` que sean iguales a 1, 2 ó 5
+usando el operador `%in%` y un vector con los valores `c(1, 2, 5)`:
+
 ```{r Selecciona por índices particulares}
 ***[*** %in% c(1, ***, ***)]
 ```
@@ -297,12 +447,15 @@ Selecciona los elementos de `mi_vector` que sean iguales a 1, 2 ó 5 usando el o
 ### Condicionales
 
 Asigna el valor 5 a la variable `a` y el valor 6 a la variable `a`:
+
 ```{r Variables para comparar}
 a <- ***
 *** -> b # Asignación inversa
 ```
 
-Ejecuta el siguiente *chunk* para comparar los valores de las variables `a` y `b`:
+Ejecuta el siguiente *chunk* para comparar los valores de las variables
+`a` y `b`:
+
 ```{r Condiciones con variables}
 a == b # Igual
 a != b # No igual
@@ -314,117 +467,168 @@ is.na(a) # No tiene valor (NA)
 is.null(b) # Tiene un valor vacío (NULL)
 ```
 
-Es posible comparar valores únicos, vectores de múltiples elementos o ambos. Comprueba cada uno de los elementos de `mi_vector` para verificar si son mayores que el valor de `a`:
+Es posible comparar valores únicos, vectores de múltiples elementos o
+ambos. Comprueba cada uno de los elementos de `mi_vector` para verificar
+si son mayores que el valor de `a`:
+
 ```{r Condiciones con vectores}
 mi_vector > *** # Comparar cada elemento en mi_vector con la variable a
 ```
 
-Verificar si el valor de `b` está entre los elementos de `mi_vector` usando el operador `%in%`:
+Verificar si el valor de `b` está entre los elementos de `mi_vector`
+usando el operador `%in%`:
+
 ```{r}
 b %in% *** # b es un elemento de mi_vector?
 ```
 
 ### Dataframes
 
-En *R*, un *dataframe* e una colección de elementos acoplados que construyen una tabla donde cada columna tienen un tipo de datos en particular. Los *dataframes* son las estructuras de datos fundamentales que usa la mayoría de software de modelado de *R*. 
+En *R*, un *dataframe* es una colección de elementos acoplados que
+construyen una tabla donde cada columna tienen un tipo de datos en
+particular. Los *dataframes* son las estructuras de datos fundamentales
+que usa la mayoría del software de modelado de *R*.
 
-Construye un *dataframe* usando la función `data.frame` e incluyendo como parámetros una columna `x` con los valores enteros de 1 a 5 y una columna `y` con los caracteres `("A", "B", "C", "D", "E")`, asígnalo a la variable `mi_df` y visualiza su contenido en la siguiente línea:
+Construye un *dataframe* usando la función `data.frame` e incluyendo
+como parámetros una columna `x` con los valores enteros de 1 a 5 y una
+columna `y` con los caracteres `("A", "B", "C", "D", "E")`, asígnalo a
+la variable `mi_df` y visualiza su contenido en la siguiente línea:
+
 ```{r Crea un dataframe}
 mi_df <- data.frame(x = ***, y = c(***))
 *** # Visualizar el contenido del dataframe 
 ```
 
-Visualiza el contenido completo de `mi_df` usando la función `View` (en RStudio, se abre una nueva ventana):
+Visualiza el contenido completo de `mi_df` usando la función `View` (en
+*RStudio*, se abre una nueva ventana):
+
 ```{r Ver el dataframe}
 View(***)
 ```
 
-También puedes visualizar los *dataframes* usando el panel *Environment* en RStudio.
+También puedes visualizar los *dataframes* usando el panel *Environment*
+en *RStudio*.
 
-Visualiza rápidamente las primeras filas de `mi_df`, usando la función `head` para visualizar las primeras 5 filas especificando el parámetro `n = 5`:
+Visualiza rápidamente las primeras filas de `mi_df`, usando la función
+`head` para visualizar las primeras 5 filas especificando el parámetro
+`n = 5`:
+
 ```{r Cabeza del dataframe}
 head(***, n = ***) # Si se omite el parámetro n, la función head regresa las primeras 5 filas por defecto
 ```
 
-Visualiza rápidamente las últimas filas de `mi_df`, usando la función `tail` para visualizar las últimas 5 filas especificando el parámetro `n = 5`:
+Visualiza rápidamente las últimas filas de `mi_df`, usando la función
+`tail` para visualizar las últimas 5 filas especificando el parámetro
+`n = 5`:
+
 ```{r Cola del dataframe}
 tail(***, n = ***) # Si se omite el parámetro n, la función tail regresa las últimas 5 filas por defecto
 ```
 
-Para acceder a una fila en particular en *dataframe*, especifica la posición del elemento entre corchetes ([Fila, Columna]). Accede al contenido de la primera fila completa de `mi_df`, omitiendo el índice para la columna:
+Para acceder a una fila en particular en *dataframe*, especifica la
+posición del elemento entre corchetes ([Fila, Columna]). Accede al
+contenido de la primera fila completa de `mi_df`, omitiendo el índice
+para la columna:
+
 ```{r Acceder a una fila en un dataframe}
 mi_df[***, ] # Omite el índice de la columna para acceder a la fila completa
 ```
 
-Accede al contenido de la primer columna completa de `mi_df`, omitiendo el índice para la fila:
+Accede al contenido de la primer columna completa de `mi_df`, omitiendo
+el índice para la fila:
+
 ```{r Acceder a una columna por índice}
 mi_df[, ***] # Omite el índice de la fila para acceder a la columna completa
 ```
 
-La manera más común de acceder a los valores en una variable (columna) es usando el separador `$`. Accede al valor de la columna `y` de `mi_df` usando el separador `$`:
+La manera más común de acceder a los valores en una variable (columna)
+es usando el separador `$`. Accede al valor de la columna `y` de `mi_df`
+usando el separador `$`:
+
 ```{r Acceder a columnas por nombre de variable}
 mi_df$*** # Usa el nombre de la variable
 ```
 
-Accede a al elemento que está en la segunda fila y en la segunda columna de `mi_df`:
+Accede a al elemento que está en la segunda fila y en la segunda columna
+de `mi_df`:
+
 ```{r Acceder a un elemento en una dataframe}
 mi_df[***, ***] # Acceder al elemento de la fila 2, columna 2
 ```
 
-Comprueba el número de filas y columnas (dimensiones) que tiene `mi_df` usando la función `dim`:
+Comprueba el número de filas y columnas (dimensiones) que tiene `mi_df`
+usando la función `dim`:
+
 ```{r Dimensiones del dataframe}
 dim(***) # Dimensiones del dataframe (números de columnas y filas)
 ```
 
 Comprueba el número de filas que tiene `mi_df` usando la función `nrow`:
+
 ```{r Número de filas de un dataframe}
 nrow(***) # Número de filas en un dataframe
 ```
 
-Comprueba el número de columnas que tiene `mi_df` usando la función `ncol`:
+Comprueba el número de columnas que tiene `mi_df` usando la función
+`ncol`:
+
 ```{r Número de columnas de un dataframe}
 ncol(***) # Número de columnas en un dataframe
 ```
 
-Crea un *dataframe* de una sola columna llamada `z` que contenga los valores enteros de 6 a 10, asígnalo a la variable `nueva_columna` y visualiza su contenido en la siguiente línea:
+Crea un *dataframe* de una sola columna llamada `z` que contenga los
+valores enteros de 6 a 10, asígnalo a la variable `nueva_columna` y
+visualiza su contenido en la siguiente línea:
+
 ```{r Crear nueva columna para dataframe}
 nueva_columna <- data.frame(*** = c(***:***)) # Debe tener el mismo número de filas que el dataframe
 ***
 ```
 
-Agrega la columna del dataframe `nueva_columna` a `mi_df` usando la función `cbind`:
+Agrega la columna del dataframe `nueva_columna` a `mi_df` usando la
+función `cbind`:
+
 ```{r Agregar columna a un dataframe}
 mi_df <- cbind(mi_df, ***)
 ***
 ```
 
-Extrae la fila 2 de `mi_df`, asígnala a la variable `nueva_fila` y visualiza su contenido:
+Extrae la fila 2 de `mi_df`, asígnala a la variable `nueva_fila` y
+visualiza su contenido:
+
 ```{r Crear nueva fila para dataframe}
 nueva_fila <- mi_df[***, ] # Agregar una copia de la fila 2, debe tener los mismos nombres de variables o se agregarán nuevas columnas con los nombres restantes
 *** # Visualiza el contenido del dataframe
 ```
 
 Agregar la fila de `nueva_fila` al `mi_df`usando la función `rbind`:
+
 ```{r Agregar fila al dataframe}
 mi_df <- rbind(mi_df, ***)
 ***
 ```
 
-Usa la función `str` para visualizar un resumen de la estructura y contenido del *dataframe* `mi_df`:
+Usa la función `str` para visualizar un resumen de la estructura y
+contenido del *dataframe* `mi_df`:
+
 ```{r Estructura del dataframe}
 str(***)
 ```
 
-Revisa los estadísticos básicos de las columnas del dataframe `mi_df` usando la función `summary`:
+Revisa los estadísticos básicos de las columnas del dataframe `mi_df`
+usando la función `summary`:
+
 ```{r Sumario del dataframe}
 summary(***)
 ```
 
 ### Programación
 
-Para una secuencia donde la variable `i` toma valores desde 1 hasta 10, usa la estructura `for` para repetir las siguientes operaciones:
-* Multiplica el valor de la variable `i` por 10 y asigna el resultado a la variable `j`
-* Imprime el valor de `j`
+Para una secuencia donde la variable `i` toma valores desde 1 hasta 10,
+usa la estructura `for` para repetir las siguientes operaciones: \*
+Multiplica el valor de la variable `i` por 10 y asigna el resultado a la
+variable `j` \* Imprime el valor de `j`
+
 ```{r Bucle for}
 for(i in ***:***) {
   j <- i * ***
@@ -432,9 +636,12 @@ for(i in ***:***) {
 }
 ```
 
-Asigna el valor de 1 a la variable `i` para que sea el valor inicial. Después usa la estructura `while` para repetir las siguientes operaciones mientras que el valor de `i` sea menor a 10:
-* Imprime el valor actual de `i`
-* Al valor de `i` súmale 1 y vuelva a asignar el resultado a la variable `i` para actualizarla
+Asigna el valor de 1 a la variable `i` para que sea el valor inicial.
+Después usa la estructura `while` para repetir las siguientes
+operaciones mientras que el valor de `i` sea menor a 10: \* Imprime el
+valor actual de `i` \* Al valor de `i` súmale 1 y vuelva a asignar el
+resultado a la variable `i` para actualizarla
+
 ```{r Bucle while}
 i <- *** # Valor inicial de i, si no se especifica correctamente el ciclo se puede ejecutar infinitamente
 while(i < ***) {
@@ -443,7 +650,11 @@ while(i < ***) {
 }
 ```
 
-Asigna el valor de 40 a la variable `k`. Usa la estructura `if` para verificar si el valor de `k` es mayor a 10, en caso de que lo sea imprime el texto `"La variable k es mayor que 10"`, o en caso contrario imprime el texto `"La variable k es menor o igual que 10"`:
+Asigna el valor de 40 a la variable `k`. Usa la estructura `if` para
+verificar si el valor de `k` es mayor a 10, en caso de que lo sea
+imprime el texto `"La variable k es mayor que 10"`, o en caso contrario
+imprime el texto `"La variable k es menor o igual que 10"`:
+
 ```{r Estructura if}
 k <- ***
 if(k > 10) {
@@ -453,12 +664,20 @@ if(k > 10) {
 }
 ```
 
-Las funciones permiten repetir un bloque de operaciones comunes cambiando parámetros de entrada para obtener los resultados deseados, reciclando así el código.
+Las funciones permiten repetir un bloque de operaciones comunes
+cambiando parámetros de entrada para obtener los resultados deseados,
+reciclando así el código.
 
-Construye una función para calcular el porcentaje que representa el parámetro `parte` respecto al parámetro `total`. Para ello, usa la estructura de `function` para realizar las siguientes operaciones:
-* Asigna a `calcular_porcentaje` una nueva función con `function` y especifica los parámetros necesarios para el cálculo: `parte` y `total`
-* Calcula la división de `parte` entre `total`, multiplícalo por 100 y asígnalo a la variable `porcentaje`
-* Especifica a la función que regrese como resultado el valor de la variable `porcentaje` usando `return`
+Construye una función para calcular el porcentaje que representa el
+parámetro `parte` respecto al parámetro `total`. Para ello, usa la
+estructura de `function` para realizar las siguientes operaciones: \*
+Asigna a `calcular_porcentaje` una nueva función con `function` y
+especifica los parámetros necesarios para el cálculo: `parte` y `total`
+\* Calcula la división de `parte` entre `total`, multiplícalo por 100 y
+asígnalo a la variable `porcentaje` \* Especifica a la función que
+regrese como resultado el valor de la variable `porcentaje` usando
+`return`:
+
 ```{r Crear una función}
 calcular_porcentaje <- function(parte, total) {
   porcentaje <- *** / *** * 100
@@ -466,29 +685,43 @@ calcular_porcentaje <- function(parte, total) {
 }
 ```
 
-Usa la función `calcular_porcentaje` para calcular el porcentaje que representa 15 en 234, usando como parámetros de la función `parte = 15` y `total = 234`:
+Usa la función `calcular_porcentaje` para calcular el porcentaje que
+representa 15 en 234, usando como parámetros de la función `parte = 15`
+y `total = 234`:
+
 ```{r}
 # Llama la función:
 calcular_porcentaje(parte = ***, total = ***)
 ```
 
-Usa nuevamente la función `calcular_porcentaje` para calcular el porcentaje que representa 20 en 200, omitiendo los nombres de los parámetros y pasando los parámetros en el mismo orden en que se definieron en la función:
+Usa nuevamente la función `calcular_porcentaje` para calcular el
+porcentaje que representa 20 en 200, omitiendo los nombres de los
+parámetros y pasando los parámetros en el mismo orden en que se
+definieron en la función:
+
 ```{r}
 # Omitiendo nombres de parámetros, escribir los valores en el orden que se definieron los parámetros en la función:
 ***(***, ***) 
 ```
 
-
 ### Directorio de trabajo
 
-Una buena práctica para programar en *R* es establecer un directorio de trabajo para almacenar todos los programas, cuadernos y datos para tener una mejor organización y facilidad al escribir códigos. 
+Una buena práctica para programar en *R* es establecer un directorio de
+trabajo para almacenar todos los programas, cuadernos y datos para tener
+una mejor organización y facilidad al escribir códigos.
 
-Ejecuta el siguiente *chunk* para ver el directorio de trabajo actual usando la función `getwd`:
+Ejecuta el siguiente *chunk* para ver el directorio de trabajo actual
+usando la función `getwd`:
+
 ```{r Recuperar directorio de trabajo}
 getwd()
 ```
 
-Define el directorio de trabajo que usarás para el taller usando la función `setwd`, escribe entre comillas la ruta de la carpeta del taller que descargaste desde *GitHub* (dentro de las comillas puedes presionar la tecla *Tab* después de cada diagonal para definir la ruta):
+Define el directorio de trabajo que usarás para el taller usando la
+función `setwd`, escribe entre comillas la ruta de la carpeta del taller
+que descargaste desde *GitHub* (dentro de las comillas puedes presionar
+la tecla *Tab* después de cada diagonal para definir la ruta):
+
 ```{r Definir la carpeta de trabajo}
 # Ejemplo para definir la carpeta de trabajo en Windows:
 # setwd("C:\centrogeo-taller-sigypp") 
@@ -499,51 +732,76 @@ Define el directorio de trabajo que usarás para el taller usando la función `s
 setwd(***)
 ```
 
-También se pueden usar los proyectos en *RStudio* para definir una carpeta de trabajo.
+También se pueden usar los proyectos en *RStudio* para definir una
+carpeta de trabajo.
 
 ### Leer y escribir datos
 
 #### Escribir datos
 
-R usa un formato de archivo con extensión `.RData` para almacenar los datos usados durante una sesión. 
+R usa un formato de archivo con extensión `.RData` para almacenar los
+datos usados durante una sesión.
 
-Guarda las variables `mi_vector`, `mi_texto`, `mi_df` en el archivo `mis_datos.RData` en la carpeta `Datos` del directorio de trabajo actual usando la función `save` :
+Guarda las variables `mi_vector`, `mi_texto`, `mi_df` en el archivo
+`mis_datos.RData` en la carpeta `Datos` del directorio de trabajo actual
+usando la función `save` :
+
 ```{r Guardar variables en un archivo}
 save(mi_vector, ***, ***, file = "Datos/mis_datos.RData")
 ```
 
-Ejecuta el siguiente *chunk* para eliminar todas las variables del entorno usando la función `rm` (todas los objetos del panel *Environment* desaparecerán):
+Ejecuta el siguiente *chunk* para eliminar todas las variables del
+entorno usando la función `rm` (todas los objetos del panel
+*Environment* desaparecerán):
+
 ```{r Limpiar entorno}
 rm(list = ls())
 ```
 
-En *RStudio* también puedes limpiar el entorno usando el botón de la *escoba* en el panel *Environment*.
+En *RStudio* también puedes limpiar el entorno usando el botón de la
+*escoba* en el panel *Environment*.
 
-Carga nuevamente las variables que guardaste anteriormente en `Datos/mis_datos.RData` usando la función `load`:
+Carga nuevamente las variables que guardaste anteriormente en
+`Datos/mis_datos.RData` usando la función `load`:
+
 ```{r Leer variables de RData}
 load(***)
 ```
 
-*R* también puede guardar datos en formato de texto plano como *CSV* (valores separados por comas) o texto delimitado por algún caracter. 
+*R* también puede guardar datos en formato de texto plano como *CSV*
+(valores separados por comas) o texto delimitado por algún caracter.
 
-Guarda el contenido del *dataframe* `mi_df` en la carpeta `Datos` en un archivo de texto llamado `mi_df.txt` y usa como delimitador el caracter `|` usando la función `write.table`:
+Guarda el contenido del *dataframe* `mi_df` en la carpeta `Datos` en un
+archivo de texto llamado `mi_df.txt` y usa como delimitador el caracter
+`|` usando la función `write.table`:
+
 ```{r Guarda los datos como texto plano}
 write.table(***, file = ***, sep = ***) # Guarda el dataframe como texto delimitado usando "|" como separador
 ```
 
-Guarda el contenido del *dataframe* `mi_df` en la carpeta `Datos` en un archivo *CSV* llamado `mi_df.csv`:
+Guarda el contenido del *dataframe* `mi_df` en la carpeta `Datos` en un
+archivo *CSV* llamado `mi_df.csv`:
+
 ```{r Guarda los datos como CSV}
 write.csv(***, file = ***) # Guarda el dataframe como CSV usando "," como separador
 ```
 
-Existe una función alternativa a `write.csv` que se llama `write.csv2`. La diferencia entre ellas es usan diferentes separadores de miles y de decimales en los números y diferentes delimitadores de columnas, por ejemplo, a diferencia de México, en España y otros países se usa como separador de miles el punto `.` y como separador de decimales la coma `,`:
+Existe una función alternativa a `write.csv` que se llama `write.csv2`.
+La diferencia entre ellas es usan diferentes separadores de miles y de
+decimales en los números y diferentes delimitadores de columnas, por
+ejemplo, a diferencia de México, en España y otros países se usa como
+separador de miles el punto `.` y como separador de decimales la coma
+`,`:
 
 | Función    | Ejemplo      | Sep. miles | Sep. decimales | Delimitador      |
-| ---------- | ------------ | ---------- | -------------- | ---------------- |
+|------------|--------------|------------|----------------|------------------|
 | write.csv  | 2,345,567.12 | Coma (,)   | Punto (.)      | Coma (,)         |
 | write.csv2 | 2.345.567,12 | Punto (.)  | Coma (,)       | Punto y coma (;) |
 
-Guarda los datos del *dataframe* `mi_df` en un formato *CSV* que pueda usarse correctamente en España, guardándolos en el archivo `mi_df2.csv` en la carpeta `Datos` del directorio de trabajo actual usando la función `write.csv2`:
+Guarda los datos del *dataframe* `mi_df` en un formato *CSV* que pueda
+usarse correctamente en España, guardándolos en el archivo `mi_df2.csv`
+en la carpeta `Datos` del directorio de trabajo actual usando la función
+`write.csv2`:
 
 ```{r Guarda los datos como CSV 2}
 write.csv2(***, file = ***) # Guarda el dataframe como CSV usando ";" como separador (para países donde el punto decimal es ",")
@@ -551,7 +809,10 @@ write.csv2(***, file = ***) # Guarda el dataframe como CSV usando ";" como separ
 
 #### Leer datos
 
-Lee el archivo `mi_df.txt` en la carpeta `Datos` y asigna su contenido a la variable `mi_df_desde_delimitado` especificando el separador `"|"` en la función `read.table`:
+Lee el archivo `mi_df.txt` en la carpeta `Datos` y asigna su contenido a
+la variable `mi_df_desde_delimitado` especificando el separador `"|"` en
+la función `read.table`:
+
 ```{r Leer datos desde texto plano}
 mi_df_desde_delimitado <- read.table(***, sep = ***)
 
@@ -559,7 +820,9 @@ mi_df_desde_delimitado <- read.table(***, sep = ***)
 ***
 ```
 
-Lee el archivo `mi_df.csv` en la carpeta `Datos` y asigna su contenido a la variable `mi_df_desde_csv` usando la función `read.csv`:
+Lee el archivo `mi_df.csv` en la carpeta `Datos` y asigna su contenido a
+la variable `mi_df_desde_csv` usando la función `read.csv`:
+
 ```{r Leer datos desde CSV}
 mi_df_desde_csv <- read.csv(***)
 
@@ -569,64 +832,104 @@ mi_df_desde_csv <- read.csv(***)
 
 ### Entorno
 
-Ejecuta el siguiente *chunk* para listar todas las variables que hay en el entorno usando `ls`:
+Ejecuta el siguiente *chunk* para listar todas las variables que hay en
+el entorno usando `ls`:
+
 ```{r Lista las variables}
 ls()
 ```
 
-Ejecuta el siguiente *chunk* para eliminar del entorno la variable `mi_df` usando la función `rm`:
+Ejecuta el siguiente *chunk* para eliminar del entorno la variable
+`mi_df` usando la función `rm`:
+
 ```{r Elimina una variable del entorno}
 rm("mi_df") # Elimina una variable
 ```
 
-Vuelve a limpiar todas las variables del entorno como lo hiciste anteriormente:
+Vuelve a limpiar todas las variables del entorno como lo hiciste
+anteriormente:
+
 ```{r Elimina todas las variables del entorno}
 __(*** = ***()) # Elimina todas las variables
 ```
 
 ## Instalar paquetes
 
-El lenguaje R extiende sus capacidades usando paquetes de terceros. Estos paquetes están almacenados y documentados en el CRAN ( [Comprehensive R Archive Network](https://cran.r-project.org)), y que permiten agregar nuevas funciones a las que incluye originalmente R.
+El lenguaje R extiende sus capacidades usando paquetes de terceros.
+Estos paquetes están almacenados y documentados en el CRAN (
+[Comprehensive R Archive Network](https://cran.r-project.org)), y que
+permiten agregar nuevas funciones a las que incluye originalmente R.
 
-En esta sección se presentan las funcionalidades que ofrecen algunos paquetes que se utilizarán en el taller y que son usados comúnmente para leer, escribir, limpiar, manipular, procesar y visualizar datos.
+En esta sección se presentan las funcionalidades que ofrecen algunos
+paquetes que se utilizarán en el taller y que son usados comúnmente para
+leer, escribir, limpiar, manipular, procesar y visualizar datos.
 
-Ejecuta el siguiente *chunk* para instalar el paquete `carData` desde el CRAN, usando la función `install.packages`:
+Ejecuta el siguiente *chunk* para instalar el paquete `carData` desde el
+CRAN, usando la función `install.packages`:
+
 ```{r Instalar un paquete}
 install.packages("carData") # carData es un paquete que contiene datos de ejemplo
 ```
 
-Otra opción para cargar, instalar y actualizar paquetes es usar el panel *Packages* en RStudio. 
+Otra opción para cargar, instalar y actualizar paquetes es usar el panel
+*Packages* en *RStudio*.
 
-Carga el paquete `carData` para usarlo en esta sesión usando la función `library` (para poder usar un paquete es necesario instalarlo antes):
+Carga el paquete `carData` para usarlo en esta sesión usando la función
+`library` (para poder usar un paquete es necesario instalarlo antes):
+
 ```{r Carga un paquete}
 library(***)
 ```
 
-Algunos paquetes incluyen datos de muestra que pueden ser cargados al entorno.usando la función `data`.
+Algunos paquetes incluyen datos de muestra que pueden ser cargados al
+entorno.usando la función `data`.
 
-Carga el dataframe `Salaries` del paquete `carData` (`Salaries` aparecerá en el panel de *Environment*):
+Carga el dataframe `Salaries` del paquete `carData` (`Salaries`
+aparecerá en el panel de *Environment*):
+
 ```{r Carga datos de muestra}
 data(***, package = "carData") # Carga los datos de Salaries del paquete carData y guárdalo en una variable
 *** # Visualiza los datos
 ```
 
-Ejecuta el siguiente *chunk* para usar la función `sessionInfo()` del paquete `utils` sin cargarlo completamente con `library` usando la siguiente notación con `::`: 
+Ejecuta el siguiente *chunk* para usar la función `sessionInfo()` del
+paquete `utils` sin cargarlo completamente con `library` usando la
+siguiente notación con `::`:
+
 ```{r Llamar función específica desde paquete}
 utils::sessionInfo() # Usa la función sessionInfo del paquete utils sin cargar el paquete antes con library 
 ```
 
-Escribe en la primer línea la instrucción `utils::` y presiona la tecla Tab para listar las funciones que incluye el paquete, busca la función `chooseCRANmirror()` y selecciónala con la tecla *Enter*. Ejecuta el *chunk* y selecciona el servidor espejo del *CRAN* más cercano, en nuestro caso es el `55: Mexico (Mexico City) [https]` así que escribe `55` en el panel *Console* y presiona la tecla *Enter*:
+Escribe en la primer línea la instrucción `utils::` y presiona la tecla
+Tab para listar las funciones que incluye el paquete, busca la función
+`chooseCRANmirror()` y selecciónala con la tecla *Enter*. Ejecuta el
+*chunk* y selecciona el servidor espejo del *CRAN* más cercano, en
+nuestro caso es el `55: Mexico (Mexico City) [https]` así que escribe
+`55` en el panel *Console* y presiona la tecla *Enter*:
+
 ```{r}
 utils::chooseCRANmirror()
 ```
 
-A veces es necesario instalar paquetes que no están disponibles en un formato nativo para nuestra computadora (se dice que están *compilados*). En estos casos será necesario que nosotros mismos *compilemos* los paquetes para usarlos en nuestra computadora a partir de su código fuente.
+A veces es necesario instalar paquetes que no están disponibles en un
+formato nativo para nuestra computadora (se dice que están
+*compilados*). En estos casos será necesario que nosotros mismos
+*compilemos* los paquetes para usarlos en nuestra computadora a partir
+de su código fuente.
 
-Si la computadora donde estás realizando estos ejercicios tiene un sistema operativo *Windows*, instala **RTools** desde [https://cran.rstudio.com/bin/windows/Rtools/](https://cran.rstudio.com/bin/windows/Rtools/) para poder *compilar* paquetes de *R*. Omite este paso si tu computadora tiene un sistema operativo *macOS* o *Linux*.
+Si la computadora donde estás realizando estos ejercicios tiene un
+sistema operativo *Windows*, instala **RTools** desde
+<https://cran.rstudio.com/bin/windows/Rtools/> para poder *compilar*
+paquetes de *R*. Omite este paso si tu computadora tiene un sistema
+operativo *macOS* o *Linux*.
 
+El paquete `janitor` es muy útil para la limpieza de datos y será
+utilizado más adelante en este taller. Instala el paquete `janitor`,
+compilando su código fuente desde la dirección del repositorio
+`https://cran.r-project.org/src/contrib/janitor_2.1.0.tar.gz`, usando la
+función `install.packages` y los parámetros `repos = NULL` y
+`type = "source`:
 
-
-El paquete `janitor` es muy útil para la limpieza de datos y será utilizado más adelante en este taller. Instala el paquete `janitor`, compilando su código fuente desde la dirección del repositorio `https://cran.r-project.org/src/contrib/janitor_2.1.0.tar.gz`, usando la función `install.packages` y los parámetros `repos = NULL` y `type = "source`:
 ```{r Instalar aspace de fuente}
 # Instalar primero algunos paquetes dependientes:
 # install.packages(c("splancs", "shapefiles", "factoextra", "clusterCrit", "NbClust", "spdep", "corrplot", "igraph", "Hmisc"))
@@ -637,24 +940,40 @@ install.packages("***",
                  type = "***")
 ```
 
-También es posible instalar cualquier paquete discontinuado que esté [archivado en el *CRAN*](https://cran.r-project.org) a partir de su código fuente usando el procedimiento anterior.
+También es posible instalar cualquier paquete discontinuado que esté
+[archivado en el *CRAN*](https://cran.r-project.org) a partir de su
+código fuente usando el procedimiento anterior.
 
-Otra manera de instalar un paquete es desde el repositorio de su desarollador en *GitHub*. Instala el paquete `aRtsy` desde el repositorio `koenderks/aRtsy` de GitHub:
+Otra manera de instalar un paquete es desde el repositorio de su
+desarollador en *GitHub*. Instala el paquete `aRtsy` desde el
+repositorio `koenderks/aRtsy` de GitHub:
+
 ```{r Instalar un paquete desde GitHub}
 devtools::install_github("***")
 ```
 
-Este es un interesante paquete que permite crear *arte generativo* que se crea a partir de algoritmos aleatorios y que resulta en imágenes únicas e irrepetibles.
+Este es un interesante paquete que permite crear *arte generativo* que
+se crea a partir de algoritmos aleatorios y que resulta en imágenes
+únicas e irrepetibles.
 
 Ejecuta el siguiente *chunk* para crear una obra de arte con R:
+
 ```{r Ejemplo de aRtsy}
 canvas_function(colors = colorPalette("tuscany1"))
 ```
 
 ## Referencias
 
-* Wickham, H., & Grolemund, G. (2017). *R for data science: Import, tidy, transform, visualize and model data. [https://r4ds.had.co.nz](https://r4ds.had.co.nz)*. O'Reilly.
-* Xie, Y., Allaire, J. J., & Grolemund, G. (2018). *R markdown: The definitive guide.  [https://bookdown.org/yihui/rmarkdown/](https://bookdown.org/yihui/rmarkdown/)*. CRC Press.
-* *RStudio Cheatsheets*. (n.d.). Rstudio.com. Recuperado el 8 de septiembre de 2021, desde [https://www.rstudio.com/resources/cheatsheets/](https://www.rstudio.com/resources/cheatsheets/)
-* Baruffa O. (2021). *Big Book of R*. [https://www.bigbookofr.com/index.html](https://www.bigbookofr.com/index.html)
-* Bryan J. et al (2021). *Happy Git and GitHub for the useR*. [https://happygitwithr.com](https://happygitwithr.com)
+-   Wickham, H., & Grolemund, G. (2017). *R for data science: Import,
+    tidy, transform, visualize and model data.
+    <https://r4ds.had.co.nz>*. O'Reilly.
+-   Xie, Y., Allaire, J. J., & Grolemund, G. (2018). *R markdown: The
+    definitive guide. <https://bookdown.org/yihui/rmarkdown/>*. CRC
+    Press.
+-   *RStudio Cheatsheets*. (n.d.). Rstudio.com. Recuperado el 8 de
+    septiembre de 2021, desde
+    <https://www.rstudio.com/resources/cheatsheets/>
+-   Baruffa O. (2021). *Big Book of R*.
+    <https://www.bigbookofr.com/index.html>
+-   Bryan J. et al (2021). *Happy Git and GitHub for the useR*.
+    <https://happygitwithr.com>
