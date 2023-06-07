@@ -141,7 +141,7 @@ Repite las operaciones anteriores ordenando los datos ahora por `Sepal.Length` e
 
 Cuenta el número de observaciones (filas) por cada valor único de la variable `Species` del *dataframe* `iris`, usando la función `count`:
 
-```{r Desagrupar datos}
+```{r Obtener cuenta}
 *** %>% 
   count(***)
 ```
@@ -477,7 +477,7 @@ El paquete `sf` usa las librerías del sistema llamadas *GDAL/OGR* para guardar 
 
 ## Referencias
 
--   Wickham, H., & Grolemund, G. (2017). *R for data science: Import, tidy, transform, visualize and model data. <https://r4ds.had.co.nz>*. O'Reilly.
--   Lovelace, R., Nowosad, J., & Muenchow, J. (2019), *Geocomputation with R. <https://geocompr.robinlovelace.net>*. CRC Press.
+-   Wickham, H., & Grolemund, G. (2017). *R for data science: Import, tidy, transform, visualize and model data.* <https://r4ds.had.co.nz>. O'Reilly.
+-   Lovelace, R., Nowosad, J., & Muenchow, J. (2019), *Geocomputation with R.* <https://geocompr.robinlovelace.net>. CRC Press.
 -   Tennekes, M., Nowosad, J. (2021). *Elegant and informative maps with tmap.* Recuperado el 8 de septembiembre, 2021, desde <https://r-tmap.github.io/tmap-book/>
 -   Engel, C. (2019). *Using Spatial Data with R.* cengel.github.io. Recuperado el 8 de septembiembre, 2021, desde [https://cengel.github.io/R-spatial/](https://cengel.github.io/R-spatial).
