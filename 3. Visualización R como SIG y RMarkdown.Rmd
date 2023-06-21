@@ -432,6 +432,82 @@ estados_con_homicidios %>%
 
 En el mapa anterior podemos observar que los estados que concentran tasas de más de 10 homicidios por cada 10 mil habitantes durante el periodo estudiado son *Colima, Baja California, Chihuahua, Guanajuato y Quintana Roo*.
 
+#### Cartograma
+
+Los mapas de coropletas permiten hacer comparaciones visuales de las magnitudes de una variable utilizando una escala de colores, sin embargo, esto puede ser algo confuso si existen polígonos muy grandes y muy pequeños en un mismo mapa. Existe otra manera de representar los valores a través del tamaño de los polígonos, manteniendo su posición espacial y complementando con el color para mejorar la lectura del mapa; a éste tipo de mapas se les conoce como *cartogramas* y se pueden construir utilizando el paquete `cartogram`.
+
+A continuación construirás tres cartogramas usando diferentes transformaciones. Carga el paquete `cartogram` usando la función `library`:
+
+```{r Preparar datos para cartograma}
+library(cartogram)
+```
+
+##### Cartograma de área continua
+
+Ejecuta el siguiente `chunk` y observa cómo se construye la variable llamada `estados_con_homicidios_cont` a partir de la capa `estados_con_homicidios` que preparaste para construir el mapa de coropletas anteriormente:
+
+-   Es necesario transformar la capa a un cartograma continua mediante la función `cartogram_cont` y usando como parámetros la variable `tasa_homicidios` (entre comillas, como texto) para definir el tamaño que tendrán los polígonos y el parámetro `itermax = 5` que es el número máximo de iteraciones para transformar los polígonos (recuerda revisar la documentación de la función consultando la ayuda).
+
+-   Nota que como la función `cartogram_cont` necesita que la capa esté en un sistema de coordenadas proyectadas, es necesario usar la función `st_transform(6369)` para cambiar la capa geográfica que originalmente está en WGS-84 (EPSG 4326) a una capa proyectada en ITRF2008 UTM Z14N (EPSG 6369).
+
+Repite los pasos que seguiste para construir el mapa de coropletas en el ejercicio anterior, usando ahora la capa `estados_con_homicidios_cart` en vez de `estados_con_municipios`:
+
+```{r Cartograma de área continua}
+estados_con_homicidios_cart <- 
+  estados_con_homicidios %>% # sf con datos de homicidios
+  st_transform(6369) %>% # Transformar a un sistema de coordenadas proyectadas
+  cartogram_cont("tasa_homicidios",
+                 itermax = 5) # Construir el cartograma continuo usando la variable tasa_homicidios para definir el tamaño de los polígonos
+
+tm_shape(estados_con_homicidios_cart) + # Usar la capa transformada en cartograma
+  tm_polygons("tasa_homicidios",
+              title = "Homicidios por cada 10 mil habitantes") + # Agrega la capa de polígonos de estados usando los datos de hom_10khab
+  tm_layout(main.title = "Estados más violentos en México, Dic, 2018 a Jun. 2021") +  # Agrega un título al mapa
+  tm_credits("Datos de INEGI y SESNSP.",
+             position = c("left", "bottom")) # Agrega las fuentes de datos
+```
+
+##### Cartograma de área no continua
+
+Repite el ejercicio anterior pero ahora sustituye la función `cartogram_cont` por la función `cartogram_ncont` usando como único parámetro la variable `tasa_homicidios` (con comillas) para definir el tamaño de los polígonos de cada estado de acuerdo al valor de su tasa de homicidios:
+
+```{r Cartograma de área no continua}
+estados_con_homicidios_cart <- 
+  *** %>% # sf con datos de homicidios
+  ***(6369) %>% # Transformar a un sistema de coordenadas proyectadas
+  ***("tasa_homicidios") # Construir el cartograma no continuo usando la variable tasa_homicidios para definir el tamaño de los polígonos
+
+tm_shape(estados) + # Agregar la capa de estados original sin transformar como referencia
+  tm_polygons() +
+  tm_shape(estados_con_homicidios_cart) + # Agregar la capa transformada en cartograma
+  tm_polygons("tasa_homicidios",
+              title = "Homicidios por cada 10 mil habitantes") + # Agrega la capa de polígonos de estados usando los datos de hom_10khab como color
+  tm_layout(main.title = "Estados más violentos en México, Dic, 2018 a Jun. 2021") +  # Agrega un título al mapa
+  tm_credits("Datos de INEGI y SESNSP.",
+             position = c("left", "bottom")) # Agrega las fuentes de datos
+```
+
+##### Cartograma de círculos no sobrepuestos
+
+Finalmente repite el ejercicio anterior pero ahora sustituye la función `cartogram_ncont` por la función `cartogram_dorling` usando como parámetros las variable `tasa_homicidios` (con comillas) para definir el tamaño de los polígonos de cada estado de acuerdo al valor de su tasa de homicidios y la variable `k` para modificar el tamaño relativo de los círculos:
+
+```{r Cartograma de círculos}
+estados_con_homicidios_cart <- 
+  *** %>% # sf con datos de homicidios
+  ***(***) %>% # Transformar a un sistema de coordenadas proyectadas
+  ***(***, 
+      k = ***) # Construir el cartograma de círculos usando la variable tasa_homicidios para definir el tamaño de los mismos
+
+tm_shape(***) + # Agregar la capa de estados original sin transformar como referencia
+  tm_polygons() +
+  tm_shape(***) + # Agregar la capa transformada en cartograma
+  tm_polygons(***,
+              title = "Homicidios por cada 10 mil habitantes") + # Agrega la capa de polígonos de estados usando los datos de hom_10khab como color
+  tm_layout(main.title = "Estados más violentos en México, Dic, 2018 a Jun. 2021") +  # Agrega un título al mapa
+  tm_credits("Datos de INEGI y SESNSP.",
+             position = c("left", "bottom")) # Agrega las fuentes de datos
+```
+
 ### Visualización como tabla de datos
 
 La CDMX no aparece en la gráfica anterior, así que será necesario saber en qué lugar de tasa de homicidio por cada 10,000 habitantes se encuentra en el país. Para ello, es posible construir una tabla interactiva usando el paquete `DT` que nos permite formatear las filas y columnas para enfatizar los hallazgos importantes y que nos permite reordenar los datos usando cualquiera de las variables disponibles.
@@ -559,4 +635,6 @@ El mapa resultante muestra varias zonas de alta concentración en rojo. Los valo
 -   *Spatial data manipulation*. Recuperado el 3 de junio, 2022, desde <https://rspatial.org/raster/spatial/index.html>
 -   Tennekes, M., Nowosad, J. (2018). *tmap: Thematic Maps in R*. Journal of Statistical Software. Recuperado el 8 de septiembre, 2021, from <https://www.researchgate.net/publication/324652152_tmap_Thematic_Maps_in_R/fulltext/5ad9e7eb0f7e9b28593cf867/tmap-Thematic-Maps-in-R.pdf>
 -   Tennekes, M., Nowosad, J. (2021). *Elegant and informative maps with tmap.* Recuperado el 8 de Septiembre, 2021, desde <https://r-tmap.github.io/tmap-book/>
+-   Jeworutzki S (2023).
+-   *cartogram: Create Cartograms with R*. R package version 0.3.0. Recuperado el 10 de junio de 2023 desde <https://sjewo.github.io/cartogram/index.html>
 -   *DT: An R interface to the DataTables library.* Recuperado el 8 de Septiembre, 2021, desde <https://rstudio.github.io/DT/>
