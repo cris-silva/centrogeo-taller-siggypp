@@ -251,6 +251,12 @@ ggplot(precios_oro, aes(x = date, y = united_states_usd)) +
 # Escribe aquí el código
 ```
 
+Para guardar la gráfica en un archivo, utiliza la función `ggsave` usando como parámetro el nombre del archivo como texto. Esta función guarda la última gráfica generada, para este caso guarda la gráfica como `"grafica_precios_oro.png"` .
+
+```{r Guardar archivo de la gráfica}
+ggsave(***)
+```
+
 ## Usando R como SIG. Caso práctico: Homicidios dolosos a nivel nacional
 
 Lee el conjunto de datos que se preparó anteriormente con los homicidios por estado y por mes (`homicidios_por_estado.csv`) usando la función `read_csv` y guárdalos en la variable `homicidios_por_estado`:
