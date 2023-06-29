@@ -59,7 +59,7 @@ library(tmap)
 
 El *raspado web* es una técnica utilizada frecuentemente en el análisis de datos que permite extraer diferentes elementos que componen una página web, por ejemplo textos, imágenes y principalmente tablas de datos. Esta herramienta aprovecha la estructura en que están construidas las páginas web usando el lenguaje de marcado *HTML* para identificar sus elementos por separado y extraerlos de manera sencilla.
 
-Extrae la tabla de indicadores económicos básicos de México (PIB anual) que está publicada en la *Wikipedia* en la página [https://es.wikipedia.org/wiki/Econom%C3%ADa_de_México](https://es.wikipedia.org/wiki/Econom%C3%ADa_de_México).
+Extrae la tabla de indicadores económicos básicos de México (PIB anual) que está publicada en la *Wikipedia* en la página <https://es.wikipedia.org/wiki/Econom%C3%ADa_de_México>.
 
 Lee la página de *Wikipedia* donde se encuentran los datos que se necesitan usando la función `read_html` del paquete `rvest`:
 
@@ -162,24 +162,50 @@ pib_mexico %>%
 
 ## Automatización de páginas
 
-Muchas fuentes de información en Internet están publicadas en páginas web dinámicas, que requieren interactuar con ellas para hacer consultas de información que nos permitan ver los datos que necesitamos. Para estos casos, es posible controlar un explorador web como *Firefox* o *Chrome* mediante instrucciones de R. Para lograrlo, usaremos un servidor de *Selenium* que permite controlar de manera remota el explorador mediante el paquete `RSelenium`.
+Muchas fuentes de información en Internet están publicadas en páginas web dinámicas, que requieren interactuar con ellas para hacer consultas de información que nos permitan ver los datos que necesitamos. Para estos casos, es posible controlar un explorador web como *Firefox* o *Chrome* mediante instrucciones de R. Para lograrlo, usaremos un servidor de *Selenium* que permite controlar de manera remota el explorador enviando instrucciones desde *R* usando las funciones del paquete `RSelenium`.
 
 En este ejercicio, obtendrás las coordenadas de la dirección de la sede de CentroGeo en la CDMX usando la página web [LatLong.net](https://www.latlong.net).
 
-El primer paso para empezar a controlar *Firefox* desde R es iniciar el servidor de *Selenium*. Para ello, usa la función `rsDriver` y especifica el parámetro `browser = "firefox"` y guarda la *instancia del servidor* en la variable `servidor_selenium`:
+### Arranque del servidor de *Selenium*
+
+Primeramente, necesitamos descargar el servidor de *Selenium* e iniciarlo para poder empezar a enviarle instrucciones al explorador web, en este caso usaremos *Firefox*, pero también puedes utilizar *Chrome* o *Internet Explorer* (no recomendado por que está descontinuado).
+
+Hay una consideración: el paquete `RSelenium` hasta la fecha sólo funciona con la versión 3 de *Selenium*. Por ello será necesario descargar la [última revisión de esta versión (3.9.1)](https://selenium-release.storage.googleapis.com/index.html?path=3.9/) del servidor *Selenium* desde su repositorio en la dirección web <https://selenium-release.storage.googleapis.com/index.html>. Busca el archivo llamado [selenium-server-standalone-3.9.1.jar](https://selenium-release.storage.googleapis.com/3.9/selenium-server-standalone-3.9.1.jar) en la [carpeta 3.9](https://selenium-release.storage.googleapis.com/index.html?path=3.9/), descárgalo y cópialo en la carpeta del proyecto de este taller.
+
+Antes de continuar, asegúrate de tener instalado *Java* en tu computadora. Si aún no lo tienes instalado, puedes descargar el instalador desde la página web <https://www.java.com/es/>.
+
+Usa la instrucción `java -jar` de *Java* para arrancar la aplicación descargada de *Selenium* `selenium-server-standalone-3.9.1.jar` con los parámetro `--port 5467`, para usar el puerto **5467** para hacer las conexiones que usará *RSelenium* para enviarle las instrucciones. Escribe el siguiente comando en la pestaña *Terminal* de *RStudio* (abajo izquierda) y presiona la tecla *Enter*:
+
+``` bash
+java -jar selenium-server-standalone-3.9.1.jar -port 4567
+```
+
+En la ventana de *Terminal* deberá aparecer el siguiente mensaje para confirmar que el servidor de *Selenium* está activo y listo para recibir instrucciones:
+
+``` bash
+INFO - Selenium Server is up and running on port 4567
+```
+
+### Conexión al servidor de *Selenium* desde *R*
+
+Para comenzar a enviar instrucciones a *Selenium* para que controle a *Firefox*, debemos definir qué explorador vamos a manejar. Usa la función `rsDriver` y especifica el parámetro `browser = "firefox"` y guarda la *instancia del servidor* en la variable `servidor_selenium`:
 
 ```{r Iniciar servidor de Selenium}
 servidor_selenium <- rsDriver(browser = "firefox")
 # wdman::selenium() # Otra manera de iniciar Selenium
 ```
 
-A continuación, es necesario conectar el controlador de *R* al servidor de *Selenium* que acabas de iniciar. Para ello, usa la función `remoteDriver` con el parámetro `port = 4567` para conectarse al puerto por defecto en que se inició el servidor de *Selenium*.
+Después de esta instrucción, *Firefox* debe abrirse automáticamente. A continuación, es necesario conectar el controlador de *R* al servidor de *Selenium* que acabas de iniciar. Para ello, usa la función `remoteDriver` con el parámetro `port = 4567` para conectarse al puerto por defecto en que se inició el servidor de *Selenium*.
 
 ```{r Iniciar controlador de Selenium}
 controlador <- remoteDriver(port = 4567)
 ```
 
-A partir de este momento, ya es posible empezar a usar las funciones de *RSelenium* para controlar el explorador web. Abre una ventana nueva de *Firefox*, usando el método `open` de `controlador`:
+A partir de este momento, ya es posible empezar a usar las funciones de *RSelenium* para controlar el explorador web. Es recomendable que dividas en la pantalla las ventanas de *RStudio* y *Firefox* para que puedas ver cómo se ejecutan las siguientes instrucciones en el explorador.
+
+### Enviando instrucciones a *Firefox*
+
+Abre una ventana nueva de *Firefox*, usando el método `open` de `controlador`:
 
 ```{r Abrir ventana de Firefox}
 controlador$open()
@@ -257,6 +283,8 @@ Cierra todas las ventanas abiertas de *Firefox* y el servidor de *Selenium*, usa
 controlador$closeall()
 controlador$closeServer()
 ```
+
+Una vez cerrada la conexión con *Selenium*, puedes cerrarlo usando el botón rojo *Stop* de la *Terminal*. En este caso déjalo abierto para continuar la práctica.
 
 ## Geocodificación
 
