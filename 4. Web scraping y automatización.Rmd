@@ -166,50 +166,29 @@ Muchas fuentes de información en Internet están publicadas en páginas web din
 
 En este ejercicio, obtendrás las coordenadas de la dirección de la sede de CentroGeo en la CDMX usando la página web [LatLong.net](https://www.latlong.net).
 
-### Arranque del servidor de *Selenium*
-
-Primeramente, necesitamos descargar el servidor de *Selenium* e iniciarlo para poder empezar a enviarle instrucciones al explorador web, en este caso usaremos *Firefox*, pero también puedes utilizar *Chrome* o *Internet Explorer* (no recomendado por que está descontinuado).
-
-Hay una consideración: el paquete `RSelenium` hasta la fecha sólo funciona con la versión 3 de *Selenium*. Por ello será necesario descargar la [última revisión de esta versión (3.9.1)](https://selenium-release.storage.googleapis.com/index.html?path=3.9/) del servidor *Selenium* desde su repositorio en la dirección web <https://selenium-release.storage.googleapis.com/index.html>. Busca el archivo llamado [selenium-server-standalone-3.9.1.jar](https://selenium-release.storage.googleapis.com/3.9/selenium-server-standalone-3.9.1.jar) en la [carpeta 3.9](https://selenium-release.storage.googleapis.com/index.html?path=3.9/), descárgalo y cópialo en la carpeta del proyecto de este taller.
+### Arranque del servidor de *Selenium y conexión desde R*
 
 Antes de continuar, asegúrate de tener instalado *Java* en tu computadora. Si aún no lo tienes instalado, puedes descargar el instalador desde la página web <https://www.java.com/es/>.
 
-Usa la instrucción `java -jar` de *Java* para arrancar la aplicación descargada de *Selenium* `selenium-server-standalone-3.9.1.jar` con los parámetro `--port 5467`, para usar el puerto **5467** para hacer las conexiones que usará *RSelenium* para enviarle las instrucciones. Escribe el siguiente comando en la pestaña *Terminal* de *RStudio* (abajo izquierda) y presiona la tecla *Enter*:
-
-``` bash
-java -jar selenium-server-standalone-3.9.1.jar -port 4567
-```
-
-En la ventana de *Terminal* deberá aparecer el siguiente mensaje para confirmar que el servidor de *Selenium* está activo y listo para recibir instrucciones:
-
-``` bash
-INFO - Selenium Server is up and running on port 4567
-```
-
-### Conexión al servidor de *Selenium* desde *R*
-
-Para comenzar a enviar instrucciones a *Selenium* para que controle a *Firefox*, debemos definir qué explorador vamos a manejar. Usa la función `rsDriver` y especifica el parámetro `browser = "firefox"` y guarda la *instancia del servidor* en la variable `servidor_selenium`:
+Para comenzar a enviar instrucciones a *Selenium* para que controle a *Firefox*, debemos definir qué explorador vamos a manejar. Usa la función `rsDriver` y especifica los parámetros `browser = "firefox"` para indicar a *Selenium* que use *Firefox, `port = 4567L`* para indicar con número entero el puerto que se utilizará para recibir las instrucciones y `chromever = NULL, iedrver = NULL, phantomver = NULL` para evitar que se carguen los controladores de los otros exploradores y evitar posibles errores. Guarda la *instancia del servidor* en la variable `servidor_selenium`:
 
 ```{r Iniciar servidor de Selenium}
-servidor_selenium <- rsDriver(browser = "firefox")
-# wdman::selenium() # Otra manera de iniciar Selenium
+servidor_selenium <- rsDriver(browser = "firefox", 
+                              port = 4567L,
+                              chromever = NULL,
+                              iedrver = NULL,
+                              phantomver = NULL)
 ```
 
-Después de esta instrucción, *Firefox* debe abrirse automáticamente. A continuación, es necesario conectar el controlador de *R* al servidor de *Selenium* que acabas de iniciar. Para ello, usa la función `remoteDriver` con el parámetro `port = 4567` para conectarse al puerto por defecto en que se inició el servidor de *Selenium*.
+Después de esta instrucción, *Firefox* debe abrirse automáticamente. A continuación, es necesario conectar el "control remoto" de *R* al servidor de *Selenium* que acabas de iniciar. Para ello, crea el `controlador` a partir del elemento de lista `[["client"]]` de la variable `servidor_selenium` con la que arrancaste el servidor de *Selenium* en el paso anterior*.*
 
 ```{r Iniciar controlador de Selenium}
-controlador <- remoteDriver(port = 4567)
+controlador <- servidor_selenium[["client"]]
 ```
 
-A partir de este momento, ya es posible empezar a usar las funciones de *RSelenium* para controlar el explorador web. Es recomendable que dividas en la pantalla las ventanas de *RStudio* y *Firefox* para que puedas ver cómo se ejecutan las siguientes instrucciones en el explorador.
+A partir de este momento, ya es posible empezar a pasar instrucciones a través de `controlador` para manejar el explorador web usando las funciones del paquete *RSelenium*. Es recomendable que dividas en la pantalla las ventanas de *RStudio* y *Firefox* para que puedas ver cómo se ejecutan las siguientes instrucciones en el explorador.
 
 ### Enviando instrucciones a *Firefox*
-
-Abre una ventana nueva de *Firefox*, usando el método `open` de `controlador`:
-
-```{r Abrir ventana de Firefox}
-controlador$open()
-```
 
 Abre la dirección de la página web del servicio de LatLong.net (<https://www.latlong.net>) usando el método `navigate` del `controlador`:
 
@@ -259,7 +238,7 @@ codigo_fuente_pagina[[1]] %>%
   write_file("Datos/latlong_net.html")
 ```
 
-Ordena a *Firefox* que abra la página de CentroGeo (<https://www.centrogeo.org.mx>) usando el método `navigate` de `controlador`:
+Ahora, ordena a *Firefox* que abra la página de CentroGeo (<https://www.centrogeo.org.mx>) usando el método `navigate` de `controlador`:
 
 ```{r Abrir página web de CentroGeo}
 controlador$navigate("https://www.centrogeo.org.mx")
@@ -277,14 +256,19 @@ Ordena a *Firefox* que vaya la página siguiente (*Adelante*), usando el método
 controlador$goForward()
 ```
 
-Cierra todas las ventanas abiertas de *Firefox* y el servidor de *Selenium*, usando los métodos `closeAll` y `closeServer` del `controlador`:
+Cierra todas las ventanas abiertas de *Firefox* y el servidor de *Selenium*, usando el método `closeAll` del `controlador`:
 
 ```{r Cerrar ventanas de Firefox}
 controlador$closeall()
-controlador$closeServer()
 ```
 
-Una vez cerrada la conexión con *Selenium*, puedes cerrarlo usando el botón rojo *Stop* de la *Terminal*. En este caso déjalo abierto para continuar la práctica.
+Detén el servidor de Selenium usando el método `stop()` en el elemento de lista `[["server"]]` del `servidor_selenium`:
+
+```{r Detener el servidor de Selenium}
+servidor_selenium[["server"]]$stop()
+```
+
+En la parte final de la práctica volverás a iniciar el servidor para realizar el ejercicio.
 
 ## Geocodificación
 
@@ -362,22 +346,20 @@ Estas etiquetas servirán más adelante para controlar la página y cambiar los 
 
 ### Automatización de la página
 
-Inicia el servidor de *Selenium* usando la función `rsDriver` con el parámetro `browser = "firefox"` y asígnalo a una nueva variable llamada `servidor_selenium`:
+Inicia el servidor de *Selenium* usando la función `rsDriver` con los parámetros que usaste anteriormente y asígnalo a una nueva variable llamada `servidor_selenium`:
 
 ```{r Iniciar el servidor de Selenium}
-servidor_selenium <- rsDriver(browser = "firefox")
+servidor_selenium <- rsDriver(browser = "firefox", 
+                              port = 4567L,
+                              chromever = NULL,
+                              iedrver = NULL,
+                              phantomver = NULL)
 ```
 
-Conecta a *R* con *Firefox* a través de *Selenium* creando un controlador usando la función `remoteDriver` con el parámetro `port = 4567` y asignándolo a la nueva variable `controlador`:
+Conecta a *R* con *Firefox* a través de *Selenium* creando un `controlador` usando el elemento de lista `[["client"]]` del `servidor_selenium`:
 
 ```{r Conectar el controlador a Selenium}
-controlador <- remoteDriver(port = 4567)
-```
-
-Abre una nueva ventana de *Firefox* usando el método `open` del `controlador`:
-
-```{r Abrir Firefox}
-controlador$open()
+controlador <- servidor_selenium[["client"]]
 ```
 
 Ordena a *Firefox* que abra la página de consulta de puntos de venta de Liconsa, usando el método `open` de `controlador` para abrir la dirección `http://invprov.liconsa.gob.mx:8080/ConsultaWEB/`:
@@ -615,9 +597,9 @@ puntos_venta_liconsa %>%
 Cierra las ventanas de *Firefox* y el servidor de *Selenium*:
 
 ```{r Cerrar Firefox y Selenium de puntos de venta}
-# Cerrar la ventana de Firefox y el servidor de Selenium:
+# Cerrar las ventanas de Firefox y detener el servidor de Selenium:
 controlador$closeall()
-controlador$closeServer()
+servidor_selenium[["server"]]$stop()
 ```
 
 Una gran ventaja de este proceso de *web scraping* es que si los datos de la página se actualizan o cambian, sólo será necesario volver a correr este proceso para tener los datos actuales.
