@@ -1,0 +1,281 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+## Preparación del entorno
+
+```{r}
+library(tidyverse)
+library(rvest)
+library(RSelenium)
+```
+
+## Procesamiento de datos
+
+```{r}
+url_sitio <- "http://clicom-mex.cicese.mx/"
+```
+
+```{r}
+servidor_selenium <- rsDriver(browser = "firefox", 
+                              port = 4567L,
+                              chromever = NULL,
+                              iedrver = NULL,
+                              phantomver = NULL)
+
+controlador <- servidor_selenium$client      
+```
+
+```{r}
+controlador$navigate(url_sitio)
+```
+
+| Elemento                                                           | Xpath                                                        |
+|-------------------------------------|----------------------------------|
+| Pestaña "Descarga de Datos"                                        | //\*[\@id="ui-id-2"]                                         |
+| Lista desplegable "Estado"                                         | //\*[\@id="estados"]                                         |
+| Botón "Buscar"                                                     | /html/body/div[1]/div[2]/div/div[2]/div[1]/p[7]/button/span  |
+| Lista desplegable "Variables"                                      | //\*[\@id="vars"]                                            |
+| Lista "Resultados"                                                 | //\*[\@id="list_resultados"]                                 |
+| Botón para borrar la selección (X)                                 | /html/body/div[1]/div[2]/div/div[2]/div[3]/p[2]/button/span  |
+| Botón "Descargar"                                                  | /html/body/div[1]/div[2]/div/div[2]/div[1]/p[13]/button/span |
+| Ventana donde aparece el vínculo de descarga del archivo de datos. | //\*[\@id="dialog"]                                          |
+| Botón de cierre de la ventana de descarga del archivo.             | /html/body/div[2]/div[1]/a/span                              |
+
+Dar clic en el botón de Descarga de Datos para abrir la pestaña:
+
+```{r}
+# Definir cuál es el botón:
+pestana_descarga <- controlador$findElement(using = "xpath",
+                                          value = '//*[@id="ui-id-2"]')
+
+# Dar clic en el botón:
+pestana_descarga$clickElement()
+```
+
+Crea un control para la lista desplegable `Estado`:
+
+```{r}
+selector_estado <- controlador$findElement(using = "xpath",
+                                           value = '//*[@id="estados"]')
+```
+
+Verificar las opciones disponibles para seleccionar en la lista desplegable `Estado`:
+
+```{r}
+opciones_estado <- selector_estado$findChildElements(using = "css selector",
+                                                     value = "option")
+
+estados <- c()
+
+for(opcion in opciones_estado) {
+  
+  estado <- opcion$getElementText()[[1]]
+  estados <- c(estados, estado)
+  
+}
+
+estados
+```
+
+Seleccionar la opción *"Todos"* para obtener todas las estaciones del país:
+
+```{r}
+selector_estado$sendKeysToElement(list("Todos"))
+```
+
+Ahora, crea un control para la lista desplegable `Variables`:
+
+```{r}
+selector_variables <- controlador$findElement(using = "xpath",
+                                              value = '//*[@id="vars"]')
+```
+
+Verifica las opciones disponibles para seleccionar en la lista desplegable `Variables`:
+
+```{r}
+opciones_variables <- selector_variables$findChildElements(using = "css selector",
+                                                           "option")
+
+variables <- c()
+
+for(opcion in opciones_variables) {
+  
+  variable <- opcion$getElementText()[[1]]
+  variables <- c(variables, variable)
+  
+}
+
+variables
+```
+
+Será necesario iterar para obtener los datos para cada variable.
+
+```{r}
+variable_seleccionada <- "Tprom"
+selector_variables$sendKeysToElement(list(variable_seleccionada))
+```
+
+Crea un control para el botón `Buscar` para obtener todas las estaciones en el cuadro de `Resultados`:
+
+```{r}
+boton_buscar <- controlador$findElement(using = "xpath",
+                                        value = "/html/body/div[1]/div[2]/div/div[2]/div[1]/p[7]/button/span")
+```
+
+Crea un control para el botón `Descargar`:
+
+```{r}
+boton_descargar <- controlador$findElement(using = "xpath",
+                                           value = '/html/body/div[1]/div[2]/div/div[2]/div[1]/p[13]/button/span')
+```
+
+Crea un control para la ventana que aparece con la liga de descarga de l archivo de datos:
+
+```{r}
+ventana_descarga <- controlador$findElement(using = "xpath",
+                                            value = '//*[@id="dialog"]')
+```
+
+Crea un control para el botón que cierra la ventana de descarga del archivo de datos:
+
+```{r}
+boton_cerrar_ventana <- controlador$findElement(using = "xpath",
+                                                value = '/html/body/div[2]/div[1]/a/span')
+```
+
+Crea un control para el botón de borrado de resultados (X):
+
+```{r}
+boton_borrar_seleccion <- controlador$findElement(using = "xpath",
+                                                  value = '/html/body/div[1]/div[2]/div/div[2]/div[3]/p[2]/button/span')
+```
+
+Da clic en el botón `Buscar` para consultar las estaciones:
+
+```{r}
+boton_buscar$clickElement()
+
+# Da un tiempo para que se carguen los resultados en la lista:
+Sys.sleep(5)
+```
+
+Crea un control para la lista de resultados:
+
+```{r}
+lista_resultados <- controlador$findElement(using = "xpath",
+                                            value = '//*[@id="list_resultados"]')
+```
+
+Verifica los elementos (hijos) que contiene la lista:
+
+```{r}
+opciones_resultados <- lista_resultados$findChildElements(using = "css selector",
+                                                          value = "li")
+
+resultados <- c()
+
+for(opcion in opciones_resultados) {
+
+  resultado <- opcion$getElementText()[[1]]
+  resultados <- c(resultados, resultado)
+
+}
+
+# Visualiza sólo los primeros resultados para comprobar:
+resultados %>% head()
+```
+
+Guarda en una variable `total_estaciones` el total de resultados que obtuviste:
+
+```{r}
+total_estaciones <- length(resultados)
+total_estaciones
+```
+
+Comienza a iterar para cada uno de los resultados de las estaciones:
+
+```{r}
+for(i in (1:total_estaciones)) {
+  
+  # Obtener el i-ésimo elemento de la lista:
+  resultado_seleccionado <- opciones_resultados[[i]]
+  
+  # Obtener las coordenadas del centro del elemento seleccionado:
+  posicion_resultado <- resultado_seleccionado$getElementLocation() 
+  
+  # Mover el cursor (virtualmente) a la posición del elemento seleccionado:
+  controlador$mouseMoveToLocation(webElement = resultado_seleccionado)
+  
+  # Da doble clic en la ubicación para que el elemento pase a la lista de Estaciones Seleccionadas:
+  controlador$doubleclick()
+  
+  # Da clic en el botón "Descargar" para obtener el archivo con los datos:
+  boton_descargar$clickElement()
+  
+  # Da tiempo para que se carguen los datos:
+  Sys.sleep(5)
+  
+  # Busca la liga para descargar el archivo en la ventana de descarga:
+  liga_descarga <- ventana_descarga$findChildElement(using = "css selector",
+                                                     value = "a")
+  
+  # Extrae la URL del archivo:
+  url_descarga <- 
+    liga_descarga$getElementAttribute("href") %>% 
+    unlist()
+  
+  # Define la ruta donde se descargará el archivo:
+  archivo_destino <- file.path(str_c("DATOS/CISESE/", variable_seleccionada), 
+                               basename(url_descarga)) # Extrae sólo el nombre del archivo de la URL.
+  
+  # Opción #1: Descargar directamente a una carpeta del proyecto: 
+  download.file(url = url_descarga,
+                destfile = archivo_destino)
+  
+  # Opción #2: Hacer que Firefox lo descargue a la carpeta de Descargas:
+  # liga_descarga$clickElement() 
+  
+  # Da tiempo para que se realice la descarga:
+  Sys.sleep(3)
+  
+  # Cierra la ventana de descarga:
+  boton_cerrar_ventana$clickElement()
+  
+  # Borrar la selección para continuar con el siguiente elemento:
+  boton_borrar_seleccion$clickElement()
+  
+}
+```
+
+Cierra las ventanas de *Firefox* y apaga el servidor de *Selenium*:
+
+```{r}
+controlador$closeall()
+servidor_selenium$server$stop()
+```
+
+## Opción: Descarga directa
+
+```{r}
+library(rvest)
+library(tidyverse)
+
+url <- "http://clicom-mex.cicese.mx/tmp/"
+page <- read_html(url)
+links <- page %>% html_nodes("a") %>% html_attr("href")
+csv_links <- links[str_detect(links, ".csv$")]
+csv_links <- str_c(url, csv_links)
+
+for (link in csv_links) {
+  
+  download.file(url = link, 
+                destfile = file.path("Datos/CISESE", basename(link)))
+  
+  # Hacer una pausa para hacer una descarga compasiva y evitar que las descargas se confundan con un ataque DDNS: 
+  Sys.sleep(5) 
+  
+}
+
+```
