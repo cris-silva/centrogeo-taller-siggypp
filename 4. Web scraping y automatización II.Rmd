@@ -1,23 +1,52 @@
 ---
-title: "R Notebook"
-output: html_notebook
+title: "4. Web scraping y automatización de páginas web (II)"
+author: "Ana J. Alegre (jalegre@centrogeo.edu.mx), Cristian Silva (csilva@centrogeo.edu.mx)"
 ---
+
+## Introducción
+
+Existen técnicas que nos permiten automatizar los procesos que se requieren para extraer y procesar información que proviene de diferentes fuentes de información, y una de las principales fuentes donde podemos acceder a diferentes tipos de información es Internet. Aunque algunas veces los datos que necesitamos están publicados en páginas web de acceso abierto, regularmente el formato en que las consultamos no es el más apropiado o sencillo de manejar.
+
+En esta sesión se utilizará una técnica que sirven para el raspado web (*web scraping*) que permite extraer contenidos de una página web y automatizar el uso del explorador web para controlar y cambiar los parámetros que usan las páginas dinámicas de consulta.
+
+## Objetivo
+
+Durante el transcurso de esta sesión, realizarás un ejercicio para automatizar la extracción de datos de una página de consulta de datos climatológicos nacionales, transformar los datos extraídos y unirlos en una sóla base de datos y construir una capa geográfica con las ubicaciones de las estaciones, utilizando únicamente programación en *R*.
 
 ## Preparación del entorno
 
-```{r}
+Cargar los paquetes que se van a utilizar:
+
+```{r Carga de paquetes}
 library(tidyverse)
 library(rvest)
 library(RSelenium)
+library(janitor)
+library(sf)
+library(tmap)
 ```
 
-## Procesamiento de datos
+Elimina todos los objetos del entorno usando la función `rm`:
 
-```{r}
+```{r Limpiar entorno}
+rm(list = ls())
+```
+
+Define la dirección del sitio web de donde se descargarán los datos y guárdala en la variable `url_sitio`:
+
+```{r Sitio web fuente}
 url_sitio <- "http://clicom-mex.cicese.mx/"
 ```
 
-```{r}
+## Arranque de *Selenium* y conexión con *Firefox*
+
+Inicia el servidor de *Selenium* para que controle el explorador *Firefox*, asignando con la función `rsDriver` a la variable `servidor_selenium`\` usando los parámetros `browser = "firefox"`, `port = 4567L`, y `chromever = NULL`, `iedrver = NULL`\` , `phantomver = NULL` para evitar que *Selenium* use los exploradores *Chrome, Internet Explorer* y *PhantomJS* respectivamente.
+
+> Nota: Se recomienda usar *Firefox*, pero recuerda que es posible usar otro explorador como *Chrome* por ejemplo, para ello cambia el parámetro `browser = "chrome"` o al que desees usar. Consulta la ayuda de la función `rsDriver`\` y la documentación de *RSelenium* para mayor información.
+
+Posteriormente crea el control con el que se enviarán las instrucciones a Selenium para manejar el explorador, asignando el objeto `servidor_selenium$client` a la variable `controlador`:
+
+```{r Arrancar servidor de Selenium y crear controlador}
 servidor_selenium <- rsDriver(browser = "firefox", 
                               port = 4567L,
                               chromever = NULL,
@@ -27,12 +56,19 @@ servidor_selenium <- rsDriver(browser = "firefox",
 controlador <- servidor_selenium$client      
 ```
 
-```{r}
+## Identificación de los elementos que se controlarán
+
+Usa el controlador para hacer que *Firefox* abra el sitio `url_sitio` usando el método `controlador$navigate`:
+
+```{r Abrir sitio web}
+# Abrir el sitio web:
 controlador$navigate(url_sitio)
 ```
 
+En *Firefox* usa el *inspector* para copiar los identificadores de los elementos que se necesitan controlar. Los elementos son los siguientes:
+
 | Elemento                                                           | Xpath                                                        |
-|-------------------------------------|----------------------------------|
+|-------------------------------------|-----------------------------------|
 | Pestaña "Descarga de Datos"                                        | //\*[\@id="ui-id-2"]                                         |
 | Lista desplegable "Estado"                                         | //\*[\@id="estados"]                                         |
 | Botón "Buscar"                                                     | /html/body/div[1]/div[2]/div/div[2]/div[1]/p[7]/button/span  |
@@ -43,9 +79,13 @@ controlador$navigate(url_sitio)
 | Ventana donde aparece el vínculo de descarga del archivo de datos. | //\*[\@id="dialog"]                                          |
 | Botón de cierre de la ventana de descarga del archivo.             | /html/body/div[2]/div[1]/a/span                              |
 
-Dar clic en el botón de Descarga de Datos para abrir la pestaña:
+## Creación de controles de cada elemento
 
-```{r}
+Crea un control para el la pestaña de `Descarga de Datos` que permite abrir la página donde se descargan los archivos de datos, usando el controlador de la página `controlador` para buscar el elemento en la página usando el identificador que buscaste anteriormente con el *inspector* de *Firefox* y usando el método `controlador$findElement` y los parámetros `using = "xpath"` para indicar que usaremos *xpath* para la identificación y `value = '//*[@id="ui-id-2"]'` para indicar el identificador de la pestaña.
+
+Luego, usa el controlador de la pestaña que acabas de crear para darle clic usando el método `pestana_descarga$clickElement()`:
+
+```{r Pestaña de descarga}
 # Definir cuál es el botón:
 pestana_descarga <- controlador$findElement(using = "xpath",
                                           value = '//*[@id="ui-id-2"]')
@@ -54,21 +94,27 @@ pestana_descarga <- controlador$findElement(using = "xpath",
 pestana_descarga$clickElement()
 ```
 
-Crea un control para la lista desplegable `Estado`:
+De la misma forma, crea un control para la lista desplegable `Estado`: usando el método `controlador$findElement` y los parámetros `using = "xpath"` y `value = '//*[@id="estados"]'`:
 
-```{r}
+```{r Control de selector de Estado}
+# Crear el controlador de la lista desplegable de Estado:
 selector_estado <- controlador$findElement(using = "xpath",
                                            value = '//*[@id="estados"]')
 ```
 
-Verificar las opciones disponibles para seleccionar en la lista desplegable `Estado`:
+Puedes usar el controlador `selector_estado` para ver las opciones de Estados que contiene el control. Verifica las opciones disponibles para seleccionar en la lista desplegable `Estado`: usando la función `selector_estado$findChildrenElements` y los parámteros `using = "css selector"` y `value = "option"` para indicar que encuentre los elementos *HTML* que tengan la etiqueta `option`, es decir, los elementos de la lista desplegable.
 
-```{r}
+Agrega el texto de cada uno de los elementos `option` que obtuviste a un vector que se llame `estados` usando la función `for` para iterar en cada uno de ellos, obtener su texto usando el método `opcion$getElement()` y acumulándolos en el vector `estados`. Finalmente, visualiza el resultado para ver los Estados disponibles como se muestra a continuación:
+
+```{r Opciones seleccionables en Estado}
+# Buscar los elementos "hijos" del selector de Estados:
 opciones_estado <- selector_estado$findChildElements(using = "css selector",
                                                      value = "option")
 
+# Crear un vector vacío donde se acumularán las nombres de los Estados disponibles:
 estados <- c()
 
+# Iterar para obtener el texto de cada opción de Estado y acumular en el vector:
 for(opcion in opciones_estado) {
   
   estado <- opcion$getElementText()[[1]]
@@ -76,30 +122,36 @@ for(opcion in opciones_estado) {
   
 }
 
+# Visualizar la lista de Estados:
 estados
 ```
 
-Seleccionar la opción *"Todos"* para obtener todas las estaciones del país:
+Aunque se posible hacer una consulta de las estaciones Estado por Estado, usaremos la opción llamada *"Todos"* que permite obtener los datos de todas las estaciones del país a la vez. Usa el controlador `selector_estado` para seleccionar la opción *"Todos"* enviando como lista con este texto al método `selector_estado$sendKeysToElement,` como se muestra a continuación:
 
-```{r}
+```{r Seleccionar todos los Estados}
+# Seleccionar la opción "Todos" en la lista desplegable de Estados:
 selector_estado$sendKeysToElement(list("Todos"))
 ```
 
-Ahora, crea un control para la lista desplegable `Variables`:
+Ahora, igual como se ha hecho anteriormente, crea un control para la lista desplegable `Variables` que se llame `selector_variables`:
 
-```{r}
+```{r Control de selector de Variable}
+# Crear el controlador para la lista desplegable de Variable:
 selector_variables <- controlador$findElement(using = "xpath",
                                               value = '//*[@id="vars"]')
 ```
 
-Verifica las opciones disponibles para seleccionar en la lista desplegable `Variables`:
+De manera similar a lo que hiciste con la lista de Estados, verifica las opciones disponibles para seleccionar en la lista desplegable `Variables`:
 
-```{r}
+```{r Opciones seleccionables en Variable}
+# Buscar los elementos "hijos" del selector de Variable:
 opciones_variables <- selector_variables$findChildElements(using = "css selector",
                                                            "option")
 
+# Crear un vector vacío donde se acumularán las nombres de las Variables disponibles:
 variables <- c()
 
+# Iterar para obtener el texto de cada opción de Variable y acumular en el vector:
 for(opcion in opciones_variables) {
   
   variable <- opcion$getElementText()[[1]]
@@ -107,75 +159,89 @@ for(opcion in opciones_variables) {
   
 }
 
+# Visualizar la lista de Variable:
 variables
 ```
 
-Será necesario iterar para obtener los datos para cada variable.
+De las variables disponibles para descargar datos, selecciona la que desees y guárdala el valor en `variable_seleccionada`, por ejemplo `variable_seleccionada <- "Tprom"`. El proceso de descarga de todos los archivos se hará para esta variable.
 
-```{r}
+```{r Seleccionar Variable}
+# Definir la variable deseada a partir de las disponibles:
 variable_seleccionada <- "Tprom"
+
+# Seleccionar en la lista desplegable, la variable deseada:
 selector_variables$sendKeysToElement(list(variable_seleccionada))
 ```
 
-Crea un control para el botón `Buscar` para obtener todas las estaciones en el cuadro de `Resultados`:
+De manera similar a los controladores anteriores, crea un control para el botón `Buscar` para obtener todas las estaciones en el cuadro de `Resultados`:
 
-```{r}
+```{r Control de botón Buscar}
+# Crear el controlador para el botón Buscar:
 boton_buscar <- controlador$findElement(using = "xpath",
                                         value = "/html/body/div[1]/div[2]/div/div[2]/div[1]/p[7]/button/span")
 ```
 
 Crea un control para el botón `Descargar`:
 
-```{r}
+```{r Control de botón Descargar}
+# Crear el controlador para el botón Descargar:
 boton_descargar <- controlador$findElement(using = "xpath",
                                            value = '/html/body/div[1]/div[2]/div/div[2]/div[1]/p[13]/button/span')
 ```
 
 Crea un control para la ventana que aparece con la liga de descarga de l archivo de datos:
 
-```{r}
+```{r Control de la ventana de descarga}
+# Crear el controlador para la ventana donde se descargan los archivos de datos:
 ventana_descarga <- controlador$findElement(using = "xpath",
                                             value = '//*[@id="dialog"]')
 ```
 
 Crea un control para el botón que cierra la ventana de descarga del archivo de datos:
 
-```{r}
+```{r Control para cerrar la ventana de descarga}
+# Crear el controlador para el botón que cierra la ventana de descarga:
 boton_cerrar_ventana <- controlador$findElement(using = "xpath",
                                                 value = '/html/body/div[2]/div[1]/a/span')
 ```
 
-Crea un control para el botón de borrado de resultados (X):
+Crea un control para el botón de borrado de resultados `(X)` :
 
-```{r}
+```{r Control para el botón de borrado de selección}
+# Crear el controlador para el botón de borrado de selección:
 boton_borrar_seleccion <- controlador$findElement(using = "xpath",
                                                   value = '/html/body/div[1]/div[2]/div/div[2]/div[3]/p[2]/button/span')
 ```
 
 Da clic en el botón `Buscar` para consultar las estaciones:
 
-```{r}
+```{r Dar clic en el botón Buscar}
+# Envia la instrucción de dar clic en el botón:
 boton_buscar$clickElement()
 
 # Da un tiempo para que se carguen los resultados en la lista:
 Sys.sleep(5)
 ```
 
-Crea un control para la lista de resultados:
+Crea un control para la lista Resultados:
 
-```{r}
+```{r Control para la lista Resultados}
+# Crear el controlador para la lista de resultados:
 lista_resultados <- controlador$findElement(using = "xpath",
                                             value = '//*[@id="list_resultados"]')
 ```
 
-Verifica los elementos (hijos) que contiene la lista:
+Así como lo hiciste anteriormente con los Estados y las Variables, verifica los elementos (hijos) que contiene la lista `Resultados` (estaciones), este bloque puede tardar un poco por la cantidad de elementos:
 
-```{r}
+```{r Elementos de la lista Resultados}
+# Buscar los elementos "hijos" de la lista de Resultados:
 opciones_resultados <- lista_resultados$findChildElements(using = "css selector",
                                                           value = "li")
 
+# Crear un vector vacío donde se acumularán las nombres de los Resultados disponibles:
 resultados <- c()
 
+# Iterar para obtener el texto de cada elemento de Resultados y acumular en el vector:
 for(opcion in opciones_resultados) {
 
   resultado <- opcion$getElementText()[[1]]
@@ -187,23 +253,38 @@ for(opcion in opciones_resultados) {
 resultados %>% head()
 ```
 
-Guarda en una variable `total_estaciones` el total de resultados que obtuviste:
+Guarda en una variable `total_estaciones` el total de resultados que obtuviste usando la función `length`:
 
-```{r}
+```{r Total de estaciones disponibles}
+# Total de resultados:
 total_estaciones <- length(resultados)
+
+# Visualizar el total de resultados:
 total_estaciones
 ```
 
-Comienza a iterar para cada uno de los resultados de las estaciones:
+Para seleccionar las estaciones de las que se desea descargar los datos, es necesario arrastrar o dar doble clic en un elemento para pasarlo desde la lista `Resultados` hasta la lista `Seleccionados`. Para simplicar el proceso, selecciona uno por uno cada elemento para descargar su archivo correspondiente.
 
-```{r}
+Para lograr esto repite el siguiente proceso para cada uno de los resultados de las estaciones:
+
+1.  Asigna el elemento *i-ésimo* de `opciones_resultados` a la variable `resultado_seleccionado`.
+2.  Usa el controlador de *Firefox* para mover el cursor del ratón a la posición donde está el elemento usando el método `controlador$mouseMoveToLocation(webElement = resultado_seleccionado)`. Nota que este desplazamiento es virtual dentro de Firefox y no significa que veas que el cursor del ratón se mueva en la pantalla.
+3.  Usa nuevamente el controlador de *Firefox* que dé doble clic usando el método `controlador$doubleclick()`.
+4.  Usa el controlador del botón `Descargar` para darle clic usando el método `boton_descargar$clickElement()`.
+5.  Haz una pausa para abra la ventana donde se cargan los datos para descargar usando la función `Sys.sleep(5)`. *Nota:* En este ejecicio se hace una pausa de 5 segundos en este caso, pero puedes modificarlo dependiendo de la velocidad de conexión y del explorador. Si la pausa no es suficientemente larga la instrucción de descarga más adelante, podría no encontrar el elemento por ejecutarse tan rápido.
+6.  Busca la liga de descarga (elemento HTML con etiqueta `a`) en la ventana que aparece usando el controlador de la misma con el método `ventana_descarga$findChildElement(using = "css selector", value = "a")`; esta función devuelve la dirección en una lista, por lo que será necesario extraerlo deshaciendo la lista con la función `unlist()`. Para mayor información de cómo se construye un hipervínculo en *HTML,* consulta la documentación de la etiqueta `a` en <https://www.w3schools.com/tags/tag_a.asp>.
+7.  Descarga el archivo desde la liga ubicada a la carpeta `Datos/CISESE` usando la función `download.file`.
+8.  Nuevamente, haz una pausa para que el archivo de datos comience a descargarse usando la función `Sys.sleep(3)`.
+9.  Cierra la ventana de descarga, usando su controlador con el método `boton_cerrar_ventana$clickElement()`.
+10. Elimina el elemento (estación) que está en la lista `Seleccionados`, enviando la instrucción para que el controlador presione el botón X para eliminar selección usando el método `boton_borrar_seleccion$clickElement()`. Nota que al borrar un elemento de los `Seleccionados` este ya no vuelve a aparecer en los `Resultados`, entonces podemos continuar con el siguiente elemento.
+
+Ejecuta el siguiente *chunk* para empezar a ejecutar los procesos anteriores y descargar los archivos de datos:
+
+```{r Descarga de archivos de datos por estación}
 for(i in (1:total_estaciones)) {
   
   # Obtener el i-ésimo elemento de la lista:
   resultado_seleccionado <- opciones_resultados[[i]]
-  
-  # Obtener las coordenadas del centro del elemento seleccionado:
-  posicion_resultado <- resultado_seleccionado$getElementLocation() 
   
   # Mover el cursor (virtualmente) a la posición del elemento seleccionado:
   controlador$mouseMoveToLocation(webElement = resultado_seleccionado)
@@ -227,7 +308,7 @@ for(i in (1:total_estaciones)) {
     unlist()
   
   # Define la ruta donde se descargará el archivo:
-  archivo_destino <- file.path(str_c("DATOS/CISESE/", variable_seleccionada), 
+  archivo_destino <- file.path("DATOS/CISESE/", 
                                basename(url_descarga)) # Extrae sólo el nombre del archivo de la URL.
   
   # Opción #1: Descargar directamente a una carpeta del proyecto: 
@@ -249,33 +330,319 @@ for(i in (1:total_estaciones)) {
 }
 ```
 
-Cierra las ventanas de *Firefox* y apaga el servidor de *Selenium*:
+Una vez terminado el proceso, revisa los archivos que se descargaron en la carpeta `Datos/CISESE`. Repite el proceso desde el *chunk Seleccionar Variable* y cambia el valor de la variable de la que se requieren datos asignando nuevamente el valor de la variable `variable_seleccionada <- "[Variable]"`.
 
-```{r}
+Una vez que he hayas terminado de descargar los archivos necesatios, cierra las ventanas de *Firefox* y apaga el servidor de *Selenium*:
+
+```{r Cerrar ventanas y apagar Selenium}
+# Cerrar todas las ventanas abiertas de Firefox:
 controlador$closeall()
+
+# Detener el servidor de Selenium:
 servidor_selenium$server$stop()
 ```
 
 ## Opción: Descarga directa
 
-```{r}
+Analiza la dirección de una de las ligas de descarga de archivos de datos. Este es un ejemplo:
+
+-   [http://clicom-mex.cicese.mx/tmp/1003-CALVILLO%20(SMN)-AGS-Tmax.csv](http://clicom-mex.cicese.mx/tmp/1003-CALVILLO%20(SMN)-AGS-Tmax.csv)
+
+-   <http://clicom-mex.cicese.mx/tmp/3024-LA%20MAQUINA-BCS-Tmax.csv>
+
+-   <http://clicom-mex.cicese.mx/tmp/5186-CABECERAS-COAH-Tmax.csv>
+
+Aparentemente, todos los archivos de datos están almacenados en la carpeta *tmp* del sitio web. Intenta acceder a esta carpeta desde el explorador que usas normalmente (no requiere de *Selenium*):
+
+-   <http://clicom-mex.cicese.mx/tmp/>
+
+Observa que en este caso, el sitio permite listar todos los archivos guardados para todas las estaciones, variables y formatos disponibles. En muchos sitios los archivos para descargar se generan al vuelo al realizar la consulta, pero en este caso los archivos de datos ya están preconstruidos y se almacenan en una carpeta de donde se pueden descargar directamente.
+
+Esto puede ser aprovechado para realizar una descarga directa obteniendo las ligas de cada uno de los archivos, sin embargo, sólo se requieren los que tienen extensión `.csv`, por lo que será necesario obtener la lista de todas las ligas de la página y filtrar sólo aquellas que tienen ésta extensión para repetir un la descarga en cada uno de ellos.
+
+Para lograr ésto, usa el paquete `rvest` que permite hacer un *web scraping* para extraer los nodos *HTML* de la página que sean hipervínculos (etiqueta `a`) y extraer la liga de descarga de cada archivo (atributo `href` de la etiqueta `a`), filtra sólo aquellas que terminen en `.csv` y repite el proceso de descarga para cada liga de la página como se explica a continuación:
+
+Carga el paquete `rvest`, usando la función `library`:
+
+```{r Cargar rvest}
 library(rvest)
-library(tidyverse)
+```
 
+Asigna la dirección del sitio y carpeta donde descubriste que se almacenan los archivos a la variable `url`. Usa la función `read_html` para leer el contenido de la página y guárdalo en la variable `page`:
+
+```{r Leer la página del listado de archivos}
+# Define la dirección donde se almacenan los archivos:
 url <- "http://clicom-mex.cicese.mx/tmp/"
-page <- read_html(url)
-links <- page %>% html_nodes("a") %>% html_attr("href")
-csv_links <- links[str_detect(links, ".csv$")]
-csv_links <- str_c(url, csv_links)
 
-for (link in csv_links) {
+# Lee el contenido de la página:
+pagina <- read_html(url)
+```
+
+Extrae del contenido de `pagina` todos los hipervínculos y guárdalos en la variable `ligas`, usando las funciones `html_nodes` para extraer los nodos con etiqueta `a` y a su vez, extrae de ellos la dirección de descarga usando la función `html_attr` para extraer el atributo `href`.
+
+```{r Extraer direcciones de las ligas}
+# Extrae las direcciones de las ligas de la página
+ligas <- 
+  pagina %>% 
+  html_nodes("a") %>% 
+  html_attr("href")
+
+# Previsualiza las ligas:
+ligas
+```
+
+Filtra sólo aquellas nombres de archivo que terminen con la extensión `.csv`, usando la función `str_detect` con la expresión regular `.csv$` que permite identificarlas (para mayor información sobre el uso de expresiones regulares consulta el sitio <https://regexlearn.com/es#>).
+
+Asigna las direcciones filtradas a la variable `ligas_csv`. Finalmente modifica ésta última para agregarle la dirección del sitio al principio y concatenarla con los nombres de los archivos para obtener la ruta completa de donde se descargará cada archivo.
+
+```{r Filtrar archivos CSV}
+# Filtrar sólo los nombres de archivo que terminan en .csv:
+ligas_csv <- ligas[str_detect(ligas, ".csv$")]
+
+# Previsualizar las ligas CSV:
+ligas_csv %>% head()
+
+# Agregar la dirección del sitio a los nombres de los archivos:
+ligas_csv <- str_c(url, ligas_csv)
+
+# Previsualizar las direcciones completas de los archivos:
+ligas_csv %>% head()
+```
+
+Teniendo las direcciones completas de cada archivo de datos, usa la función `for` para descargar con la función `download.file` cada una de las direcciones que están guardadas en `ligas_csv`, y haz una pausa de 3 segundos usando la función `Sys.sleep` para evitar saturar el servidor y evitar un bloqueo de seguridad en caso de que pueda confundir las descargas masivas con un ataque malicioso (a este proceso se le conoce como *descarga compasiva*):
+
+```{r Descarga directa de los archivos}
+# Repetir para cada dirección de los archivos CSV:
+for (liga in ligas_csv) {
   
-  download.file(url = link, 
-                destfile = file.path("Datos/CISESE", basename(link)))
+  # Descargar el archivo
+  download.file(url = liga, 
+                destfile = file.path("Datos/CISESE2", basename(liga))) 
+  # basename extrae el nombre del archivo de la dirección web
   
   # Hacer una pausa para hacer una descarga compasiva y evitar que las descargas se confundan con un ataque DDNS: 
-  Sys.sleep(5) 
+  Sys.sleep(3) 
   
 }
-
 ```
+
+Espera a que el proceso termine de descargar todos los archivos a la carpeta `Datos/CISESE2`.
+
+## Integración y transformación de los datos
+
+### Exploración de los datos
+
+Para unir los datos descargados en una sola base de datos, es necesario hacer una transformación de datos.
+
+Examina uno de los archivos descargados, ábrelo desde el panel *Files* de *RStudio,* por ejemplo, `Datos/CISESE/1003-CALVILLO%20(SMN)-AGS-Evap.csv`.
+
+Observa que las primeras líneas del archivo contienen los siguientes datos:
+
+```         
+Id:,1003
+Estación:,CALVILLO (SMN)-AGS
+Posición:,21.8833333333N -102.728611111W
+Variable:,Evaporación (mm)
+Fecha Inicial:,01/01/1932
+Fecha Final:,07/01/1984
+No Dato:,nan
+```
+
+Después contiene la tabla con la serie de datos para la variable seleccionada:
+
+```         
+Mes,Día,Anio,Datos
+01,01,1932,6.5
+01,02,1932,5.8
+01,03,1932,7.7
+```
+
+Será necesario hacer una transformación para unir y ordenar los datos para obtener un tabla final con la siguiente estructura:
+
+| id   | estacion           | latitud       | longitud       | fecha      | variable         | datos |
+|------|--------------------|---------------|----------------|------------|------------------|-------|
+| 1003 | CALVILLO (SMN)-AGS | 21.8833333333 | -102.728611111 | 1932-01-01 | Evaporación (mm) | 6.5   |
+| ...  | ...                | ...           | ...            | ...        | ...              | ...   |
+
+Este proceso se puede hacer en varios pasos:
+
+1.  Leer las primeras líneas para hacer una tabla con los datos de la estación y la variable, y convertir las filas en columnas y viceversa (*pivotear*).
+2.  Leer la tabla omitiendo las primeras líneas con los datos de la estación y la variable y guardar la serie de datos por mes.
+3.  Agregar a la serie de datos los datos de la estación como columnas.
+4.  Transformar las columnas para convertir las coordenadas en *formato numérico* y el día, mes y año en *formato fecha*.
+
+Empieza haciendo un ensayo con uno de los archivos que descargaste. Guarda su ruta y nombre en la variable `csv_prueba`:
+
+```{r Definir un archivo de prueba}
+csv_prueba <- "Datos/CISESE/1003-CALVILLO%20(SMN)-AGS-Evap.csv"
+```
+
+Primero realiza la siguiente transformación de los datos de la estación:
+
+1.  Lee los datos de la estación usando la función `read_csv` usando los parámetros `n_max = 4` para leer sólo las primeras 4 líneas, `col_names = FALSE` para indicar que no hay nombres de columnas (se usarán por defecto los nombre de columnas `X1` y `X2` consecutivamente) y `col_types = "c"` para especificar que todas las columnas son de tipo *texto.*
+2.  A continuación, convierte las filas en columnas y viceversa usando la función `pivot_wider` indicando que tome los nombres de las columnas desde la columna `X1` y los valores desde la columna `X2` usando los parámetros `names_from = X1` y `values_from = X2`.
+3.  Limpia los nombres de las columnas usando la función `clean_names` para pasarlos a notación *snake_case.*
+4.  Finalmente, separa las coordenadas que están en la columna `posicion` usando la función `separate` y los parámetros `into = c("latitud", "longitud")` para indicar los nombres de las columnas en las que se separarán los datos y `sep = " "` para indicar que los valores se separen donde haya un espacio.
+
+Ejecuta el siguiente *chunk* para realizar el proceso:
+
+```{r Leer datos de estación}
+# Leer y transformar los datos de la estación:
+datos_estacion <- 
+  read_csv(csv_prueba,
+           n_max = 4,
+           col_names = FALSE,
+           col_types = "c") %>% 
+  pivot_wider(names_from = X1,
+              values_from = X2) %>% 
+  clean_names() %>% 
+  separate(posicion,
+           into = c("latitud", "longitud"),
+           sep = " ") 
+
+# Previsualizar los datos de la estación:
+datos_estacion
+```
+
+Ahora lee y transforma los datos de las series:
+
+1.  Lee los datos de la serie usando la función `read_csv` usando los parámetros `skip = 7` para omitir las primeras 7 líneas, `col_names = FALSE`, `col_types = "iiin"` para especificar que las primeras tres columnas son de tipo *entero* y la última de tipo *numérico* y `na = "null"` para indicar que todos los valores que tengan el texto `"null"` se consideren como valores vacíos (`NA`)*.*
+2.   Limpia los nombres de las columnas usando la función `clean_names` para pasarlos a notación *snake_case.*
+3.  Crea las columnas `id`, `estacion`, `latitud`, `longitud` y `variable` y asígnales el valor correspondiente de la tabla `datos_estacion` que transformaste anteriormente, usando la función `mutate`.
+4.  Elimina las letras que indican el rumbo en las coordenadas para dejar sólo el valor decimal, usando la función `mutate_at` para aplicar la función `str_remove` a las columnas `c("latitud", "longitud")`, usando la expresión regular `[NnSsWwEe]` para eliminar cualquiera de esas letras.
+5.  Convierte las columnas de `longitud` y `latitud` a valores numéricos usando la función `mutate_at` para aplicar la función `as.numeric` a éstas columnas.
+6.  Crea una nueva columna llamada `fecha` construyendo una fecha a partir de las columnas `anio`, `mes` y `dia`, usando la función `make_date`.
+7.  Selecciona las columnas que se van a conserva y omite las que ya no son útiles, usando la función `select` para quedarte con las columnas `id, estacion, latitud, longitud, fecha, variable, datos`.
+8.  Revisar la estructura del resultado y comprueba que los datos se transformaron adecuadamente usando la función `glimpse`.
+
+```{r Leer serie de datos}
+# Leer y transformar los datos de la serie:
+datos_serie <-
+  read_csv(casv_prueba,
+           col_types = "iiin",
+           skip = 7,
+           na = "null") %>% 
+  clean_names() %>% 
+  mutate(id = datos_estacion$id,
+         estacion = datos_estacion$estacion,
+         latitud = datos_estacion$latitud,
+         longitud = datos_estacion$longitud,
+         variable = datos_estacion$variable) %>% 
+  mutate_at(c("latitud", "longitud"),
+            str_remove,
+            "[NnSsWwEe]") %>% 
+  mutate_at(c("longitud", "latitud"),
+            as.numeric) %>% 
+  mutate(fecha = make_date(anio, mes, dia)) %>% 
+  select(id, estacion, latitud, longitud, fecha, variable, datos) %>% 
+  glimpse()
+```
+
+### Procesamiento de todos los archivos
+
+Será necesario repetir este proceso para cada uno de los archivos descargados. Por ello, es conveniente construir una función que haga este proceso de forma repetitiva.
+
+Crea la función `transformar_archivo` con el parámetro de entrada `archivo` (que irá variando durante el procesamiento), usando `function` y reutiliza los códigos para leer los datos de estación y series de la prueba anterior, sustituyendo el nombdre del archivo de prueba por el parámetro `archivo`, como se realiza a continuación:
+
+```{r Función para transformar datos}
+# Definir la función con el parámetro archivo
+transformar_archivo <- function(archivo) {
+  
+  # Leer y transformar los datos de la estación:
+  datos_estacion <- 
+    read_csv(archivo,
+             n_max = 4,
+             col_names = FALSE,
+             col_types = "c") %>% 
+    pivot_wider(names_from = X1,
+                values_from = X2) %>% 
+    clean_names() %>% 
+    separate(posicion,
+             into = c("latitud", "longitud"),
+             sep = " ") 
+  
+  # Leer y transformar los datos de la serie:
+  datos_serie <-
+    read_csv(archivo,
+             col_types = "iiin",
+             skip = 7,
+             na = "null") %>% 
+    clean_names() %>% 
+    mutate(id = datos_estacion$id,
+           estacion = datos_estacion$estacion,
+           latitud = datos_estacion$latitud,
+           longitud = datos_estacion$longitud,
+           variable = datos_estacion$variable) %>% 
+    mutate_at(c("latitud", "longitud"),
+              str_remove,
+              "[NnSaWwEe]") %>% 
+    mutate_at(c("longitud", "latitud"),
+              as.numeric) %>% 
+    mutate(fecha = make_date(anio, mes, dia)) %>% 
+    select(id, estacion, latitud, longitud, fecha, variable, datos)
+  
+  # Devolver como resultado de aplicar la función, los datos de la serie transformados.
+  return(datos_serie)
+  
+}
+```
+
+Obten una lista de todos los archivos descargados que serán unidos usando la función `list.files` para obtener una lista del contenido de la carpeta `Datos/CISESE` (o `Datos/CISESE2`) y guárdala en la variable `archivos_csv` y previsualiza los resultados:
+
+```{r Lista de archivos descargados}
+# Guardar la lista de archivos contenidos en la carpeta de descarga:
+archivos_csv <- list.files("Datos/CISESE",
+                           full.names = TRUE)
+
+#Previsualiza la lista de archivos descargados:
+archivos_csv %>% head()
+```
+
+Repite la operación de lectura y transformación de datos que definiste con la función `transformar_archivo` para cada uno de los archivos de la lista `archivos_csv`, usando la función `map_df` y guarda la tabla unida resultante en la variable `datos_completos`, finalmente previsualiza el resultado usando la función `glimpse`.
+
+```{r Unir los archivos de datos}
+datos_completos <- 
+  map_df(archivos_csv,
+         transformar_archivo) %>% 
+  glimpse()
+```
+
+Finalmente, guarda la tabla de datos completa en el archivo `Datos/CISESE.csv` usando la función `write_excel_csv`:
+
+```{r Guardar archivo completo}
+datos_completos %>% write_excel_csv("Datos/CISESE.csv")
+```
+
+### Capa de estaciones
+
+A partir de los datos que obtuviste, es posible construir una capa geográfica con la ubicación de las estaciones. Para ésto, usa los valores únicos de la estación (`id, estacion, latitud, longitud`) a partir de los `datos_completos` usando la función `distinct`, y transfórmalos en una capa geográfica (`sf`) usando la función `st_as_sf`, con los parámetros `coords = c("longitud", "latitud")` para indicarle cuáles son las columnas que tienen las coordenadas y `crs = 4326` para indicarle que use el sistema de coordenadas (CRS) WGS-84 (que tiene la clave EPSG: 4326); y previsualiza la estructura de la capa resultante usando la función `glimpse`:
+
+```{r Crear capa geográfica de estaciones}
+# Extraer los datos únicos de las estaciones y convertir en capa geográfica (sf)
+estaciones <-
+  datos_completos %>% 
+  distinct(id, estacion, latitud, longitud) %>% 
+  st_as_sf(coords = c("longitud", "latitud"),
+           crs = 4326) %>% # Especificar la proyección en WGS-84
+  glimpse()
+```
+
+Finalmente, visualiza las estaciones en un mapa interactivo, cambiando su modo de visualización con la función `tmap_mode("view")` y usando la función `qtm` para visualizar la capa *sf* `estaciones`.
+
+```{r Visualizar mapa de estaciones}
+# Cambiar a visualización de mapa interactivo
+tmap_mode("view")
+
+# Visualizar la capa de estaciones:
+estaciones %>% qtm()
+```
+
+## Referencias
+
+-   Lovelace, R., Nowosad, J., & Muenchow, J. (2019), *Geocomputation with R. <https://geocompr.robinlovelace.net>*. CRC Press.
+-   Tennekes, M., Nowosad, J. (2018). *tmap: Thematic Maps in R*. Journal of Statistical Software. Recuperado el 8 de septiembre, 2021, from <https://www.researchgate.net/publication/324652152_tmap_Thematic_Maps_in_R/fulltext/5ad9e7eb0f7e9b28593cf867/tmap-Thematic-Maps-in-R.pdf>.
+-   Engel, C. (2019). *Using Spatial Data with R.* cengel.github.io. Recuperado el 8 de septiembre, 2021, desde [https://cengel.github.io/R-spatial/](https://cengel.github.io/R-spatial).
+-   Wickham H. (2022). *rvest*. Recuperado el 11 de junio, 2022 desde <https://rvest.tidyverse.org/index.html>.
+-   *RSelenium*. Recuperado el 11 de junio, 2022 desde <https://docs.ropensci.org/RSelenium/index.html>.
+-   *Web Scraping Reference: Cheat Sheet for Web Scraping using R*. Recuperado el 11 de junio, 2022 desde <https://github.com/yusuzech/r-web-scraping-cheat-sheet>
+-   W3 Schools. *HTML \<a\> Tag.* Recuperado el 13 de agosto, 2013 desde <https://www.w3schools.com/tags/tag_a.asp>
