@@ -9,19 +9,21 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introducción
 
-Existen técnicas que nos permiten automatizar los procesos que se requieren para extraer y procesar información que proviene de diferentes fuentes de información, y una de las principales fuentes donde podemos acceder a diferentes tipos de información es Internet. Aunque algunas veces los datos que necesitamos están publicados en páginas web de acceso abierto, regularmente el formato en que las consultamos no es el más apropiado o sencillo de manejar.
+Existen técnicas que nos permiten automatizar los procesos necesarios para extraer y procesar información de diversas fuentes, siendo una de las principales Internet. Aunque en ocasiones los datos que necesitamos están disponibles en páginas web de acceso abierto, el formato en que los consultamos no siempre es el más apropiado o sencillo de manejar.
 
-En esta sesión se utilizarán dos técnicas que sirven para automatizar la extracción y la geocodificación de datos provenientes de Internet, la primera el raspado web (*web scraping*) que permite extraer contenidos de una página web y automatizar el uso del explorador web para controlar y cambiar los parámetros que usan las páginas dinámicas de consulta.
+En esta sesión, se utilizarán dos técnicas para automatizar la extracción y geocodificación de datos provenientes de Internet. La primera técnica es el raspado web (*web scraping*), que permite extraer contenido de una página web programando el explorador para controlar y modificar los parámetros utilizados por las páginas de consulta. Esto nos permite obtener información automáticamente, evitando el trabajo repetitivo que requeriría hacerlo manualmente. La segunda técnica es la geocodificación automática, que consiste en obtener las coordenadas de una lista de direcciones de manera automatizada mediante un servicio *web*.
+
+Es importante utilizar estas técnicas con discreción, ya que tienen implicaciones éticas y ciertos márgenes de imprecisión. Sin embargo, son herramientas muy útiles para adquirir datos difíciles de obtener por medios convencionales.
 
 ## Objetivo
 
-Durante el transcurso de esta sesión, realizarás un ejercicio sencillo para extraer una tabla de datos económicos de una página de Wikipedia usando el paquete `rvest`, usarás *Selenium* para controlar el explorador *Firefox* y hacer una búsqueda en una página usando las funcionesdel paquete *RSelenium*, y convertirás una lista de direcciones en una capa geográfica usando el servicio web de *Here*.
+Durante el transcurso de esta sesión, realizarás un ejercicio sencillo para extraer una tabla de datos económicos de una página de Wikipedia usando el paquete `rvest`, usarás *Selenium* para controlar el explorador *Firefox* y hacer una búsqueda en una página usando las funciones del paquete *RSelenium*, y convertirás una lista de direcciones en una capa geográfica usando el servicio web de *Here*.
 
 Finalmente, aplicarás todos las técnicas anteriores para automatizar la extracción de datos de la página de consulta de puntos de venta de Liconsa y obtener una capa geográfica con sus ubicaciones, utilizando únicamente programación en *R*.
 
 ## Preparación del entorno
 
-**Importante:** Para trabajar con este cuaderno, será necesario que tengas instalado el explorador *Firefox* que se puede instalar desde su [página oficial](https://www.mozilla.org). También se requerirá crear una cuenta de desarrollador del servicio de `Here` en la página <https://developer.here.com> y crear una llave de *API REST* para un nuevo proyecto.
+**Importante:** Para trabajar con este cuaderno, será necesario que tengas instalado el explorador *Firefox* que se puede instalar desde su [página oficial](https://www.mozilla.org).
 
 Elimina todos los objetos del entorno usando la función `rm`:
 
@@ -36,7 +38,7 @@ Para esta sesión nos aseguraremos de tener instalados y actualizados todos los 
 #                    "janitor",
 #                    "rvest",
 #                    "RSelenium",
-#                    "hereR",
+#                    "tidygeocoder",
 #                    "tmap"))
 ```
 
@@ -51,19 +53,20 @@ library(tidyverse)
 library(janitor)
 library(rvest)
 library(RSelenium)
-library(hereR)
+library(tidygeocoder)
 library(tmap)
 ```
 
-## Raspado web (*Web scraping*)
+## Raspado web (*web scraping*)
 
-El *raspado web* es una técnica utilizada frecuentemente en el análisis de datos que permite extraer diferentes elementos que componen una página web, por ejemplo textos, imágenes y principalmente tablas de datos. Esta herramienta aprovecha la estructura en que están construidas las páginas web usando el lenguaje de marcado *HTML* para identificar sus elementos por separado y extraerlos de manera sencilla.
+El raspado *web* es una técnica ampliamente utilizada en el análisis de datos que permite extraer diversos elementos de una página web, como textos, imágenes y, sobre todo, tablas de datos. Esta herramienta se basa en la estructura de las páginas web, aprovechando el lenguaje de marcado *HTML* para identificar y extraer sus elementos de forma sencilla y automatizada.
 
 Extrae la tabla de indicadores económicos básicos de México (PIB anual) que está publicada en la *Wikipedia* en la página <https://es.wikipedia.org/wiki/Econom%C3%ADa_de_México>.
 
 Lee la página de *Wikipedia* donde se encuentran los datos que se necesitan usando la función `read_html` del paquete `rvest`:
 
 ```{r Leer página de Wikipedia}
+# Lee el código HTML de la página:
 html <- read_html("https://es.wikipedia.org/wiki/Econom%C3%ADa_de_México")
 
 # Visualiza el contenido:
@@ -125,28 +128,28 @@ tablas <-
 tablas
 ```
 
-La tabla que contiene la información sobre el PIB es la quinta. Selecciona la tabla correspondiente de la lista de `tablas` y guárdala en una nueva variable llamada `pib_mexico`:
+La tabla que contiene la información sobre el PIB es la secta. Selecciona la tabla correspondiente de la lista de `tablas` y guárdala en una nueva variable llamada `pib_mexico`:
 
-1.  Toma como base el quinto elemento de la lista `tablas`.
+1.  Toma como base el sexto elemento de la lista `tablas`.
 2.  Visualiza la estructura de la tabla usando la función `glimpse`.
 
 ```{r Extraer tabla de PIB}
 pib_mexico <-
-  tablas[[5]] %>% # Usamos la quinta tabla de la página
+  tablas[[6]] %>% # Usamos la quinta tabla de la página
   glimpse()
 ```
 
-La tabla obtenida tiene nombres de variables que no son convenientes por que tienen mayúsculas y espacios, además las variables tienen tipo de datos de texto. Antes de poder usar estos datos en un análisis es necesario hacer un proceso de limpieza, realiza la siguiente manipulación de datos y asigna el resultado a la variable `pib_mexico`:
+La tabla obtenida tiene nombres de variables que no son convenientes por que tienen mayúsculas y espacios, además las variables tienen un tipo de datos de texto. Antes de poder usar estos datos en un análisis es necesario hacer un proceso de limpieza, realiza la siguiente manipulación de datos y asigna el resultado a la variable `pib_mexico`:
 
 1.  Toma como base la quinta tabla de `tablas`.
 2.  Limpia los nombres de las variables usando la función `clean_names`.
-3.  Convierte el tipo de datos de las variables 2 a 7 a numérico aplicandoles la función `parse_numeric` y usando la función `mutate_at`.
-4.  Divide entre 100 el valor de las variables 4 a 7 aplicándoles la función `function(x) x/100` y usando la función `mutate_at`.
+3.  Convierte el tipo de datos de las variables (columnas) 2 a 7 a numérico aplicándoles la función `parse_numeric` y usando la función `mutate_at`.
+4.  Divide entre 100 el valor de las variables (columnas) 4 a 7 aplicándoles la función `function(x) x/100` y usando la función `mutate_at`.
 5.  Visualiza la estructura de la tabla resultante usando la función `glimpse`.
 
 ```{r Extraer y limpiar la tabla de PIB}
 pib_mexico <-
-  tablas[[5]] %>% # Usamos la quinta tabla de la página
+  tablas[[6]] %>% # Usamos la quinta tabla de la página
   clean_names() %>% # Limpia los nombres de las variables
   mutate_at(2:7, parse_number) %>% # Convierte las variables 2 a 7 en número
   mutate_at(4:7, function(x) x/100) %>% # Divide la variables 4 a 7 entre 100
@@ -168,22 +171,43 @@ En este ejercicio, obtendrás las coordenadas de la dirección de la sede de Cen
 
 ### Arranque del servidor de *Selenium y conexión desde R*
 
-Antes de continuar, asegúrate de tener instalado *Java* en tu computadora. Si aún no lo tienes instalado, puedes descargar el instalador desde la página web <https://www.java.com/es/>.
+El primer paso es iniciar un servidor de *Selenium*, existen varios métodos como puedes leer en la [documentación de *RSelenium*](https://docs.ropensci.org/RSelenium/articles/basics.html#do-i-need-to-run-a-selenium-server)*,* en ésta práctica, ejecutaremos el archivo binario de *Selenium Server (Grid)* para *Java.*
+
+Descarga el archivo de la versión más reciente de *Selenium Server (Grid)* desde su [página oficial de descargas](https://www.selenium.dev/downloads/). Guarda una copia del archivo `selenium-server-x.xx.x.jar` en la raíz de la carpeta de trabajo.
+
+Antes de continuar, asegúrate de tener instalado *Java* en tu computadora. Si aún no lo tienes instalado, puedes descargar los instaladores de la versiones más recientes de *JRE* y *JDK* desde las página *web* <https://www.java.com/es/> y [https://www.oracle.com/java/technologies/downloads/](https://www.oracle.com/java/technologies/downloads/#jdk22-mac){.uri}, respectivamente.
+
+Inicia el servidor de Selenium desde la pestaña *Terminal* de *RStudio*, con la siguiente instrucción (usaremos como ejemplo la versión 4.20.0, cambia el número de la versión si es necesario):
+
+``` bash
+java -jar selenium-server-4.20.0.jar standalone --port 4445
+```
+
+Por defecto, *Selenium* usa el puerto 4444. Observa que en la instrucción anterior se usa el parámetro `--port 4445` para usar el puerto 4445 en su lugar, ya que de acuerdo con la [documentación de *RSelenium*](https://docs.ropensci.org/RSelenium/articles/basics.html#how-do-i-run-the-selenium-server), se pueden presentar problemas en sistemas con *macOS*. Si trabajas en un entorno *Windows* puedes omitir esta modificación y trabajar con el puerto por defecto.
+
+El servidor *Selenium* ya está activo si después de ejecutar la instrucción anterior aparece en la última línea un mensaje similar a este:
+
+```         
+14:58:50.691 INFO [Standalone.execute] - Started Selenium Standalone 4.20.0 (revision 866c76ca80): http://192.168.20.251:4445
+```
 
 Para comenzar a enviar instrucciones a *Selenium* para que controle a *Firefox*, debemos definir qué explorador vamos a manejar. Usa la función `rsDriver` y especifica los parámetros `browser = "firefox"` para indicar a *Selenium* que use *Firefox, `port = 4567L`* para indicar con número entero el puerto que se utilizará para recibir las instrucciones y `chromever = NULL, iedrver = NULL, phantomver = NULL` para evitar que se carguen los controladores de los otros exploradores y evitar posibles errores. Guarda la *instancia del servidor* en la variable `servidor_selenium`:
 
 ```{r Iniciar servidor de Selenium}
-servidor_selenium <- rsDriver(browser = "firefox", 
-                              port = 4567L,
-                              chromever = NULL,
-                              iedrver = NULL,
-                              phantomver = NULL)
+servidor_selenium <- remoteDriver(remoteServerAddr = "192.168.20.251",
+                                  port = 4444L,
+                                  browserName = "firefox")
 ```
 
 Después de esta instrucción, *Firefox* debe abrirse automáticamente. A continuación, es necesario conectar el "control remoto" de *R* al servidor de *Selenium* que acabas de iniciar. Para ello, crea el `controlador` a partir del elemento de lista `[["client"]]` de la variable `servidor_selenium` con la que arrancaste el servidor de *Selenium* en el paso anterior*.*
 
 ```{r Iniciar controlador de Selenium}
 controlador <- servidor_selenium[["client"]]
+```
+
+```{r}
+servidor_selenium$getStatus()
+servidor_selenium$open()
 ```
 
 A partir de este momento, ya es posible empezar a pasar instrucciones a través de `controlador` para manejar el explorador web usando las funciones del paquete *RSelenium*. Es recomendable que dividas en la pantalla las ventanas de *RStudio* y *Firefox* para que puedas ver cómo se ejecutan las siguientes instrucciones en el explorador.
