@@ -322,7 +322,7 @@ API
 <https://www.bingmapsportal.com>
 
 ```{r Definir la llave API de Bing}
-Sys.setenv("BINGMAPS_API_KEY" = "AuYj6J2QUZZa9C9aqubfCpVch18S4jVjiWs1MnZj_VfdAe8dcc9xme66p42lRS5w")
+Sys.setenv("BINGMAPS_API_KEY" = "TU_API_KEY_AQUI")
 ```
 
 ```{r Geocodificación de sedes de CentroGeo}
