@@ -11,15 +11,15 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Existen técnicas que nos permiten automatizar los procesos necesarios para extraer y procesar información de diversas fuentes, siendo una de las principales Internet. Aunque en ocasiones los datos que necesitamos están disponibles en páginas web de acceso abierto, el formato en que los consultamos no siempre es el más apropiado o sencillo de manejar.
 
-En esta sesión, se utilizarán dos técnicas para automatizar la extracción y geocodificación de datos provenientes de Internet. La primera técnica es el raspado web (web scraping), que permite extraer contenido de una página web programando el explorador para controlar y modificar los parámetros utilizados por las páginas de consulta. Esto nos permite obtener información automáticamente, evitando el trabajo repetitivo que requeriría hacerlo manualmente. La segunda técnica es la geocodificación automática, que consiste en obtener las coordenadas de una lista de direcciones de manera automatizada mediante un servicio web.
+En esta sesión, se utilizarán dos técnicas para automatizar la extracción y geocodificación de datos provenientes de Internet. La primera técnica es el raspado web (*web scraping*), que permite extraer contenido de una página web programando el explorador para controlar y modificar los parámetros utilizados por las páginas de consulta. Esto nos permite obtener información automáticamente, evitando el trabajo repetitivo que requeriría hacerlo manualmente. La segunda técnica es la geocodificación automática, que consiste en obtener las coordenadas de una lista de direcciones de manera automatizada mediante un servicio web.
 
 Es importante utilizar estas técnicas con discreción, ya que tienen implicaciones éticas y ciertos márgenes de imprecisión. Sin embargo, son herramientas muy útiles para adquirir datos difíciles de obtener por medios convencionales.
 
 ## Objetivo
 
-Durante el transcurso de esta sesión, realizarás un ejercicio sencillo para extraer una tabla de datos económicos de una página de Wikipedia usando el paquete `rvest`, usarás Selenium para controlar el explorador Firefox y hacer una búsqueda en una página usando las funciones del paquete RSelenium, y convertirás una lista de direcciones en una capa geográfica usando el servicio web de Here.
+Durante el transcurso de esta sesión, realizarás un ejercicio sencillo para extraer una tabla de datos económicos de una página de Wikipedia usando el paquete `rvest`, usarás Selenium para controlar el explorador Firefox y hacer una búsqueda en una página usando las funciones del paquete `RSelenium`, y convertirás una lista de direcciones en una capa geográfica usando el servicio web de Here*.*
 
-Finalmente, aplicarás todos las técnicas anteriores para automatizar la extracción de datos de la página de consulta de puntos de venta de Liconsa y obtener una capa geográfica con sus ubicaciones, utilizando únicamente programación en R.
+Finalmente, aplicarás todos las técnicas anteriores para automatizar la extracción de datos de la página de consulta de puntos de venta de leche Liconsa y obtener una capa geográfica con sus ubicaciones, utilizando únicamente programación en R.
 
 ## Preparación del entorno
 
@@ -129,7 +129,7 @@ tablas <-
 tablas
 ```
 
-La tabla que contiene la información sobre el PIB es la secta. Selecciona la tabla correspondiente de la lista de `tablas` y guárdala en una nueva variable llamada `pib_mexico`:
+La tabla que contiene la información sobre el PIB es la sexta. Selecciona la tabla correspondiente de la lista de `tablas` y guárdala en una nueva variable llamada `pib_mexico`:
 
 1.  Toma como base el sexto elemento de la lista `tablas`.
 2.  Visualiza la estructura de la tabla usando la función `glimpse`.
@@ -170,7 +170,7 @@ Muchas fuentes de información en Internet están publicadas en páginas web din
 
 En este ejercicio, obtendrás las coordenadas de la dirección de la sede de CentroGeo en la CDMX usando la página web [LatLong.net](https://www.latlong.net).
 
-### Arranque del servidor de Selenium y conexión desde R
+### Arranque del servidor de *Selenium* y conexión desde *R*
 
 Antes de continuar, asegúrate de tener instalado Java en tu computadora. Si aún no lo tienes instalado, puedes descargar los instaladores de la versiones más recientes de JRE y JDK desde las página web <https://www.java.com/es/> y [https://www.oracle.com/java/technologies/downloads/](https://www.oracle.com/java/technologies/downloads/#jdk22-mac){.uri}, respectivamente.
 
@@ -250,11 +250,11 @@ Ahora, ordena a Firefox que abra la página de CentroGeo (<https://www.centrogeo
 controlador$navigate("https://www.centrogeo.org.mx")
 ```
 
-Identifica el elemento de la liga del menú Posgrado, con el inspector y copia su dirección CSS. Crea una instancia de este elemento usando el método `findElement` con los parámetros `using = "css selector"` y el la dirección que obtuviste del inspector `value = ".item-120 > a:nth-child(1)"` y guarda el control en la variable `liga_picig`:
+Identifica el elemento de la liga del Directorio en el pie de la página, con el inspector y copia su dirección xPath. Crea una instancia de este elemento usando el método `findElement` con los parámetros `using = "xpath"` y la dirección que obtuviste del inspector `value = "/html/body/div[2]/footer[1]/div/div/div[2]/div/ul/li[1]/a"` y guarda el control en la variable `liga_directorio`:
 
-```{r Identificar la liga a la página de Postgrado en CIG}
-liga_posgrado <- controlador$findElement(using = "css selector",
-                                      value = ".item-120 > a:nth-child(1)")
+```{r Identificar la liga a la página del directorio}
+liga_directorio <- controlador$findElement(using = "xpath",
+                                      value = "/html/body/div[2]/footer[1]/div/div/div[2]/div/ul/li[1]/a")
 ```
 
 Ordena a Firefox que abra la liga:
@@ -293,7 +293,7 @@ En la parte final de la práctica volverás a iniciar el servidor para realizar 
 
 La geocodificación es el proceso que nos permite obtener la ubicación geográfica a partir de direcciones y referencias en texto. Para llevar a cabo este proceso, podemos utilizar servicios web ofrecidos por plataformas como Google, OpenStreetMaps, Bing o Here, entre otros.
 
-En el caso de este ejercicio, utilizaremos el paquete **`tidygeocoder`** para obtener una tabla con coordenadas a partir de una lista de direcciones correspondientes a las cuatro sedes de CentroGeo en el país.
+En este ejercicio, utilizaremos el paquete **`tidygeocoder`** para obtener una tabla con coordenadas a partir de una lista de direcciones correspondientes a las cuatro sedes de CentroGeo en el país.
 
 Lee el archivo `sedes_centrogeo.txt` en la carpeta `Datos`, usando la función `read_lines` y visualiza su contenido:
 
@@ -301,88 +301,83 @@ Lee el archivo `sedes_centrogeo.txt` en la carpeta `Datos`, usando la función `
 sedes_centrogeo <-
   read_lines("Datos/sedes_centrogeo.txt") %>% 
   as_tibble()
-# sedes_centrogeo <-
-#   read_csv("Datos/sedes_centrogeo.csv") %>% 
-#   glimpse() # Visualiza el contenido del archivo
+
 sedes_centrogeo
 ```
 
-CORREGIR
+Como vimos en clase, [hay diferentes servicios web que nos permiten geocodificar direcciones](https://jessecambon.github.io/tidygeocoder/articles/geocoder_services.html). Para este ejercicio, puedes usar la API de Bing por que se puede usar gratuitamente, tiene pocas limitaciones de uso y ofrece buenos resultados.
 
-Se usa la API de Bing por que no tiene limitaciones de costo y uso y buenos resultados. comaprativa en <https://jessecambon.github.io/tidygeocoder/articles/geocoder_services.html> (Google cuesta y no tiene gratis)
-
-Envía la lista de direcciones al servicio de geocodificación de *Bing Maps* para obtener una capa geográfica con las ubicaciones, realizando la siguiente manipulación de datos y guardando el resultado en la variable `sedes_centrogeo_geocodificadas`:
-
-1.  Toma como base los datos de `sedes_centrogeo`.
-2.  Envia los datos para geocodificar al servicio de *Bing Maps* usando la función `geocode`.
-3.  Visualiza la estructura resultante usando la función `glimpse`.
-
-API
-
-<https://www.bingmapsportal.com>
+Para usar el servicio de Bing, es necesario crear una cuenta de usuario en <https://www.bingmapsportal.com> y obtener una llave de API (*token*). Ejecuta el siguiente *chunk* para definir en el entorno de R, la llave de API que generaste, asignándola a la variable `BINGMAPS_API_KEY` usando la función `Sys.setenv` como se indica a continuación:
 
 ```{r Definir la llave API de Bing}
+# Establece tu llave API de Bing en cada nueva sesión de trabajo.
 Sys.setenv("BINGMAPS_API_KEY" = "TU_API_KEY_AQUI")
 ```
+
+> Ten cuidado con tus llaves API, no las compartas ni publiques en ningún sitio web para evitar que alguien más pueda hacer mal uso de ella. Puedes copiar la instrucción del *chunk* anterior y correrla en la consola si no deseas guardar tu llave en este cuaderno.
+
+Ahora que ya puedes acceder al servicio web usando tu llave API envía la lista de direcciones al servicio de geocodificación de Bing para obtener una tabla con las coordenadas de las direcciones, realizando la siguiente manipulación de datos y guardando el resultado en la variable `sedes_centrogeo_geocodificadas`:
+
+1.  Toma como base los datos de `sedes_centrogeo`.
+2.  Envía los datos para geocodificar al servicio de Bing Maps usando la función `geocode`.
+3.  Convierte la tabla resultante de la geocodificación en un objeto espacial *simple features (sf)* de puntos usando la función `st_as_sf` del paquete `sf` indicando cuáles son las columnas con las coordenadas con el parámetro `coords = c("long", "lat")` y el sistema de coordenadas geográficas WGS-84 (EPSG:4326) con el parámetro `crs = 4326.`
+4.  Visualiza la estructura resultante usando la función `glimpse`.
 
 ```{r Geocodificación de sedes de CentroGeo}
 sedes_centrogeo_geocodificadas <-
   sedes_centrogeo %>% 
   geocode(address = "value",
           method = "bing") %>% 
-  st_as_sf(coords = c("long", "lat"), # Convierte en sf indicando cuáles son las columans delas coordenadas
+  st_as_sf(coords = c("long", "lat"), # Convierte en sf indicando cuáles son las columnas delas coordenadas
            crs = 4326) %>% # Indica el sistema de coordenadas WGS-84
   glimpse()
-# sedes_centrogeo_geocodificadas <-
-#   sedes_centrogeo %>% 
-#   geocode(street = "calle",
-#           city = "ciudad",
-#           county = "municipio",
-#           state = "estado",
-#           postalcode = "cp",
-#           country = "pais",
-#           method = "osm") %>% 
-#   glimpse()
 ```
 
-Establece el modo de visualización interactiva del paquete `tmap` usando el parámetro `"view"` de la función `tmap_mode`.
-
-Visualiza en un mapa los resultados de la geocodificación, convirtiendo la tabla `sedes_centrogeo_geocodificadas` en un objeto espacial simple features de puntos usando la función `st_as_sf` del paquete `sf` indicando cuáles son las columnas con las coordenadas con el parámetro `coords = c("long", "lat")` y el sistema de coordenadas geográficas WGS-84 (EPSG:4326) con el parámetro `crs = 4326`, y finalmente usa la función `qtm` para construir el mapa:
+Establece el modo de visualización interactiva del paquete `tmap` usando el parámetro `"view"` de la función `tmap_mode`. Visualiza en un mapa los resultados de la geocodificación, usa la función `qtm` para construir el mapa con los puntos de la capa `sedes_centrogeo_geocodificadas`:
 
 ```{r Mapa de sedes geocodificadas}
 # Cambiar modo de visualización a interactivo:
 tmap_mode("view")
 
 # Visualizar en un mapa rápido:
-sedes_centrogeo_geocodificadas %>% 
-  qtm()
+qtm(sedes_centrogeo_geocodificadas)
+```
+
+El archivo `sedes_centrogeo_reales.gpkg` de la carpeta `Datos` contiene una capa con las ubicaciones reales de las sedes de CentroGeo. Ejecuta el siguiente *chunk* para comparar en el mapa las ubicaciones obtenidas por la geocodificación automática (puntos rojos) con las ubicaciones reales (puntos azules):
+
+```{r Comparación de ubicaciones}
+# Leer la capa de ubicaciones reales de las sedes
+sedes_centrogeo_reales <- 
+  st_read("Datos/sedes_centrogeo_reales.gpkg")
+
+# Construir el mapa con la capa de ubicaciones reales y geocodificadas
+tm_shape(sedes_centrogeo_reales) +
+  tm_dots(size = 0.1, 
+          col = "blue") + # Agregar la capa de ubicaciones reales en azul
+  tm_shape(sedes_centrogeo_geocodificadas) +
+  tm_dots(size = 0.1,
+          col = "red") # Agregar la capa de ubicaciones geocodificadas en rojo
 ```
 
 Explora el mapa y verifica la ubicación de los puntos geocodificados a través del API de Bing.
 
 > ¿Las ubicaciones obtenidas automáticamente son correctas?
-
-Ejecuta el siguiente chunk para comparar en el mapa las ubicaciones obtenidas por la geocodificación automática (puntos rojos) con las ubicaciones reales (puntos azules):
-
-```{r Comparación de ubicaciones}
-sedes_centrogeo_reales <- 
-  st_read("Datos/sedes_centrogeo_reales.gpkg")
-
-tm_shape(sedes_centrogeo_reales) +
-  tm_dots(col = "blue") +
-  tm_shape(sedes_centrogeo_geocodificadas) +
-  tm_dots(col = "red")
-```
+>
+> Si encuentras diferencias, ¿a qué crees que se deben?
+>
+> ¿En qué casos usarías la geocodificación automática?
+>
+> ¿Cómo mejorarías la calidad de los resultados obtenidos?
 
 ## Caso práctico. Análisis de puntos de venta de Leche Liconsa (Parte I)
 
-En esta sesión, prepararás los datos principales que se requieren para hacer una evaluación de la localización de puntos de venta de leche Liconsa en el país. Para ello es necesario obtener una capa geográfica con las ubicaciones de estos puntos de venta, antes de poder compararlos o empezar a hacer análisis más específicos. Como no se cuenta con descarga directa de estos datos, será necesario extraer los datos de la página y geocodificarlos.
+En esta sesión, prepararás los datos principales que se requieren para hacer una evaluación de la localización de puntos de venta de leche Liconsa en el país. Para ello es necesario obtener una capa geográfica con las ubicaciones de estos puntos de venta para poder compararlas o empezar a hacer análisis más específicos. Como no se cuenta con descarga directa de estos datos, será necesario extraer los datos de la página y geocodificarlos.
 
 ### Raspado web de datos oficiales
 
 El Gobierno de México publica los puntos de venta de leche en la página dinámica de Puntos de venta de Liconsa ubicada en <http://www.liconsa.gob.mx/padron/puntosdeventa.php>.
 
-Aunque los datos publicados incluyen la calle, colonia, código postal, municipio y estado de la República donde se encuentran los puntos de venta, se trata de una página dinámica que no permite la descarga directa de datos, y que además requiere la interacción directa para consultar por estado y municipio. Por esta razón, para poder extraer los datos de la página será necesario usar una técnica de raspado web (web scraping) combinada con automatización de páginas web.
+Aunque los datos publicados incluyen la calle, colonia, código postal, municipio y estado de la República donde se encuentran los puntos de venta, se trata de una página dinámica que no permite la descarga directa de datos, y que además requiere la interacción directa para consultar por estado y municipio. Por esta razón, para poder extraer los datos de la página de manera más rápida y eficiente, será necesario usar una técnica de raspado web (*web scraping*) combinada con automatización de páginas web.
 
 ### Exploración de los componentes de la página
 
@@ -405,20 +400,23 @@ Estas etiquetas servirán más adelante para controlar la página y cambiar los 
 
 ### Automatización de la página
 
-Inicia el servidor de Selenium usando la función `rsDriver` con los parámetros que usaste anteriormente y asígnalo a una nueva variable llamada `servidor_selenium`:
+Antes de comenzar con éste proceso, es conveniente borrar todos los objetos del entorno. Presiona el botón *Clear objects from the workspace* (escoba) del panel *Environment* o ejecuta el siguiente bloque:
+
+```{r Limpiar entorno para caso de uso}
+rm(list = ls())
+```
+
+Inicia el servidor de Selenium usando la función `rsDriver` con los parámetros que usaste anteriormente y asígnalo a una nueva variable llamada `servidor_selenium`:. Incluye el parámetro `verbose = FALSE` para evitar mensajes de salida repetitivos.
 
 ```{r Iniciar el servidor de Selenium}
-servidor_selenium <- rsDriver(browser = "firefox", 
-                              port = 4567L,
-                              chromever = NULL,
-                              iedrver = NULL,
-                              phantomver = NULL)
+servidor_selenium <- rsDriver(browser = "firefox",
+                              verbose = FALSE)
 ```
 
 Conecta a R con Firefox a través de Selenium creando un `controlador` usando el elemento de lista `[["client"]]` del `servidor_selenium`:
 
 ```{r Conectar el controlador a Selenium}
-controlador <- servidor_selenium[["client"]]
+controlador <- servidor_selenium$client
 ```
 
 Ordena a Firefox que abra la página de consulta de puntos de venta de Liconsa, usando el método `open` de `controlador` para abrir la dirección `http://invprov.liconsa.gob.mx:8080/ConsultaWEB/`:
@@ -509,6 +507,7 @@ Ahora usa el paquete `rvest` para extraer la tabla del código fuente de la pág
 Finalmente, visualiza los datos extraídos.
 
 ```{r Extraer la tabla de datos del código HTML}
+# Extraer sólo la tabla con los datos 
 tabla_datos <-
   read_html(codigo_html[[1]]) %>% 
   html_element("table#GridArea") %>% 
@@ -528,11 +527,6 @@ rm(list = c("selector_estado",
             "tabla_datos"))
 
 extrae_tabla <- function(opcion_estado, controlador_remoto, tiempo_espera = 2) {
-  
-  # Especificar los paquetes que requiere la función (por si se ocupa en otro script):
-  require(tidyverse)
-  require(rvest)
-  require(RSelenium)
   
   # Buscar y asignar a variables los componentes de la página que se van a controlar:
   selector_estado <- controlador_remoto$findElements(using = "css", value = "select#seledo option")
@@ -626,7 +620,7 @@ for(estado in 2:opciones_estado) {
 puntos_venta_liconsa
 ```
 
-Realiza un proceso de limpieza a los datos extraidos, aplicando la siguiente manipulación de datos:
+Realiza un proceso de limpieza a los datos extraídos, aplicando la siguiente manipulación de datos:
 
 1.  Toma como base la tabla original `puntos_venta_liconsa`.
 2.  Limpia los nombres de las variables usando la función `clean_names`.
@@ -658,73 +652,64 @@ Cierra las ventanas de Firefox y el servidor de Selenium:
 ```{r Cerrar Firefox y Selenium de puntos de venta}
 # Cerrar las ventanas de Firefox y detener el servidor de Selenium:
 controlador$closeall()
-servidor_selenium[["server"]]$stop()
+servidor_selenium$server$stop()
 ```
 
-Una gran ventaja de este proceso de web scraping es que si los datos de la página se actualizan o cambian, sólo será necesario volver a correr este proceso para tener los datos actuales.
+Una gran ventaja de este proceso de *web scraping* es que si los datos de la página se actualizan o cambian, sólo será necesario volver a correr este proceso para tener los datos actuales.
 
 ### Geocodificación inversa de los datos
 
 Para continuar con el procesamiento de datos, ahora que contamos con un directorio de todos los puntos de venta de leche Liconsa será necesario georreferenciarlos.
 
-Usa el servicio de Here para realizar la geocodificación de las direcciones de puntos de venta de leche que extrajiste de la página oficial. Anteriormente ya estableciste tu llave de la REST API de Here usando la función `set_key`.
+Usa las funciones del paquete `tidygeocoder` para realizar la geocodificación de las direcciones de puntos de venta de leche que extrajiste de la página oficial. Para este ejercicio utiliza el servicio de geocodificación de Here en vez del de Bing.
+
+Para usar el servicio de Here, es necesario crear una cuenta de usuario en <https://platform.here.com> y obtener una llave de API (*token*). Ejecuta el siguiente *chunk* para definir en el entorno de R, la llave de API que generaste, asignándola a la variable `HERE_API_KEY` usando la función `Sys.setenv` como se indica a continuación:
+
+```{r Definir la llave API de Here}
+# Establece tu llave API de Bing en cada nueva sesión de trabajo.
+Sys.setenv("HERE_API_KEY" = "TU_API_KEY_AQUI")
+```
 
 Crea una nueva tabla de direcciones que contenga sólo los campos de identificador y de dirección, aplicando la siguiente manipulación de datos para guardar el resultado en una nueva variable llamada `direcciones`:
 
 1.  Toma como base los datos de la tabla `puntos_venta_liconsa`.
-2.  Usa la función `transmutep` para construir la tabla incluyendo sólamente las variables `rowid` y una nueva variable llamada `direccion` construida concatenando las variables `calle`, `colonia`, `cp`, `municipio`, `estado` e incluye el texto `"MEXICO"` al final, usando la función `str_c`.
-3.  Visualiza la estructura de la tabla transformada usando la función `glimpse`.
+2.  Usa la función `mutate` para agregar una nueva variable llamada `direccion` que contendrá la dirección en una sola línea concatenando las variables `calle`, `colonia`, `cp`, `municipio`, `estado` e incluye el texto `"MEXICO"` al final para indicar el país, usando la función `str_c`.
+3.  Geocodifica las direcciones para obtener las coordenadas de los puntos de venta de leche, aplicando la usando la función `geocode` e indica que usarás la dirección concatenada con el parámetro `address = direccion` para geocodificar usando el servicio de Here con el parámetro `method = "here"`.
+4.  Convierte la tabla resultante de la geocodificación en una capa de puntos usando la función `st_as_sf` del paquete `sf` indicando cuáles son las columnas con las coordenadas con el parámetro `coords = c("long", "lat")` y el sistema de coordenadas geográficas WGS-84 (EPSG:4326) con el parámetro `crs = 4326.`
+5.  Visualiza el resultado de la geocodificación usando la función `glimpse`.
 
 ```{r Transformar tabla de direcciones de puntos de venta}
-direcciones <-
-  puntos_venta_liconsa %>% 
-  transmute(rowid,
-            direccion = str_c(calle, colonia, cp, municipio, estado, "MEXICO", sep = ", ")) %>% 
-  glimpse()
-```
-
-Geocodifica las direcciones para obtener la capa geográfica con las ubicaciones de los puntos de venta de leche, aplicando la siguiente transformación de datos y guardando el resultado en una nueva variable llamada `puntos_venta_liconsa_geo`:
-
-1.  Toma como base el resultado de la geocodificación de la variable `direccion` de la tabla `direcciones` usando la función `geocode`.
-2.  Visualiza el resultado de la geocodificación usando la función `glimpse`.
-
-```{r Geocodificar puntos de venta}
+# Agregar una columna con la dirección en una sola línea, geocodificar y convertir en capa
 puntos_venta_liconsa_geo <-
-  geocode(address = direcciones$direccion) %>% 
-  glimpse()
-```
-
-Agrega las direcciones originales de `direcciones` a los datos geocodificados de `puntos_venta_licons_geo` aplicando la siguiente manipulación de datos:
-
-1.  Toma como base los datos geocodificados de `puntos_venta_liconsa_geo`.
-2.  Une los datos de `direcciones` usando la función `left_join` donde coincidan las variables `"id" = "rowid"`.
-3.  Visualiza la estructura de los datos transformados usando la función `glimpse`.
-
-```{r Agregar direcciones originales a tabla geocodificada}
-puntos_venta_liconsa_geo <-
-  puntos_venta_liconsa_geo %>% 
-  left_join(direcciones, by = c("id" = "rowid")) %>% 
+  puntos_venta_liconsa %>%
+  mutate(direccion = str_c(calle, colonia, cp, municipio, estado, "MEXICO", sep = ", ")) %>%
+  geocode(address = direccion,
+          method = "here") %>%
+  st_as_sf(coords = c("long", "lat"),
+           crs = 4326) %>% 
   glimpse()
 ```
 
 ### Visualización de los datos
 
-Visualiza los datos georeferenciados de `puntos_venta_liconsa_geo`, cambiando el modo de visualización como mapa web interactivo (`"view"`) usando la función `tmap_mode` y construye el mapa con la función `qtm`:
+Visualiza los datos geocodificados de `puntos_venta_liconsa_geo`, cambiando el modo de visualización como mapa web interactivo (`"view"`) usando la función `tmap_mode` y construye el mapa con la función `qtm`:
 
 ```{r Mapa de puntos de venta geocodificados}
+# Cambiar a modo de visualización interactivo
 tmap_mode("view")
 
-puntos_venta_liconsa_geo %>% 
-  qtm()
+# Visualizar en un mapa rápido
+qtm(puntos_venta_liconsa_geo)
 ```
 
-Omite la variable `street` que tiene un tipo de datos de lista para evitar problemas de compatibilidad y guarda la capa geográfica `puntos_venta_liconsa_geo` como `Shapefile` en el archivo `puntos_venta_liconsa.shp` en la carpeta `Datos` usando la función `sf::st_write`:
+Revisa el mapa y comprueba la ubicación de algunas direcciones.
+
+Guarda la capa geográfica `puntos_venta_liconsa_geo` como *shapefile* en el archivo `puntos_venta_liconsa.shp` en la carpeta `Datos` usando la función `st_write`:
 
 ```{r Guardar capa de puntos de venta}
 puntos_venta_liconsa_geo %>% 
-  select(-street) %>% # Para evitar problemas al guardar el archivo, quitar la variable street que es de tipo lista
-  sf::st_write("Datos/puntos_venta_liconsa.shp",
-               delete_dsn = TRUE) # Sobreescribir el archivo si existe 
+  st_write("Datos/puntos_venta_liconsa.shp",
+           delete_dsn = TRUE) # Sobreescribir el archivo si existe 
 ```
 
 ## Referencias
@@ -735,4 +720,4 @@ puntos_venta_liconsa_geo %>%
 -   Wickham H. (2022). rvest. Recuperado el 11 de junio, 2022 desde <https://rvest.tidyverse.org/index.html>.
 -   RSelenium. Recuperado el 11 de junio, 2022 desde <https://docs.ropensci.org/RSelenium/index.html>.
 -   Web Scraping Reference: Cheat Sheet for Web Scraping using R. Recuperado el 11 de junio, 2022 desde <https://github.com/yusuzech/r-web-scraping-cheat-sheet>
--   hereR. Recuperado el 11 de junio, 2022 desde <https://munterfi.github.io/hereR/index.html>.
+-   tidygeocoder. Recuperado el 13 de mayo, 2024 desde <https://jessecambon.github.io/tidygeocoder/index.html>.
