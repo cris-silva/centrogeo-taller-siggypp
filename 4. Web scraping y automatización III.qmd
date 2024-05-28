@@ -33,72 +33,184 @@ controlador <- servidor_selenium$client
 ### Identificación de los controles de la página
 
 ```{r Abrir la página de descarga}
-pagina_descarga <- "https://catalogonacionalmhi.inah.gob.mx/consulta_publica/"
+pagina_ficha <- "https://catalogonacionalmhi.inah.gob.mx/consulta_publica/detalle/"
+id_ficha <- 90000
 
-controlador$navigate(pagina_descarga)
+controlador$navigate(str_c(pagina_ficha, id_ficha))
 ```
 
-Identifica el botón *Búsqueda avanzada* con el inspector web. Su *xPath* es `//*[@id="mostrarCriterios"]`
+Esperar a que cargue la página:
 
-```{r Identificar el botón de Búsqueda avanzada}
-# Buscar el botón y crearle una instancia para controlarlo
-boton_busqueda_avanzada <- controlador$findElement(using = "xpath",
-                                                   value = '//*[@id="mostrarCriterios"]')
+```{r Definir tiempo de espera de Selenium}
+# Establecer el tiempo de espera de Selenium para que aparezcan los elementos a 5 s
+controlador$setImplicitWaitTimeout(5000)
+
+# Esperar 5 s a que cargue la página
+Sys.sleep(5000)
 ```
 
-Identifica el menú desplegable de *Entidad Federativa*. Su *xPath* es `//*[@id="entidad_federativa_id"]` . Añade `/option` al final del xPath para indicar que quieres obtener las opciones del selector.
+Expandir todos los contenedores de la ficha:
 
-```{r Identificar el menú de Entidad Federativa y sus opciones seleccionables}
-# Buscar la lista desplegable y obtener los elementos que contiene
-selector_entidad_federativa <- controlador$findElements(using = "xpath",
-                                                       value = '//*[@id="entidad_federativa_id"]/option')
+```{r Expandir contenedores}
+# Crear una instancia del botón Expandir todos:
+boton_expandir_todos <- controlador$findElement(using = "xpath",
+                                                value = '//*[@id="btnExpandir"]')
 
-# Cuántos elementos tiene el selector?
-total_opciones_entidad_federativa <- length(selector_entidad_federativa)
-
-# Comprobar qué elementos contiene el selector
-for(opcion in 1:total_opciones_entidad_federativa) {
-  print(selector_entidad_federativa[[opcion]]$getElementText()[[1]])
-}
+# Presionar el botón para expandir los contenedores
+boton_expandir_todos$clickElement()
 ```
 
-La primer opción `"Selecciona una opción"` no permite hacer ninguna consulta, así que se descartará para hacer el *scraping*.
+Descargar el código fuente de la página:
 
-Identifica el botón *Buscar* para hacer la consulta:
+```{r Guardar el código fuente de la ficha}
+# Guarda el contenido de la página en una variable
+codigo_fuente <- controlador$getPageSource()
 
-```{r Identificar el botón Buscar}
-# Buscar el botón y crearle una instancia para controlarlo
-boton_buscar <- controlador$findElement(using = "xpath",
-                                        value = '//*[@id="buscarObjeto"]')
+# Extraer con rvest el código fuente de la lista obtenida con Selenium:
+html_ficha <- 
+  read_html(codigo_fuente[[1]])
 ```
 
-### Automatización de las consultas
+### Extracción de los campos:
 
-```{r Presionar el botón de Búsqueda avanzada}
-# Presionar el botón Búsqueda avanzada
-boton_busqueda_avanzada$clickElement()
+```{r Extraer tipo de inmueble}
+# Buscar la cabecera, extraer y limpiar el texto del tipo de inmueble
+datos_contenedor_1 <-
+  html_ficha %>% 
+  html_element(xpath = '//*[@id="clasif"]') %>% # Buscar el elemento del título
+  html_text() %>% # Extraer el texto del elemento
+  str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+  str_squish() # Eliminar los espacios en blanco antes y después del texto
+
+# Ver el resultado
+datos_contenedor_1
 ```
 
-```{r Seleccionar un estado de la lista desplegable}
-# Seleccionar un estado
-selector_entidad_federativa[[2]]$clickElement()
+```{r Extraer datos del primer contenedor}
+# Buscar el siguiente contenedor y extraer los datos
+datos_contenedor_2 <-
+  html_ficha %>% 
+  html_element(xpath = '//*[@id="encabezado"]/div/div[2]/div[1]') %>% # Buscar el siguiente contenedor
+  html_elements("p") %>% # Buscar los elementos etiquetados como párrafos (p)
+  html_text() %>% # Extraer el texto de cada elemento que se encontró
+  str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+  str_squish() # Eliminar los espacios en blanco antes y después del texto
+
+# Ver el resultado
+datos_contenedor_2
 ```
 
-```{r Presionar el botón Buscar}
-# Presionar el botón Buscar para hacer la consulta
-boton_buscar$clickElement()
-```
-
-```{r Espera de la carga de resultados}
-# Esperar a que se carguen los resultados
-Sys.sleep(5)
-```
-
-Extraer los elementos de los resultados:
+class="col-md-12 margen-inferior-xs "
 
 ```{r}
-resultados_consulta <- controlador$findElements(using = "css selector",
-                                                value = 'div#col-md-2')
+# Buscar el siguiente contenedor y extraer los datos
+datos_contenedor_3 <-
+  html_ficha %>% 
+  html_element(xpath = '//*[@id="divSeccion1"]') %>% # Buscar el siguiente contenedor
+  html_elements(css = 'div.col-md-12.margen-inferior-xs') %>% # Buscar los elementos que tengan este formato CSS
+  html_text() %>% # Extraer el texto de cada elemento que se encontró
+  str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+  str_squish() # Eliminar los espacios en blanco antes y después del texto
 
-# /html/body/div[2]/div[4]/div[4]/div[4]/div[2]/div/div[1]/div/div[2]/div/div[1]/div[3]
+# Ver el resultado
+datos_contenedor_3
+```
+
+```{r}
+# Buscar el siguiente contenedor y extraer los datos
+datos_contenedor_4 <-
+  html_ficha %>% 
+  html_element(xpath = '//*[@id="divSeccion2"]') %>% # Buscar el siguiente contenedor
+  html_elements(css = 'div.col-md-4') %>% # Buscar los elementos que tengan este formato CSS
+  html_text() %>% # Extraer el texto de cada elemento que se encontró
+  str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+  str_squish() # Eliminar los espacios en blanco antes y después del texto
+
+# Ver el resultado
+datos_contenedor_4
+```
+
+```{r}
+# Buscar el siguiente contenedor y extraer los datos
+contenedor_5 <-
+  html_ficha %>% 
+  html_element(xpath = '//*[@id="divSeccion3"]') # Buscar el siguiente contenedor
+  
+datos_contenedor_5_1 <-
+  contenedor_5 %>% 
+  html_elements(xpath = '//*[@id="divSeccion3"]/div[1]/div/div') %>% # Buscar el elemento donde está el dato
+  html_text() %>% # Extraer el texto de cada elemento que se encontró
+  str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+  str_squish() # Eliminar los espacios en blanco antes y después del texto
+
+
+datos_contenedor_5_2 <-
+  contenedor_5 %>% 
+  html_elements(css = 'div.col-md-4') %>% # Buscar los elementos que tengan este formato CSS
+  html_text() %>% # Extraer el texto de cada elemento que se encontró
+  str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+  str_squish() # Eliminar los espacios en blanco antes y después del texto
+
+datos_contenedor_5_3 <-
+  contenedor_5 %>% 
+  html_elements(xpath = '//*[@id="divSeccion3"]/div[9]/div/div/div') %>% # Buscar el elemento donde está el dato
+  html_text() %>% # Extraer el texto de cada elemento que se encontró
+  str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+  str_squish() # Eliminar los espacios en blanco antes y después del texto
+
+# Ver el resultado
+datos_contenedor_5_1
+datos_contenedor_5_2
+datos_contenedor_5_3
+```
+
+class="row margen-superior"
+
+En este caso algunas filas usan el estilo "row" y otras el estilo "row margen-superior", será más conveniente extraer todo el texto y separarlo usando delimitadores:
+
+```{r}
+# Buscar el siguiente contenedor y extraer los datos
+datos_contenedor_6 <-
+  html_ficha %>% 
+  html_element(xpath = '//*[@id="divSeccion4"]') %>% # Buscar el siguiente contenedor
+  html_text() %>% # Extraer el texto de cada elemento que se encontró
+  str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+  str_squish() # Eliminar los espacios en blanco antes y después del texto
+
+# Definir entre qué textos se va a poner el separador
+campos_6 <- c("Folio Real RPMZAH:",
+              "Declaratoria de Monumento Histórico:",
+              "Folio y Denominación ZMH:",
+              "Listado en Declaratoria de Zona de Monumentos Históricos:",
+              "Ubicado en la Zona de Monumentos Históricos:",
+              "Sitio Inscrito en la lista de patrimonio Mundial UNESCO:")
+
+# Reemplazar cada uno de los campos por el mismo texto anteponiendo el separador |
+for(campo in campos_6) {
+  datos_contenedor_6 <-
+    datos_contenedor_6 %>% 
+    str_replace(campo, str_c("| ", campo)) # Reemplazar por su versión con separador
+}
+
+# Separación y limpieza final:
+datos_contenedor_6 <-
+  str_split(datos_contenedor_6, pattern = "\\|") %>% # Separar donde esté el separador
+  unlist() %>% # Convertir la lista en un vector de caracteres
+  str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+  str_squish() # Eliminar los espacios en blanco antes y después del texto
+
+# Ver el resultado
+datos_contenedor_6
+```
+
+NOTA: NO HICE UNA FUNCIÓN POR QUE CADA DIV ESTÁ CONSTRUIDO DIFERENTE
+
+Cierra las ventanas abiertas del explorador y apaga el servidor de *Selenium*:
+
+```{r Cerrar explorador y servidor de Selenium}
+# Cerrar todas las ventanas abiertas
+controlador$closeall()
+
+# Apagar el servidor de Selenium
+servidor_selenium$server$stop()
 ```
