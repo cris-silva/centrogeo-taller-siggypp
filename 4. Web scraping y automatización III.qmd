@@ -6,6 +6,20 @@ editor: visual
 
 ## Introducción
 
+Se hará en estas etapas:
+
+Observar cómo funciona la página de consulta
+
+Identificar la estructura de la página de consulta ylos elementos que se van a extraer
+
+Crear procedimientos para extraer los datos de cada sección de la página de consulta
+
+Automatizar para repetir el procedimiento de extracción de datos de cada ficha
+
+Acumular los registros extraídos en una misma tabla y limpiarla.
+
+Geocodificar las direcciones y guardar como capa geográfica.
+
 ## Objetivo
 
 ## Preparación del entorno
@@ -34,19 +48,9 @@ controlador <- servidor_selenium$client
 
 ```{r Abrir la página de descarga}
 pagina_ficha <- "https://catalogonacionalmhi.inah.gob.mx/consulta_publica/detalle/"
-id_ficha <- 90000
+id_ficha <- 1
 
 controlador$navigate(str_c(pagina_ficha, id_ficha))
-```
-
-Esperar a que cargue la página:
-
-```{r Definir tiempo de espera de Selenium}
-# Establecer el tiempo de espera de Selenium para que aparezcan los elementos a 5 s
-controlador$setImplicitWaitTimeout(5000)
-
-# Esperar 5 s a que cargue la página
-Sys.sleep(5000)
 ```
 
 Expandir todos los contenedores de la ficha:
@@ -82,8 +86,31 @@ datos_contenedor_1 <-
   str_remove_all("\n") %>% # Eliminar todos los saltos de línea
   str_squish() # Eliminar los espacios en blanco antes y después del texto
 
+# Agregar el nombre del campo al valor:
+datos_contenedor_1 <-
+  str_c("Tipo de inmueble: ",
+        datos_contenedor_1)
+
 # Ver el resultado
 datos_contenedor_1
+```
+
+Extraer la URL del mapa de Google con las coordenadas:
+
+```{r}
+# Buscar la URL origen del mapa de Google
+datos_contenedor_mapa <-
+  html_ficha %>%
+  html_element(css = '#div-mapa > div > div.gm-style > div:nth-child(14) > div > a') %>% # Buscar los links del mapa
+  html_attr("href") # Extraer la URL del mapa
+
+# Agregar el nombre del campo al valor:
+datos_contenedor_mapa <-
+  str_c("Google Maps: ",
+        datos_contenedor_mapa)
+
+# Ver el resultado
+datos_contenedor_mapa
 ```
 
 ```{r Extraer datos del primer contenedor}
@@ -159,9 +186,11 @@ datos_contenedor_5_3 <-
   str_squish() # Eliminar los espacios en blanco antes y después del texto
 
 # Ver el resultado
-datos_contenedor_5_1
-datos_contenedor_5_2
-datos_contenedor_5_3
+datos_contenedor_5 <- c(datos_contenedor_5_1,
+                        datos_contenedor_5_2,
+                        datos_contenedor_5_3)
+
+datos_contenedor_5
 ```
 
 class="row margen-superior"
@@ -203,7 +232,262 @@ datos_contenedor_6 <-
 datos_contenedor_6
 ```
 
+//\*[@id="divSeccion6"]
+
+```{r}
+# Buscar el siguiente contenedor y extraer los datos
+datos_contenedor_7 <-
+  html_ficha %>% 
+  html_element(xpath = '//*[@id="divSeccion6"]') %>% # Buscar el siguiente contenedor
+  html_text() %>% # Extraer el texto de cada elemento que se encontró
+  str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+  str_squish() # Eliminar los espacios en blanco antes y después del texto
+
+# Definir entre qué textos se va a poner el separador
+campos_7 <- c("Intervenciones:",
+              "Información histórica:",
+              "Existe preexistencia:")
+
+# Reemplazar cada uno de los campos por el mismo texto anteponiendo el separador |
+for(campo in campos_7) {
+  datos_contenedor_7 <-
+    datos_contenedor_7 %>% 
+    str_replace(campo, str_c("| ", campo)) # Reemplazar por su versión con separador
+}
+
+# Separación y limpieza final:
+datos_contenedor_7 <-
+  datos_contenedor_7 %>% 
+  str_remove("Preexistencia de otras épocas") %>% 
+  str_split(pattern = "\\|") %>% # Separar donde esté el separador
+  unlist() %>% # Convertir la lista en un vector de caracteres
+  str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+  str_squish() # Eliminar los espacios en blanco antes y después del texto
+
+# Ver el resultado
+datos_contenedor_7
+```
+
+```{r}
+# Buscar el siguiente contenedor y extraer los datos
+datos_contenedor_8 <-
+  html_ficha %>% 
+  html_element(xpath = '//*[@id="divSeccion7"]') %>% # Buscar el siguiente contenedor
+  html_elements(css = 'div.row.margen-superior.margen-izquierdo.margen-derecho') %>% # Buscar los elementos con este estilo
+  html_text() %>% # Extraer el texto de cada elemento que se encontró
+  str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+  str_squish() # Eliminar los espacios en blanco antes y después del texto
+
+# Ver el resultado
+datos_contenedor_8
+```
+
+```{r}
+# Buscar el siguiente contenedor y extraer los datos
+datos_contenedor_9 <-
+  html_ficha %>% 
+  html_element(xpath = '//*[@id="divSeccion8"]') %>% # Buscar el siguiente contenedor
+  html_text() %>% # Extraer el texto de cada elemento que se encontró
+  str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+  str_squish() # Eliminar los espacios en blanco antes y después del texto
+
+# Agregar el nombre del campo al valor:
+datos_contenedor_9 <-
+  str_c("Monografía: ", datos_contenedor_9)
+
+# Ver el resultado
+datos_contenedor_9
+```
+
+```{r}
+# Buscar el siguiente contenedor y extraer los datos
+datos_contenedor_10 <-
+  html_ficha %>% 
+  html_element(xpath = '//*[@id="divSeccion11"]') %>% # Buscar el siguiente contenedor
+  html_text() %>% # Extraer el texto de cada elemento que se encontró
+  str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+  str_squish() # Eliminar los espacios en blanco antes y después del texto
+
+# Ver el resultado
+datos_contenedor_10
+```
+
+class="col-md-11 panel panel-primary"
+
+class="row margen-izquierdo margen-derecho margen-inferior"
+
+```{r}
+# Buscar el siguiente contenedor y extraer los datos
+datos_contenedor_11 <-
+  html_ficha %>% 
+  html_element(xpath = '//*[@id="divSeccion12"]') %>% # Buscar el siguiente contenedor
+  html_elements(css = "div.row.margen-izquierdo.margen-derecho") %>% 
+  html_text() %>% # Extraer el texto de cada elemento que se encontró
+  str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+  str_squish() # Eliminar los espacios en blanco antes y después del texto
+
+# Ver el resultado
+datos_contenedor_11
+```
+
+Separar el 8, 12, 16
+
+Quitar los títulos
+
+```{r}
+# Juntar los registros deseados, omitir los títulos y separar los que sea necesario
+datos_contenedor_11 <-
+  c(
+    datos_contenedor_11[2],
+    datos_contenedor_11[4:7],
+    datos_contenedor_11[8] %>% 
+      str_replace("Descripción: ", "|Descripción: ") %>% 
+      str_split("\\|") %>% 
+      unlist(),
+    datos_contenedor_11[9:11],
+    datos_contenedor_11[12] %>% 
+      str_replace("Descripción: ", "|Descripción: ") %>% 
+      str_split("\\|"),
+    datos_contenedor_11[14:15],
+    datos_contenedor_11[16] %>% 
+      str_replace("Descripción: ", "|Descripción: ") %>% 
+      str_split("\\|") %>% 
+      unlist(),
+    datos_contenedor_11[18:19],
+    datos_contenedor_11[21:23],
+    datos_contenedor_11[25]
+  ) %>% 
+  unlist()
+
+# Ver el resultado
+datos_contenedor_11
+```
+
+```{r}
+# Buscar el siguiente contenedor y extraer los datos
+datos_contenedor_12 <-
+  html_ficha %>% 
+  html_element(xpath = '//*[@id="divSeccion17"]') %>% # Buscar el siguiente contenedor
+  html_elements(css = "div.col-md-6.margen-superior.margen-inferior") %>% 
+  html_text() %>% # Extraer el texto de cada elemento que se encontró
+  str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+  str_squish() # Eliminar los espacios en blanco antes y después del texto
+  
+# Quedarse con la actualización más reciente
+datos_contenedor_12 <-
+  datos_contenedor_12[1]
+  
+# Ver el resultado
+datos_contenedor_12
+```
+
+```{r}
+# Buscar el siguiente contenedor y extraer los datos
+datos_contenedor_13 <-
+  html_ficha %>% 
+  html_element(xpath = '//*[@id="divSeccion22"]') %>% # Buscar el siguiente contenedor
+  html_element(xpath = '//*[@id="divSeccion22"]/div[1]/div[2]') %>% 
+  html_text() %>% # Extraer el texto de cada elemento que se encontró
+  str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+  str_squish() # Eliminar los espacios en blanco antes y después del texto
+  
+# Agregar el nombre del campo al valor:
+datos_contenedor_13 <- c(str_c("Planoteca del AHJE: ", datos_contenedor_13),
+                         str_c("URL Planoteca del AHJE: https://catalogonacionalmhi.inah.gob.mx/consulta_publica/generarPdfPlanoteca/", 9000))
+
+# Ver el resultado
+datos_contenedor_13
+```
+
+```{r}
+# Buscar el siguiente contenedor y extraer los datos
+datos_contenedor_14 <-
+  html_ficha %>% 
+  html_element(xpath = '//*[@id="divSeccion23"]') %>% # Buscar el siguiente contenedor
+  html_element(xpath = '//*[@id="divSeccion23"]/div[1]/div[2]') %>% 
+  html_text() %>% # Extraer el texto de cada elemento que se encontró
+  str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+  str_squish() # Eliminar los espacios en blanco antes y después del texto
+
+# Agregar el nombre del campo al valor:
+datos_contenedor_14 <- c(str_c("AHJE: ", datos_contenedor_14),
+                         str_c("URL AHJE: https://catalogonacionalmhi.inah.gob.mx/consulta_publica/generarPdfArchivoHistorico/", 9000))
+
+# Ver el resultado
+datos_contenedor_14
+```
+
+```{r}
+# Buscar el siguiente contenedor y extraer los datos
+datos_contenedor_15 <-
+  html_ficha %>% 
+  html_element(xpath = '//*[@id="divSeccion24"]') %>% # Buscar el siguiente contenedor
+  html_element(xpath = '//*[@id="divSeccion24"]/div[1]/div[2]') %>% 
+  html_text() %>% # Extraer el texto de cada elemento que se encontró
+  str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+  str_squish() # Eliminar los espacios en blanco antes y después del texto
+
+# Agregar el nombre del campo al valor:
+datos_contenedor_15 <- c(str_c("FCRV: ", datos_contenedor_15),
+                         str_c("URL FCRV: https://catalogonacionalmhi.inah.gob.mx/consulta_publica/generarPdfFototeca/", 9000))
+
+# Ver el resultado
+datos_contenedor_15
+```
+
+Unir los datos extraídos:
+
+```{r}
+datos_contenedor <- c("ID: 90000",
+                      datos_contenedor_1,
+                      datos_contenedor_2,
+                      datos_contenedor_mapa,
+                      datos_contenedor_3,
+                      datos_contenedor_4,
+                      datos_contenedor_5,
+                      datos_contenedor_6,
+                      datos_contenedor_7,
+                      datos_contenedor_8,
+                      datos_contenedor_9,
+                      datos_contenedor_10,
+                      datos_contenedor_11,
+                      datos_contenedor_12,
+                      datos_contenedor_13,
+                      datos_contenedor_14,
+                      datos_contenedor_15)
+
+datos_contenedor
+```
+
+Convertir el listado de datos extraídos en un registro de tabla:
+
+Para que `pivot_wider` funcione correctamente en este caso, es necesario que no haya nombres de campos repetidos, por lo que se le agrega un consecutivo al final a cada nombre de campo para que sean únicos.
+
+```{r}
+# Construir un tibble con un registro con los datos extraídos
+registro_extraido <-
+  tibble(lista = datos_contenedor) %>% # Nuevo tibble con una columna con la lista
+  separate(lista, into = c("nombre", "valor"), sep = ":") %>% # Separar en los dos puntos
+  rowid_to_column("id_variable") %>% # Agregar un consecutivo a cada fila
+  transmute(variable = str_c(nombre, "_", id_variable) %>% make_clean_names(),
+            valor) %>% # Construir un nombre de columna único usando el consecutivo
+  pivot_wider(names_from = variable, values_from = valor) %>% # Voltear de filas a columnas
+  glimpse() # Ver la estructura de datos
+```
+
 NOTA: NO HICE UNA FUNCIÓN POR QUE CADA DIV ESTÁ CONSTRUIDO DIFERENTE
+
+## Automatización y extracción masiva
+
+Hasta este punto, ya desarrollaste la secuencia de operaciones que se requieren para descargar los datos de una página en particular. Ahora debes repetir este proceso para cambiando el ID de la dirección de la página que genera la ficha para obtener los datos de todas las fichas posibles:
+
+```         
+https://catalogonacionalmhi.inah.gob.mx/consulta_publica/detalle/[ID de la página]
+```
+
+Donde debes iterar el valor de \[`ID de la página]` con números enteros.
+
+Hasta este momento, es conveniente cerrar el servidor de Selemium y borrar el entorno para comenzar con la automatización de la página para la extración masiva de los datos.
 
 Cierra las ventanas abiertas del explorador y apaga el servidor de *Selenium*:
 
@@ -213,4 +497,389 @@ controlador$closeall()
 
 # Apagar el servidor de Selenium
 servidor_selenium$server$stop()
+
+# Borra todas las variables y objetos del entorno
+rm(list = ls())
+```
+
+### Función para el *scraping*
+
+A partir de la secuencia de operaciones que creaste anteriormente, junta las instrucciones anteriores y construye una función que permita hacer el scraping, definiendo como parámetros el ID de la URL de la página de consulta y el controlador de Selenium que usarás para controlar el cambio de páginas.
+
+```{r}
+extraer_datos <- function(id_pagina, controlador, espera_carga = 3, espera_expandir = 3) {
+  
+  # Construir la URL usando el ID de la página que se pasa como parámetro (id_pagina):
+  pagina_ficha <- str_c("https://catalogonacionalmhi.inah.gob.mx/consulta_publica/detalle/", id_pagina)
+  
+  # Ordenar al explorador que abra la página de la ficha con el ID deseado
+  controlador$navigate(pagina_ficha)
+  
+  # Esperar a que cargue la página
+  Sys.sleep(espera_carga)
+  
+  # Crear una instancia del botón Expandir todos
+  boton_expandir_todos <- controlador$findElement(using = "xpath",
+                                                  value = '//*[@id="btnExpandir"]')
+  
+  # Presionar el botón para expandir los contenedores
+  boton_expandir_todos$clickElement()
+  
+  # Esperar a que se expandan las secciones
+  Sys.sleep(espera_expandir)
+  
+  # Guarda el contenido de la página en una variable
+  codigo_fuente <- controlador$getPageSource()
+  
+  # Extraer con rvest el código fuente de la lista obtenida con Selenium:
+  html_ficha <- 
+    read_html(codigo_fuente[[1]])
+  
+  # Buscar la cabecera, extraer y limpiar el texto del tipo de inmueble
+  datos_contenedor_1 <-
+    html_ficha %>% 
+    html_element(xpath = '//*[@id="clasif"]') %>% # Buscar el elemento del título
+    html_text() %>% # Extraer el texto del elemento
+    str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+    str_squish() # Eliminar los espacios en blanco antes y después del texto
+  
+  # Agregar el nombre del campo al valor:
+  datos_contenedor_1 <-
+    str_c("Tipo de inmueble: ",
+          datos_contenedor_1)
+  
+  # Buscar el siguiente contenedor y extraer los datos
+  datos_contenedor_2 <-
+    html_ficha %>% 
+    html_element(xpath = '//*[@id="encabezado"]/div/div[2]/div[1]') %>% # Buscar el siguiente contenedor
+    html_elements("p") %>% # Buscar los elementos etiquetados como párrafos (p)
+    html_text() %>% # Extraer el texto de cada elemento que se encontró
+    str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+    str_squish() # Eliminar los espacios en blanco antes y después del texto
+  
+  # Buscar la URL origen del mapa de Google
+  datos_contenedor_mapa <-
+    html_ficha %>%
+    html_element(xpath = '//*[@id="divSeccion2"]') %>% # Buscar la sección donde está el mapa
+    html_element("a") %>% # Buscar el primer link con la URL del mapa
+    html_attr("href") %>%  # Extraer la URL del mapa
+    replace_na("") # Si no hay mapa, reemplazar el valor vacío NA con un espacio
+  
+  # Agregar el nombre del campo al valor:
+  datos_contenedor_mapa <-
+    str_c("Google Maps: ",
+          datos_contenedor_mapa)
+  
+  # Buscar el siguiente contenedor y extraer los datos
+  datos_contenedor_3 <-
+    html_ficha %>% 
+    html_element(xpath = '//*[@id="divSeccion1"]') %>% # Buscar el siguiente contenedor
+    html_elements(css = 'div.col-md-12.margen-inferior-xs') %>% # Buscar los elementos que tengan este formato CSS
+    html_text() %>% # Extraer el texto de cada elemento que se encontró
+    str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+    str_squish() # Eliminar los espacios en blanco antes y después del texto
+  
+  # Buscar el siguiente contenedor y extraer los datos
+  datos_contenedor_4 <-
+    html_ficha %>% 
+    html_element(xpath = '//*[@id="divSeccion2"]') %>% # Buscar el siguiente contenedor
+    html_elements(css = 'div.col-md-4') %>% # Buscar los elementos que tengan este formato CSS
+    html_text() %>% # Extraer el texto de cada elemento que se encontró
+    str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+    str_squish() # Eliminar los espacios en blanco antes y después del texto
+  
+  # Buscar el siguiente contenedor y extraer los datos
+  contenedor_5 <-
+    html_ficha %>% 
+    html_element(xpath = '//*[@id="divSeccion3"]') # Buscar el siguiente contenedor
+  
+  datos_contenedor_5_1 <-
+    contenedor_5 %>% 
+    html_elements(xpath = '//*[@id="divSeccion3"]/div[1]/div/div') %>% # Buscar el elemento donde está el dato
+    html_text() %>% # Extraer el texto de cada elemento que se encontró
+    str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+    str_squish() # Eliminar los espacios en blanco antes y después del texto
+  
+  datos_contenedor_5_2 <-
+    contenedor_5 %>% 
+    html_elements(css = 'div.col-md-4') %>% # Buscar los elementos que tengan este formato CSS
+    html_text() %>% # Extraer el texto de cada elemento que se encontró
+    str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+    str_squish() # Eliminar los espacios en blanco antes y después del texto
+  
+  datos_contenedor_5_3 <-
+    contenedor_5 %>% 
+    html_elements(xpath = '//*[@id="divSeccion3"]/div[9]/div/div/div') %>% # Buscar el elemento donde está el dato
+    html_text() %>% # Extraer el texto de cada elemento que se encontró
+    str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+    str_squish() # Eliminar los espacios en blanco antes y después del texto
+  
+  # Unir el resultado
+  datos_contenedor_5 <- c(datos_contenedor_5_1,
+                          datos_contenedor_5_2,
+                          datos_contenedor_5_3)
+  
+  # Buscar el siguiente contenedor y extraer los datos
+  datos_contenedor_6 <-
+    html_ficha %>% 
+    html_element(xpath = '//*[@id="divSeccion4"]') %>% # Buscar el siguiente contenedor
+    html_text() %>% # Extraer el texto de cada elemento que se encontró
+    str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+    str_squish() # Eliminar los espacios en blanco antes y después del texto
+  
+  # Definir entre qué textos se va a poner el separador
+  campos_6 <- c("Folio Real RPMZAH:",
+                "Declaratoria de Monumento Histórico:",
+                "Folio y Denominación ZMH:",
+                "Listado en Declaratoria de Zona de Monumentos Históricos:",
+                "Ubicado en la Zona de Monumentos Históricos:",
+                "Sitio Inscrito en la lista de patrimonio Mundial UNESCO:")
+  
+  # Reemplazar cada uno de los campos por el mismo texto anteponiendo el separador |
+  for(campo in campos_6) {
+    datos_contenedor_6 <-
+      datos_contenedor_6 %>% 
+      str_replace(campo, str_c("| ", campo)) # Reemplazar por su versión con separador
+  }
+  
+  # Separación y limpieza final:
+  datos_contenedor_6 <-
+    str_split(datos_contenedor_6, pattern = "\\|") %>% # Separar donde esté el separador
+    unlist() %>% # Convertir la lista en un vector de caracteres
+    str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+    str_squish() # Eliminar los espacios en blanco antes y después del texto
+  
+  # Buscar el siguiente contenedor y extraer los datos
+  datos_contenedor_7 <-
+    html_ficha %>% 
+    html_element(xpath = '//*[@id="divSeccion6"]') %>% # Buscar el siguiente contenedor
+    html_text() %>% # Extraer el texto de cada elemento que se encontró
+    str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+    str_squish() # Eliminar los espacios en blanco antes y después del texto
+  
+  # Definir entre qué textos se va a poner el separador
+  campos_7 <- c("Intervenciones:",
+                "Información histórica:",
+                "Existe preexistencia:")
+  
+  # Reemplazar cada uno de los campos por el mismo texto anteponiendo el separador |
+  for(campo in campos_7) {
+    datos_contenedor_7 <-
+      datos_contenedor_7 %>% 
+      str_replace(campo, str_c("| ", campo)) # Reemplazar por su versión con separador
+  }
+  
+  # Separación y limpieza final:
+  datos_contenedor_7 <-
+    datos_contenedor_7 %>% 
+    str_remove("Preexistencia de otras épocas") %>% 
+    str_split(pattern = "\\|") %>% # Separar donde esté el separador
+    unlist() %>% # Convertir la lista en un vector de caracteres
+    str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+    str_squish() # Eliminar los espacios en blanco antes y después del texto
+  
+  # Buscar el siguiente contenedor y extraer los datos
+  datos_contenedor_8 <-
+    html_ficha %>% 
+    html_element(xpath = '//*[@id="divSeccion7"]') %>% # Buscar el siguiente contenedor
+    html_elements(css = 'div.row.margen-superior.margen-izquierdo.margen-derecho') %>% # Buscar los elementos con este estilo
+    html_text() %>% # Extraer el texto de cada elemento que se encontró
+    str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+    str_squish() # Eliminar los espacios en blanco antes y después del texto
+  
+  # Ver el resultado
+  datos_contenedor_8
+  
+  # Buscar el siguiente contenedor y extraer los datos
+  datos_contenedor_9 <-
+    html_ficha %>% 
+    html_element(xpath = '//*[@id="divSeccion8"]') %>% # Buscar el siguiente contenedor
+    html_text() %>% # Extraer el texto de cada elemento que se encontró
+    str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+    str_squish() # Eliminar los espacios en blanco antes y después del texto
+  
+  # Agregar el nombre del campo al valor:
+  datos_contenedor_9 <-
+    str_c("Monografía: ", datos_contenedor_9)
+  
+  # Buscar el siguiente contenedor y extraer los datos
+  datos_contenedor_10 <-
+    html_ficha %>% 
+    html_element(xpath = '//*[@id="divSeccion11"]') %>% # Buscar el siguiente contenedor
+    html_text() %>% # Extraer el texto de cada elemento que se encontró
+    str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+    str_squish() # Eliminar los espacios en blanco antes y después del texto
+  
+  # Buscar el siguiente contenedor y extraer los datos
+  datos_contenedor_11 <-
+    html_ficha %>% 
+    html_element(xpath = '//*[@id="divSeccion12"]') %>% # Buscar el siguiente contenedor
+    html_elements(css = "div.row.margen-izquierdo.margen-derecho") %>% 
+    html_text() %>% # Extraer el texto de cada elemento que se encontró
+    str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+    str_squish() # Eliminar los espacios en blanco antes y después del texto
+  
+  # Ver el resultado
+  datos_contenedor_11
+  
+  # Juntar los registros deseados, omitir los títulos y separar los que sea necesario
+  datos_contenedor_11 <-
+    c(
+      datos_contenedor_11[2],
+      datos_contenedor_11[4:7],
+      datos_contenedor_11[8] %>% 
+        str_replace("Descripción: ", "|Descripción: ") %>% 
+        str_split("\\|") %>% 
+        unlist(),
+      datos_contenedor_11[9:11],
+      datos_contenedor_11[12] %>% 
+        str_replace("Descripción: ", "|Descripción: ") %>% 
+        str_split("\\|"),
+      datos_contenedor_11[14:15],
+      datos_contenedor_11[16] %>% 
+        str_replace("Descripción: ", "|Descripción: ") %>% 
+        str_split("\\|") %>% 
+        unlist(),
+      datos_contenedor_11[18:19],
+      datos_contenedor_11[21:23],
+      datos_contenedor_11[25]
+    ) %>% 
+    unlist()
+  
+  # Buscar el siguiente contenedor y extraer los datos
+  datos_contenedor_12 <-
+    html_ficha %>% 
+    html_element(xpath = '//*[@id="divSeccion17"]') %>% # Buscar el siguiente contenedor
+    html_elements(css = "div.col-md-6.margen-superior.margen-inferior") %>% 
+    html_text() %>% # Extraer el texto de cada elemento que se encontró
+    str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+    str_squish() # Eliminar los espacios en blanco antes y después del texto
+  
+  # Quedarse con la actualización más reciente
+  datos_contenedor_12 <-
+    datos_contenedor_12[1]
+  
+  # Buscar el siguiente contenedor y extraer los datos
+  datos_contenedor_13 <-
+    html_ficha %>% 
+    html_element(xpath = '//*[@id="divSeccion22"]') %>% # Buscar el siguiente contenedor
+    html_element(xpath = '//*[@id="divSeccion22"]/div[1]/div[2]') %>% 
+    html_text() %>% # Extraer el texto de cada elemento que se encontró
+    str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+    str_squish() # Eliminar los espacios en blanco antes y después del texto
+  
+  # Agregar el nombre del campo al valor:
+  datos_contenedor_13 <- c(str_c("Planoteca del AHJE: ", datos_contenedor_13),
+                           str_c("URL Planoteca del AHJE: https://catalogonacionalmhi.inah.gob.mx/consulta_publica/generarPdfPlanoteca/", id_pagina)) # Agregar el ID de página
+  
+  # Buscar el siguiente contenedor y extraer los datos
+  datos_contenedor_14 <-
+    html_ficha %>% 
+    html_element(xpath = '//*[@id="divSeccion23"]') %>% # Buscar el siguiente contenedor
+    html_element(xpath = '//*[@id="divSeccion23"]/div[1]/div[2]') %>% 
+    html_text() %>% # Extraer el texto de cada elemento que se encontró
+    str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+    str_squish() # Eliminar los espacios en blanco antes y después del texto
+  
+  # Agregar el nombre del campo al valor:
+  datos_contenedor_14 <- c(str_c("AHJE: ", datos_contenedor_14),
+                           str_c("URL AHJE: https://catalogonacionalmhi.inah.gob.mx/consulta_publica/generarPdfArchivoHistorico/", id_pagina))
+  
+  # Buscar el siguiente contenedor y extraer los datos
+  datos_contenedor_15 <-
+    html_ficha %>% 
+    html_element(xpath = '//*[@id="divSeccion24"]') %>% # Buscar el siguiente contenedor
+    html_element(xpath = '//*[@id="divSeccion24"]/div[1]/div[2]') %>% 
+    html_text() %>% # Extraer el texto de cada elemento que se encontró
+    str_remove_all("\n") %>% # Eliminar todos los saltos de línea
+    str_squish() # Eliminar los espacios en blanco antes y después del texto
+  
+  # Agregar el nombre del campo al valor:
+  datos_contenedor_15 <- c(str_c("FCRV: ", datos_contenedor_15),
+                           str_c("URL FCRV: https://catalogonacionalmhi.inah.gob.mx/consulta_publica/generarPdfFototeca/", id_pagina))
+  
+  # Unir los valores extraidos
+  datos_contenedor <- c(str_c("ID: ", id_pagina), # Agregar el ID de la página
+                        datos_contenedor_1,
+                        datos_contenedor_2,
+                        datos_contenedor_mapa,
+                        datos_contenedor_3,
+                        datos_contenedor_4,
+                        datos_contenedor_5,
+                        datos_contenedor_6,
+                        datos_contenedor_7,
+                        datos_contenedor_8,
+                        datos_contenedor_9,
+                        datos_contenedor_10,
+                        datos_contenedor_11,
+                        datos_contenedor_12,
+                        datos_contenedor_13,
+                        datos_contenedor_14,
+                        datos_contenedor_15)
+  
+  # Construir un tibble con un registro con los datos extraídos
+  registro_extraido <-
+    tibble(lista = datos_contenedor) %>% # Nuevo tibble con una columna con la lista
+    separate(lista, into = c("nombre", "valor"), sep = ":", extra = "merge") %>% # Separar en los primeros dos puntos del nombre del campo
+    rowid_to_column("id_variable") %>% # Agregar un consecutivo a cada fila
+    transmute(variable = str_c(nombre, "_", id_variable) %>% make_clean_names(),
+              valor) %>% # Construir un nombre de columna único usando el consecutivo
+    pivot_wider(names_from = variable, values_from = valor) # Voltear de filas a columnas
+  
+  str_c("Extrayendo datos [", id_pagina, "] ...") %>% 
+    print()
+  
+  # Finalmente, regresar como resultado de la función el tibble con el registro extraido
+  return(registro_extraido)
+  
+} 
+```
+
+### Extracción masiva
+
+```{r}
+# Iniciar el servidor de Selenium
+servidor_selenium <- rsDriver(browser = "firefox")
+
+# Crear el controlador del explorador web
+controlador <- servidor_selenium$client
+```
+
+<a target="_blank" rel="noopener" title="Abrir esta área en Google&nbsp;Maps (se abre en una ventana nueva)" aria-label="Abrir esta área en Google&nbsp;Maps (se abre en una ventana nueva)" href="https://maps.google.com/maps?ll=21.879337,-102.372222&amp;z=18&amp;t=m&amp;hl=es-MX&amp;gl=US&amp;mapclient=apiv3" style="display: inline;"></a>
+
+```{r}
+# Iterar el número de ID de la página para extraer los datos
+id_inicial <- 1
+id_final <- 3
+
+datos_acumulados <- map_df(id_inicial:id_final,
+                           extraer_datos,
+                           controlador)
+
+datos_acumulados %>% 
+  glimpse()
+```
+
+Cierra las ventanas abiertas del explorador y apaga el servidor de *Selenium*:
+
+```{r Cerrar explorador y servidor de Selenium}
+# Cerrar todas las ventanas abiertas
+controlador$closeall()
+
+# Apagar el servidor de Selenium
+servidor_selenium$server$stop()
+```
+
+### Geocodificación
+
+```{r}
+# Establece tu llave API de Bing en cada nueva sesión de trabajo.
+Sys.setenv("HERE_API_KEY" = "TU_API_KEY_AQUI")
+```
+
+```{r}
+datos_geocodificados <-
+  datos_acumulados %>% 
+  mutate(direccion = )
+  geocode()
 ```
