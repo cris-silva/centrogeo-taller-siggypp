@@ -916,7 +916,6 @@ extraer_datos <- function(id_pagina, controlador, espera_carga = 3, espera_expan
   str_c("Extrayendo datos [", id_pagina, "] ...") %>% 
     print()
   
-  
   # Finalmente, regresar como resultado de la función el tibble con el registro extraido
   return(registro_extraido)
   
@@ -946,6 +945,17 @@ datos_acumulados %>%
   glimpse()
 ```
 
+Guardar el archivo con los datos extraídos:
+
+```{r Guardar los datos en un archivo}
+datos_acumulados %>% 
+  write_excel_csv(str_c("Datos/inah_monumentos_historicos_",
+                        str_pad(id_inicial, width = 5, pad = "0"),
+                        "-",
+                        str_pad(id_final, width = 5, pad = "0"),
+                        ".csv"))
+```
+
 Cierra las ventanas abiertas del explorador y apaga el servidor de Selenium:
 
 ```{r Cerrar explorador y servidor de Selenium}
@@ -954,9 +964,14 @@ controlador$closeall()
 
 # Apagar el servidor de Selenium
 servidor_selenium$server$stop()
+
+# Borra todas las variables y objetos del entorno
+rm(list = ls())
 ```
 
 ### Geocodificación
+
+NOTA: Por seguridad, no compartas tu llave de API, puedes copiar la instrucción y ejecutarla en la consola para no guardarla en este cuaderno.
 
 ```{r}
 # Establece tu llave API de Here en cada nueva sesión de trabajo.
@@ -964,9 +979,43 @@ Sys.setenv("HERE_API_KEY" = "TU_API_KEY_AQUI")
 ```
 
 ```{r}
+# Leer los datos extraídos:
+datos_acumulados <-
+  read_csv("Datos/inah_monumentos_historicos_00001-00100.csv")
+
+# Concatenar textos para obtener la dirección en una sola variable y geocodificar:
 datos_geocodificados <-
   datos_acumulados %>% 
-  mutate(direccion = str_c(nombre_de_la_vialidad_14,
-                           numero_exterior_15,))
-  geocode()
+  mutate_at(c("s2_nombre_de_la_vialidad",
+              "s2_numero_exterior",
+              "s2_tipo_y_nombre_del_asentamiento_humano",
+              "s2_localidad_colonia",
+              "s2_municipio_alcaldia",
+              "s2_entidad_federativa"),
+            str_replace_na,
+            "") %>% 
+  mutate(direccion = str_c(s2_nombre_de_la_vialidad,
+                           " ",
+                           s2_numero_exterior,
+                           ", ",
+                           s2_localidad_colonia,
+                           ", ",
+                           s2_municipio_alcaldia,
+                           ", ",
+                           s2_entidad_federativa,
+                           ", México")) %>% 
+  select(id, direccion) %>%
+  slice_sample(n = 10) %>% 
+  geocode(address = "direccion")
+```
+
+```{r}
+tmap_mode("view")
+
+datos_geocodificados %>% 
+  st_as_sf(coords = c("long", "lat"),
+           crs = 4326,
+           remove = FALSE,
+           na.fail = FALSE) %>% 
+  qtm()
 ```
