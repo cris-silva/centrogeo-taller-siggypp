@@ -176,10 +176,13 @@ Antes de continuar, asegúrate de tener instalado Java en tu computadora. Si aú
 
 El primer paso es iniciar un servidor de Selenium, existen varios métodos como puedes leer en la [documentación de RSelenium](https://docs.ropensci.org/RSelenium/articles/basics.html#do-i-need-to-run-a-selenium-server). En ésta práctica, iniciaremos el servidor usando la función `rsDriver` del paquete `RSelenium`, ya que no requiere de hacer instalaciones adicionales.
 
-Para comenzar a enviar instrucciones a Selenium, debemos definir qué explorador vamos a manejar. Usa la función `rsDriver` y especifica el parámetro `browser = "firefox"` para indicar a Selenium que use Firefox. Guarda la instancia del servidor en la variable `servidor_selenium`:
+Para comenzar a enviar instrucciones a Selenium, debemos definir qué explorador vamos a manejar. Usa la función `rsDriver` y especifica el parámetro `browser = "firefox"` para indicar a Selenium que use Firefox. También debes agregar los parámetros `chromever = NULL`, `iedrver = NULL` y `phantomver = NULL` para indicar a Selenium que no intente abrir los otros exploradores. Guarda la instancia del servidor en la variable `servidor_selenium`:
 
 ```{r Iniciar servidor de Selenium}
-servidor_selenium <- rsDriver(browser = "firefox")
+servidor_selenium <- rsDriver(browser = "firefox",
+                              chromever = NULL,
+                              iedrver = NULL,
+                              phantomver = NULL)
 ```
 
 Después de esta instrucción, el servidor de Selenium se inicia y una nueva ventana de Firefox debe abrirse automáticamente. A continuación, es necesario conectar el "control remoto" de R al servidor de Selenium que acabas de iniciar. Para ello, crea el `controlador` a partir del elemento de lista `client` de la variable `servidor_selenium` con la que arrancaste el servidor de Selenium en el paso anterior.
@@ -410,7 +413,9 @@ Inicia el servidor de Selenium usando la función `rsDriver` con los parámetros
 
 ```{r Iniciar el servidor de Selenium}
 servidor_selenium <- rsDriver(browser = "firefox",
-                              verbose = FALSE)
+                              chromever = NULL,
+                              iedrver = NULL,
+                              phantomver = NULL)
 ```
 
 Conecta a R con Firefox a través de Selenium creando un `controlador` usando el elemento de lista `[["client"]]` del `servidor_selenium`:
