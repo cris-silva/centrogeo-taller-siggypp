@@ -1,5 +1,6 @@
 ---
 title: "4. Web scraping y automatización III"
+author: "Cristian Silva (csilva@centrogeo.edu.mx)"
 format: html
 editor: visual
 ---
@@ -8,7 +9,7 @@ editor: visual
 
 Existen técnicas que nos permiten automatizar los procesos necesarios para extraer y procesar información de diversas fuentes, siendo una de las principales Internet. Aunque en ocasiones los datos que necesitamos están disponibles en páginas web de acceso abierto, el formato en que los consultamos no siempre es el más apropiado o sencillo de manejar.
 
-En esta sesión, de la misma manera que en la anterior, se utilizarán dos técnicas para automatizar la extracción y geocodificación de datos provenientes de Internet. La primera técnica es el raspado web (*web scraping*), que permite extraer contenido de una página web programando el explorador para controlar y modificar los parámetros utilizados por las páginas de consulta. Esto nos permite obtener información automáticamente, evitando el trabajo repetitivo que requeriría hacerlo manualmente. La segunda técnica es la geocodificación automática, que consiste en obtener las coordenadas de una lista de direcciones de manera automatizada mediante un servicio web.
+En esta sesión, de la misma manera que en la anterior, se utilizarán dos técnicas para automatizar la extracción y geocodificación de datos provenientes de Internet. La primera técnica es el raspado web (web scraping), que permite extraer contenido de una página web programando el explorador para controlar y modificar los parámetros utilizados por las páginas de consulta. Esto nos permite obtener información automáticamente, evitando el trabajo repetitivo que requeriría hacerlo manualmente. La segunda técnica es la geocodificación automática, que consiste en obtener las coordenadas de una lista de direcciones de manera automatizada mediante un servicio web.
 
 Es importante utilizar estas técnicas con discreción, ya que tienen implicaciones éticas y ciertos márgenes de imprecisión. Sin embargo, son herramientas muy útiles para adquirir datos difíciles de obtener por medios convencionales.
 
@@ -24,23 +25,23 @@ Durante el transcurso de esta sesión, usarás Selenium y las funciones del paqu
 
 Haz una revisión del sitio con el que trabajarás en esta práctica para conocerlo. Abre en tu explorador la página principal del Catálogo Nacional de Monumentos Históricos Inmuebles del INAH (<https://catalogonacionalmhi.inah.gob.mx/>), y observa que tiene un botón *Consulta Pública* que permite hacer la consulta de información:
 
-![Página de inicio del sitio](Imagenes/InicioCatalogo.png){fig-alt="Página de inicio del sitio" fig-align="center" width="468"}
+![Página de inicio del sitio](Imagenes/InicioCatalogo.png){fig-alt="Página de inicio del sitio" width="468"}
 
 Al hacer clic en este botón el sitio te redirigirá a otra página donde puedes hacer búsquedas de información:
 
-![Página de consulta pública](Imagenes/PaginaConsulta.png){fig-alt="Página de consulta pública" fig-align="center" width="468"}
+![Página de consulta pública](Imagenes/PaginaConsulta.png){fig-alt="Página de consulta pública" width="468"}
 
 Si haces clic en el botón *Búsqueda avanzada* aparecerán más opciones para incluir criterios de búsqueda:
 
-![Opciones de búsqueda avanzada](Imagenes/BusquedaAvanzada.png){fig-alt="Opciones de búsqueda avanzada" fig-align="center" width="449"}
+![Opciones de búsqueda avanzada](Imagenes/BusquedaAvanzada.png){fig-alt="Opciones de búsqueda avanzada" width="449"}
 
 Haz una consulta al azar, selecciona al menos una *Entidad Federativa* y un *Municipio / Alcaldía* y presiona el botón *Buscar* para obtener los registros de los inmuebles correspondientes:
 
-![Resultados de la consulta](Imagenes/ResultadosConsulta.png){fig-alt="Resultados de la consulta" fig-align="center" width="400"}
+![Resultados de la consulta](Imagenes/ResultadosConsulta.png){fig-alt="Resultados de la consulta" width="400"}
 
 Da clic en la liga *Ver detalle* de cualquiera de los resultados. Se abrirá la página de la ficha correspondiente a ese inmueble, y encontrarás varias secciones de información, como *tipo de ficha, localización, identificación,* etc. que están contraídas. Presiona el botón *Expandir todos* para que los paneles de todas las secciones se abran y muestren toda la información disponible sobre el inmueble:
 
-![Ejemplo de una ficha de datos de inmueble.](Imagenes/ConsultaPublica.png){alt="Ejemplo de una ficha de datos de inmueble." fig-alt="Ejemplo de una ficha de datos de inmueble." fig-align="center" width="30%"}
+![Ejemplo de una ficha de datos de inmueble.](Imagenes/ConsultaPublica.png){alt="Ejemplo de una ficha de datos de inmueble." fig-alt="Ejemplo de una ficha de datos de inmueble." width="30%"}
 
 Ahora puedes ver en esta ficha todos los datos que deberás extraer. En la barra de direcciones de tu explorador, observa la dirección de la página web de la ficha de datos, debe ser un URL similar a este:
 
@@ -56,9 +57,36 @@ Si agregas al URL un número de identificador que no existe en el catálogo, te 
 
 Por otro lado, existen fichas que tienen diferentes datos dependiendo del tipo de inmueble. Estos se distinguen usando colores en el cintillo del número de captura.
 
-![Tipos de fichas](Imagenes/TiposFicha.png){fig-alt="Tipos de fichas" fig-align="center" width="532"}
+![Tipos de fichas](Imagenes/TiposFicha.png){fig-alt="Tipos de fichas" width="532"}
 
 Será necesario asegurar que todos estos datos se guarden de manera ordenada en la base final, ya que existirán columnas con datos para algunos registros que pueden no existir en otros y viceversa. Esto se detalla más adelante en la práctica.
+
+Utiliza el inspector web para identificar las direcciones xPath de los paneles de cada sección de datos de la ficha.
+
+![Identificación de secciones con el inspector web](Imagenes/InspectorWebPanel.png){alt="Identificación de secciones con el inspector web" fig-alt="Identificación de secciones con el inspector web" width="519"}
+
+Las direcciones de los paneles de cada sección son las siguientes:
+
+| Sección                            | Dirección xPath          |
+|------------------------------------|--------------------------|
+| Encabezado                         | //\*[@id="encabezado"]   |
+| Tipo de ficha                      | //\*[@id="divSeccion1"]  |
+| Localización                       | //\*[@id="divSeccion2"]  |
+| Identificación                     | //\*[@id="divSeccion3"]  |
+| Aspectos legales                   | //\*[@id="divSeccion4"]  |
+| Información histórica              | //\*[@id="divSeccion6"]  |
+| Fuentes consultadas                | //\*[@id="divSeccion7"]  |
+| Monografía                         | //\*[@id="divSeccion8"]  |
+| Descripción arquitectónica         | //\*[@id="divSeccion11"] |
+| Características del monumento      | //\*[@id="divSeccion12"] |
+| Fecha de elaboración               | //\*[@id="divSeccion17"] |
+| Planoteca del AHJE                 | //\*[@id="divSeccion22"] |
+| Archivo histórico Jorge Enciso     | //\*[@id="divSeccion23"] |
+| Fototeca Constantino Reyes-Valerio | //\*[@id="divSeccion24"] |
+
+: Direcciones xPath de los paneles de sección
+
+Una vez localizados estos paneles, será necesario extraer los elementos de texto de cada uno de ellos para acumularlos en un sólo registro que contenga los datos de la ficha consultada.
 
 ## Metodología
 
@@ -95,6 +123,7 @@ library(tmap)
 Utiliza la función `rsDriver` del paquete `RSelenium` para iniciar un servidor de Selenium y guarda el resultado en la variable `servidor_selenium`, indicando que vas a usar el explorador Firefox con el parámetro `browser = "firefox"` y omite la carga de los demás exploradores usando los parámetros `chromever = NULL, iedrver = NULL, phantomver = NULL`:
 
 ```{r Iniciar Selenium}
+# Inicia el servidor de Selenium omitiendo los exploradores que no se necesitan:
 servidor_selenium <- rsDriver(browser = "firefox",
                               chromever = NULL,
                               iedrver = NULL,
@@ -104,6 +133,7 @@ servidor_selenium <- rsDriver(browser = "firefox",
 El explorador Firefox se ha iniciado y en la barra de direcciones a la izquierda encontrarás un icono de robot. Esto indica que Selenium ya está conectado a Firefox y está listo para enviarle instrucciones. Ahora, crea un controlador para Selenium usando el atributo `client` de `servidor_selenium` y asígnalo a una instancia que se llame `controlador`:
 
 ```{r Crear el controlador del explorador web}
+# Crea una instancia de la conexión al servidor de Selenium para controlar Firefox:
 controlador <- servidor_selenium$client
 ```
 
@@ -130,7 +160,7 @@ controlador$navigate(str_c(pagina_ficha, id_ficha))
 
 ### Identificación de los controles de la página
 
-Usando el inspector web en la página de la ficha, determina la dirección *xPath* del botón *Expandir todos*, en este caso es `//*[@id="btnExpandir"]`.
+Usando el inspector web en la página de la ficha, determina la dirección xPathdel botón *Expandir todos*, en este caso es `//*[@id="btnExpandir"]`.
 
 Ahora, crea un control para el botón que se llame `boton_expandir` usando la función `controlador$findElement` con los parámetros `using = "xpath"` y `value = '//*[@id="btnExpandir"]'`. Usa el control `boton_expandir_todos$clickElement()` para expandir todos los contenedores de la ficha y visualizar todos los datos:
 
@@ -139,14 +169,14 @@ Ahora, crea un control para el botón que se llame `boton_expandir` usando la fu
 boton_expandir_todos <- controlador$findElement(using = "xpath",
                                                 value = '//*[@id="btnExpandir"]')
 
-# Presionar el botón para expandir los contenedores
+# Presionar el botón para expandir los contenedores:
 boton_expandir_todos$clickElement()
 ```
 
 Guarda una copia de la página (su código fuente) en la variable `codigo_fuente` usando el método del controlador del explorador `controlador$getPageSource()` y usa la función `read_html` de `rvest` para leer la página copiada en `codigo_fuente[[1]]` (el primer elemento de la lista es el texto del código fuente), guarda el resultado de la lectura en la variable `html_ficha` de donde rasparás los datos:
 
 ```{r Guardar el código fuente de la ficha}
-# Guarda el contenido de la página en una variable
+# Guarda el contenido de la página en una variable:
 codigo_fuente <- controlador$getPageSource()
 
 # Leer con rvest el código fuente de la lista obtenida con Selenium:
@@ -158,22 +188,25 @@ html_ficha <-
 
 Para obtener los datos de la ficha, será necesario considerar lo siguiente:
 
-1.  En la ficha, los datos se presentan usando el nombre de la variable, dos puntos y el valor correspondiente (por ejemplo `Nombre: Sepulcro de Manuel Escudero y Verdugo`).
+1.  En la ficha, la mayoría de los datos se presentan usando el nombre de la variable, dos puntos y el valor correspondiente (por ejemplo `Nombre: Sepulcro de Manuel Escudero y Verdugo`).
 2.  Los datos se deberán extraer sección por sección como vector de texto con la convención anterior, si hay datos que no tienen un nombre de variable con `:` será necesario agregarlos.
-3.  De acuerdo con lo anterior, es posible construir una tabla con todos las variables y valores si todos tienen esta misma estructura y al final se separa en dos columnas usando `:` como separador.
-4.  Se obtendrá una tabla con dos columnas, la primera contendrá el nombre de las variables y la segunda sus valores correspondientes.
-5.  Será necesario transformar esta tabla de valores y variables para que las variables estén como columnas los valores representen un registro de fila. Para ello, será necesario hacer un *pivote,* es decir, pasar filas a columnas.
-6.  Una vez transpuestos, los datos se acumularán en
+3.  Agregar el prefijo de la sección
+4.  De acuerdo con lo anterior, es posible construir una tabla con todos las variables y valores si todos tienen esta misma estructura y al final se separa en dos columnas usando `:` como separador.
+5.  Se obtendrá una tabla con dos columnas, la primera contendrá el nombre de las variables y la segunda sus valores correspondientes.
+6.  Será necesario transformar esta tabla de valores y variables para que las variables estén como columnas los valores representen un registro de fila. Para ello, será necesario hacer un *pivote,* es decir, pasar filas a columnas.
+7.  Una vez transpuestos, tendremos un registro con los datos de un inmueble que se podrá acumular en una tabla general.
 
 Observa y ejecuta el siguiente bloque para realizar la manipulación de datos que te permitirá extraer los datos del panel de la primera sección de la ficha:
 
-1.  A partir de tu copia de la página en `html_ficha` busca el primer panel (con dirección *xPath* `//*[@id="encabezado"]`), usa la función `html_children` cuatro veces para identificar los elementos de texto (datos) que están en el cuarto nivel de la estructura web, extrae el texto sin HTML usando la función `html_text` y limpia el resultado eliminando saltos de página innecesarios con `str_remove_all("\n")` y los espacios en blanco antes y después de cada texto con `str_squish.`
-2.  
+1.  A partir de tu copia de la página en `html_ficha` busca el primer panel (con dirección xPath `//*[@id="encabezado"]`), usa la función `html_children` cuatro veces para identificar los elementos de texto (datos) que están en el cuarto nivel de la estructura web, extrae el texto sin HTML usando la función `html_text` y limpia el resultado eliminando saltos de página innecesarios con `str_remove_all("\n")` y los espacios en blanco antes y después de cada texto con `str_squish.`
+2.  Agrega los nombres correspondientes al primer y quinto valores que no están asociados con un nombre de variable, en este caso *Tipo* y *Validación.* Usa la función `str_c` para concatenar los nombres de variables con los valores y no olvides agregar `:` que servirá para separar en dos columnas posteriormente.
+3.  Elimina las filas del texto extraído que no contienen variables útiles. En este caso sólo debes conservar las filas 1 a 5 del vector `datos_contenedor_encabezado`.
+4.  Verifica los datos extraídos contenidos en `datos_contenedor_encabezado`.
 
 > Recuerda que puedes ejecutar parcialmente el código para comprobar sus resultados poco a poco, si seleccionas un fragmento de código y presionas Ctrl+Enter.
 
 ```{r Extraer datos del encabezado}
-# Buscar los elementos donde están los datos, extraer y limpiar el texto
+# Buscar los elementos donde están los datos, extraer y limpiar el texto:
 datos_contenedor_encabezado <-
   html_ficha %>% 
   html_element(xpath = '//*[@id="encabezado"]') %>% 
@@ -185,20 +218,26 @@ datos_contenedor_encabezado <-
   str_remove_all("\n") %>% # Eliminar todos los saltos de línea
   str_squish() # Eliminar los espacios en blanco antes y después del texto
 
-# Agregar nombres de variables faltantes
+# Agregar nombres de variables faltantes:
 datos_contenedor_encabezado[1] <- 
   str_c("Tipo: ", datos_contenedor_encabezado[1])
 
 datos_contenedor_encabezado[5] <- 
   str_c("Validación: ", datos_contenedor_encabezado[5])
 
-# Cosnervar las 5 primeras filas
+# Conservar las 5 primeras filas:
 datos_contenedor_encabezado <-
   datos_contenedor_encabezado[1:5]
 
-# Ver el resultado
+# Ver el resultado:
 datos_contenedor_encabezado
 ```
+
+Usando de manera similar el procedimiento anterior, extrae los datos del siguiente panel (en este caso `//*[@id="divSeccion1"]`), obtén los elementos de texto que están dentro del panel bajando en la estructura HTML usando la función `html_children` y limpia los datos eliminando los saltos de línea innecesarios con `str_remove_all("\n")` y los espacios en blanco antes y después de cada elemento de texto con `str_squish` como lo hiciste anteriormente, guardando las valores extraídos en la variable `datos_contenedor_1`.
+
+Agrega también el sufijo `S1_` a los elementos de `datos_contenedor_1` con la función `str_c` para indicar a qué sección pertenece el dato extraído y asegurar que los nombres de variables no se repitan al juntar todos los valores en un solo registro.
+
+Finalmente visualiza los elementos almacenados en `datos_contenedor_1` y verifica que los datos tengan el formato adecuado de acuerdo a la metodología planteada.
 
 ```{r Extraer tipo de ficha}
 # Buscar el siguiente contenedor y extraer los datos
@@ -219,7 +258,15 @@ datos_contenedor_1 <- str_c("S1_", datos_contenedor_1)
 datos_contenedor_1
 ```
 
-Extraer la URL del mapa de Google con las coordenadas:
+Repite de manera similar el procedimiento anterior para extraer los datos del siguiente panel (en este caso `//*[@id="divSeccion2"]`).
+
+En este caso, hay un mapa de Google Maps incrustado en el panel, del cual es posible extraer desde su código el URL de origen desde donde se visualiza. Usa el inspector web para identificar este URL. Encontrarás una dirección similar a esta:
+
+```         
+https://maps.google.com/?q=16.1183333333333,-92.0502777777778
+```
+
+Ejecuta el siguiente bloque de código para buscar y extraer esta dirección en la variable `datos_contenedor_mapa`, agrega el sufijo de la sección `S2_` y visualiza el valor extraído.
 
 ```{r Extraer URL del mapa}
 # Buscar la URL origen del mapa de Google
@@ -238,6 +285,10 @@ datos_contenedor_mapa <-
 # Ver el resultado
 datos_contenedor_mapa
 ```
+
+Repite de manera similar los procedimientos anteriores para extraer los datos restantes del mismo panel (en este caso `//*[@id="divSeccion2"]`) y almacenarlos en la variable `datos_contenedor_2`.
+
+Una vez hecho, verifica el valor obtenido en `datos_contenedor_2`.
 
 ```{r Extraer datos de Localización}
 # Buscar el siguiente contenedor y extraer los datos
@@ -269,6 +320,33 @@ datos_contenedor_2 <-
 # Ver el resultado
 datos_contenedor_2
 ```
+
+Repite de manera similar los procedimientos anteriores para extraer los datos restantes del mismo panel (en este caso `//*[@id="divSeccion3"]`) y almacenarlos en la variable `datos_contenedor_3`.
+
+En este caso será necesario separar algunos datos como el del décimo elemento (`datos_contenedor_3_original[10]`) que aparecen juntos en un mismo elemento del vector, de manera similar a esta:
+
+```         
+Categoría: Arquitectura FunerariaGénero: Cementerio o panteónTipo Arquitectónico:
+Monumento funerario
+```
+
+Para separarlos, usa las función `str_replace` para agregar un separador `|` antes de `Genero:` y `Tipo Arquitectónico` en el texto extraído y obtener esta cadena:
+
+```         
+Categoría: Arquitectura Funeraria|Género: Cementerio o panteón|Tipo Arquitectónico:
+Monumento funerario
+```
+
+De esta manera podrás separar el texto en tres elementos diferentes y guardarlos en la variable de tipo vector `datos_contenedor_3_separados`. Para ello, usa la función `str_split` usando el separador `|`.
+
+```         
+[1] Categoría: Arquitectura Funeraria
+[2] Género: Cementerio o panteón
+[3] Tipo Arquitectónico:
+Monumento funerario
+```
+
+Sustituye los elementos que no estaban separados en `datos_contenedor_3_original` con estos nuevos elementos separados `datos_contenedor_3_separados` y guarda los valores finales en la variable `datos_contenedor_3`. Recuerda agregarle el sufijo de la sección `S3_`. Una vez hecho, verifica el valor obtenido en `datos_contenedor_3`.
 
 ```{r Extraer datos de Identificación}
 # Buscar el siguiente contenedor y extraer los datos
@@ -311,6 +389,8 @@ datos_contenedor_3 <-
 datos_contenedor_3
 ```
 
+Repite de manera similar los procedimientos anteriores para extraer los datos del siguiente panel (en este caso `//*[@id="divSeccion4"]`) y almacenarlos en la variable `datos_contenedor_4`.
+
 ```{r Extraer datos de Aspectos Legales}
 # Buscar el siguiente contenedor y extraer los datos
 datos_contenedor_4_original <-
@@ -346,6 +426,8 @@ datos_contenedor_4 <-
 datos_contenedor_4
 ```
 
+Repite de manera similar los procedimientos anteriores para extraer los datos del siguiente panel (en este caso `//*[@id="divSeccion6"]`) y almacenarlos en la variable `datos_contenedor_5`.
+
 ```{r Extraer datos de Información Histórica}
 # Buscar el siguiente contenedor y extraer los datos
 datos_contenedor_5 <-
@@ -380,6 +462,8 @@ datos_contenedor_5 <-
 datos_contenedor_5
 ```
 
+Repite de manera similar los procedimientos anteriores para extraer los datos del siguiente panel (en este caso `//*[@id="divSeccion7"]`) y almacenarlos en la variable `datos_contenedor_6`.
+
 ```{r Extraer datos de Fuentes Consultadas}
 # Buscar el siguiente contenedor y extraer los datos
 datos_contenedor_6 <-
@@ -401,6 +485,8 @@ datos_contenedor_6 <-
 # Ver el resultado
 datos_contenedor_6
 ```
+
+Repite de manera similar los procedimientos anteriores para extraer los datos del siguiente panel (en este caso `//*[@id="divSeccion8"]`) y almacenarlos en la variable `datos_contenedor_7`.
 
 ```{r Extraer datos de monografía}
 # Buscar el siguiente contenedor y extraer los datos
@@ -424,6 +510,8 @@ datos_contenedor_7 <-
 datos_contenedor_7
 ```
 
+Repite de manera similar los procedimientos anteriores para extraer los datos del siguiente panel (en este caso `//*[@id="divSeccion11"]`) y almacenarlos en la variable `datos_contenedor_8`.
+
 ```{r Extraer datos de Descripción Arquitectónica}
 # Buscar el siguiente contenedor y extraer los datos
 datos_contenedor_8 <-
@@ -444,6 +532,10 @@ datos_contenedor_8 <-
 # Ver el resultado
 datos_contenedor_8
 ```
+
+Repite de manera similar los procedimientos anteriores para extraer los datos del siguiente panel (en este caso `//*[@id="divSeccion12"]`) y almacenarlos en la variable `datos_contenedor_9`.
+
+En este caso encontrarás varios nombres de variables que se repiten en diferentes subsecciones del panel, usa los encabezados de cada subsección, acórtalos usando la funcion `str_trunc` y agrégalos al sufijo después del número de sección.
 
 ```{r Extraer Características}
 # Buscar el siguiente contenedor y extraer los datos
@@ -484,6 +576,8 @@ datos_contenedor_9 <-
 datos_contenedor_9
 ```
 
+Repite de manera similar los procedimientos anteriores para extraer los datos del siguiente panel (en este caso `//*[@id="divSeccion17"]`) y almacenarlos en la variable `datos_contenedor_10`.
+
 ```{r Extraer Fecha de Elaboración o Actualización}
 # Buscar el siguiente contenedor y extraer los datos
 datos_contenedor_10 <-
@@ -503,6 +597,16 @@ datos_contenedor_10 <-
 datos_contenedor_10
 ```
 
+Repite de manera similar los procedimientos anteriores para extraer los datos del siguiente panel (en este caso `//*[@id="divSeccion22"]`) y almacenarlos en la variable `datos_contenedor_11`.
+
+En este caso, es conveniente que almacenes el URL de la ficha en PDF que contiene la información. Prueba haciendo clic en el botón de descarga y revisa cómo está construida la dirección. Verás que tiene una forma similar a esta:
+
+```         
+https://catalogonacionalmhi.inah.gob.mx/consulta_publica/generarPdfPlanoteca/9000
+```
+
+Observa que el número al final de la dirección es el mismo identificador único de la página, por lo que es posible utilizar la variable `id_ficha` que definiste al principio para construir este URL mediante la función `str_c`.
+
 ```{r Extrae datos PAHJE}
 # Buscar el siguiente contenedor y extraer los datos
 datos_contenedor_11 <-
@@ -515,11 +619,15 @@ datos_contenedor_11 <-
   
 # Agregar el nombre del campo al valor:
 datos_contenedor_11 <- c(str_c("S11_Planoteca del AHJE: ", datos_contenedor_11),
-                         str_c("S11_URL Planoteca del AHJE: https://catalogonacionalmhi.inah.gob.mx/consulta_publica/generarPdfPlanoteca/", 9000))
+                         str_c("S11_URL Planoteca del AHJE: https://catalogonacionalmhi.inah.gob.mx/consulta_publica/generarPdfPlanoteca/", id_ficha))
 
 # Ver el resultado
 datos_contenedor_11
 ```
+
+Repite de manera similar los procedimientos anteriores para extraer los datos del siguiente panel (en este caso `//*[@id="divSeccion23"]`) y almacenarlos en la variable `datos_contenedor_12`.
+
+Igual que en el bloque anterior, es posible almacenar la URL de descarga del archivo PDF ligado usando el mismo procedimiento.
 
 ```{r Extraer datos AHJE}
 # Buscar el siguiente contenedor y extraer los datos
@@ -533,11 +641,15 @@ datos_contenedor_12 <-
 
 # Agregar el nombre del campo al valor:
 datos_contenedor_12 <- c(str_c("S12_AHJE: ", datos_contenedor_12),
-                         str_c("S12_URL AHJE: https://catalogonacionalmhi.inah.gob.mx/consulta_publica/generarPdfArchivoHistorico/", 9000))
+                         str_c("S12_URL AHJE: https://catalogonacionalmhi.inah.gob.mx/consulta_publica/generarPdfArchivoHistorico/", id_ficha))
 
 # Ver el resultado
 datos_contenedor_12
 ```
+
+Repite de manera similar los procedimientos anteriores para extraer los datos del siguiente panel (en este caso `//*[@id="divSeccion24"]`) y almacenarlos en la variable `datos_contenedor_13`.
+
+Igual que en el bloque anterior, es posible almacenar la URL de descarga del archivo PDF ligado usando el mismo procedimiento.
 
 ```{r Extraer datos FCRV}
 # Buscar el siguiente contenedor y extraer los datos
@@ -551,17 +663,19 @@ datos_contenedor_13 <-
 
 # Agregar el nombre del campo al valor:
 datos_contenedor_13 <- c(str_c("S13_FCRV: ", datos_contenedor_13),
-                         str_c("S13_URL FCRV: https://catalogonacionalmhi.inah.gob.mx/consulta_publica/generarPdfFototeca/", 9000))
+                         str_c("S13_URL FCRV: https://catalogonacionalmhi.inah.gob.mx/consulta_publica/generarPdfFototeca/", id_ficha))
 
 # Ver el resultado
 datos_contenedor_13
 ```
 
-Unir los datos extraídos:
+Finalmente, une los datos extraídos en un mismo vector de texto `datos_contenedor` usando la función `str_c`. Agrega una nueva columna `ID` al principio del vector que contenga el identificador de prueba `id_ficha` que usaste para extraer los datos de la ficha de ejemplo.
 
-```{r Unir los valores extraidos}
-# Unir los valores extraidos
-datos_contenedor <- c(str_c("ID: ", 9000), # Agregar el ID de la página
+Visualiza el resultado y comprueba que todos los nombres de variable y valores del vector estén separados con `:` como se estableció anteriormente en la metodología.
+
+```{r Unir los valores extraídos}
+# Unir los valores extraídos
+datos_contenedor <- c(str_c("ID: ", id_ficha), # Agregar el ID de la página
                       datos_contenedor_1,
                       datos_contenedor_mapa,
                       datos_contenedor_2,
@@ -577,12 +691,19 @@ datos_contenedor <- c(str_c("ID: ", 9000), # Agregar el ID de la página
                       datos_contenedor_12,
                       datos_contenedor_13)
 
+# Visualiza el resultado
 datos_contenedor
 ```
 
-Convertir el listado de datos extraídos en un registro de tabla:
+### Conversión de los datos extraídos a tabla
 
-Para que `pivot_wider` funcione correctamente en este caso, es necesario que no haya nombres de campos repetidos.
+Si el formato de los datos extraídos en `datos_contenedor` es correcto, el siguiente paso es convertir el vector de datos extraídos en un registro de tabla. Aplica a `datos_contenedor` la siguiente transformación:
+
+1.  Usando la función `tibble` para crear una nueva tabla (tibble) llamada `registro_extraido` agregando los valores extraídos en `datos_contenedor` a una columna llamada `lista`, que inicialmente será la única columna de la tabla.
+2.  Separa el contenido de la columna `lista` en dos columnas `variable` y `valor` usando la función `separate`. Agrega el parámetro `extra = "merge"` para que ignore aquellos valores que tengan más de un `:` y que pudiera confundirse como separador y generar accidentalmente más de dos columnas.
+3.  Limpia el nombre de las variables, eliminando espacios, mayúsculas y caracteres especiales usando la función `make_clean_names` en la columna `variable`.
+4.  Convierte las filas en columnas haciendo un pivoteo con la función `pivot_wider` usando el parámetro `names_from = variable` para usar los valores de la columna `variable` como nombre de columna de la nueva tabla y el parámetro `values_from = valor` para usar los valores de la columna `valor` como sus valores correspondientes. Nota que para que `pivot_wider` funcione correctamente en este caso, es necesario que no haya nombres de campos repetidos, razón por la que anteriormente agregaste los sufijos de secciones para garantizar que no hayan nombres de variables repetidos.
+5.  Finalmente, visualiza la estructura de la tabla resultante usando la función `glimpse`. Comprueba que tienes un registro completo con los datos de la ficha que acabas de raspar.
 
 ```{r Contruir el registro}
 # Construir un tibble con un registro con los datos extraídos
@@ -594,7 +715,7 @@ registro_extraido <-
   glimpse() # Ver la estructura de datos
 ```
 
-NOTA: NO HICE UNA FUNCIÓN POR QUE CADA DIV ESTÁ CONSTRUIDO DIFERENTE
+Lograste extraer un registro para una ficha de ejemplo. ¡Buen trabajo!
 
 ## Automatización y extracción masiva
 
@@ -606,7 +727,7 @@ https://catalogonacionalmhi.inah.gob.mx/consulta_publica/detalle/[ID de la pági
 
 Donde debes iterar el valor de \[`ID de la página]` con números enteros.
 
-Hasta este momento, es conveniente cerrar el servidor de Selemium y borrar el entorno para comenzar con la automatización de la página para la extración masiva de los datos.
+Hasta este momento, es conveniente cerrar el servidor de Selenium que está activo en el fondo y borrar el entorno para comenzar con la automatización de la página para la extracción masiva de los datos.
 
 Cierra las ventanas abiertas del explorador y apaga el servidor de Selenium:
 
@@ -693,7 +814,6 @@ extraer_datos <- function(id_pagina, controlador, espera_carga = 3, espera_expan
   
   # Agregar un prefijo con la sección
   datos_contenedor_1 <- str_c("S1_", datos_contenedor_1)
-  
   
   
   # Buscar la URL origen del mapa de Google
@@ -1019,28 +1139,41 @@ extraer_datos <- function(id_pagina, controlador, espera_carga = 3, espera_expan
 
 ### Extracción masiva
 
-```{r}
+Arranca el servidor de Selenium para usar Firefox.
+
+```{r Iniciar Selenium para extracción masiva}
 # Iniciar el servidor de Selenium
-servidor_selenium <- rsDriver(browser = "firefox")
+servidor_selenium <- rsDriver(browser = "firefox",
+                              chromever = NULL,
+                              iedrver = NULL,
+                              phantomver = NULL)
 
 # Crear el controlador del explorador web
 controlador <- servidor_selenium$client
 ```
 
-```{r}
-# Iterar el número de ID de la página para extraer los datos
+Inicia la extracción masiva, repitiendo la función `extraer_datos` para un rango de identificadores únicos de fichas:
+
+1.  Define el rango de identificadores únicos de las fichas que vas a descargar en las variables `id_inicial` e `id_final`. En esta práctica usaremos las fichas de 1 a la 50 como ejemplo.
+2.  Repite la función iterando el valor del parámetro `id_ficha` de la función `extraer_datos` desde `id_inicial` hasta `id_final` y pasandole también el `controlador` que acabas de construir. Para ello, usa la función `map_df` para repetir la función y almacenar los resultados en un tibble llamado `datos_acumulados`.
+3.  Finalmente, explora la tabla resultante `datos_acumulados` usando la función.
+
+```{r Extracción masiva de los datos}
+# Definir el rango de IDs de ficha que se desean
 id_inicial <- 1
-id_final <- 100
+id_final <- 50
 
-datos_acumulados <- map_df(id_inicial:id_final,
-                           extraer_datos,
-                           controlador)
-
-datos_acumulados %>% 
+# Iterar el número de ID de la página para extraer los datos
+datos_acumulados <- 
+  map_df(id_inicial:id_final,
+         extraer_datos,
+         controlador) %>% 
   glimpse()
 ```
 
-Guardar el archivo con los datos extraídos:
+> Además de `map_df`, es posible utilizar otros métodos para repetir la función de extracción de datos para un rango determinado de identificadores únicos, como los ciclos `for` o `while`, sin embargo es más eficiente usar las funciones del paquete `purrr` para estos fines. Consulta todo lo que puedes hacer con este paquete en la [página de su documentación oficial](https://purrr.tidyverse.org).
+
+Guarda el archivo con los datos extraídos usando la función `write_excel_csv`. Define el nombre del archivo donde se guardarán los datos usando la función `str_c` para agregarle los valores de `id_inicio` e `id_final`, considerando agregarles ceros a la izquierda para completar cinco dígitos mediante la función `str_pad`.
 
 ```{r Guardar los datos en un archivo}
 datos_acumulados %>% 
@@ -1051,7 +1184,7 @@ datos_acumulados %>%
                         ".csv"))
 ```
 
-Cierra las ventanas abiertas del explorador y apaga el servidor de Selenium:
+Finalmente, cierra las ventanas abiertas del explorador, apaga el servidor de Selenium y reinicia el entorno de trabajo eliminando todos los objetos almacenados en la memoria:
 
 ```{r Cerrar explorador y servidor de Selenium}
 # Cerrar todas las ventanas abiertas
@@ -1064,21 +1197,38 @@ servidor_selenium$server$stop()
 rm(list = ls())
 ```
 
-### Geocodificación
+## Geocodificación
 
-NOTA: Por seguridad, no compartas tu llave de API, puedes copiar la instrucción y ejecutarla en la consola para no guardarla en este cuaderno.
+Antes de usar los datos de los inmuebles históricos que acabas de extraer para hacer análisis geoespaciales, será necesario convertirlos en geodatos y guardarlos en un formato adecuado para usarlos en un Sistema de Información Geográfica (SIG).
 
-```{r}
+Como el volumen de registros del Catálogo Nacional de Monumentos Históricos Inmuebles es muy grande, hacer una georreferencia de los datos de manera manual sería muy complicado y laborioso, por lo que puedes usar un servicio web de geocodificación para obtener las coordenadas a partir de las direcciones que has extraído desde las fichas de inmuebles.
+
+Para esta práctica, utiliza el servicio web de Here Maps para realizar la geocodificación automática de los datos. Define cuál es la llave API de Here Maps que utilizarás para este proceso usando la instrucción `Sys.setenv("HERE_API_KEY" = "TU_API_KEY_AQUI")` sustituyendo `"TU_API_KEY_AQUI"` por tu llave (también llamada *token*).
+
+```{r Establece la llave API de Here Maps}
 # Establece tu llave API de Here en cada nueva sesión de trabajo.
 Sys.setenv("HERE_API_KEY" = "TU_API_KEY_AQUI")
 ```
 
-```{r}
-# Leer los datos extraídos:
-datos_acumulados <-
-  read_csv("Datos/inah_monumentos_historicos_00001-00100.csv")
+> Por seguridad, no compartas tu llave de API. Puedes copiar la instrucción y ejecutarla en la consola para no guardarla en este cuaderno.
 
-# Concatenar textos para obtener la dirección en una sola variable y geocodificar:
+Para realizar la geocodificación es necesario enviar a la API del servicio web de Here Maps, la dirección completa en una sola columna, sin embargo en los datos que extrajiste vienen separados por calle, número exterior, colonia, municipio, etc. Por lo tanto, será necesario que construyas una dirección completa concatenando todos estos valores.
+
+Lee el archivo CSV con los datos extraídos que deseas geocodificar y ejecuta la siguiente manipulación de datos:
+
+1.  Lee el archivo usando la función `read_csv` y guárdalos en la variable `datos_acumulados`.
+2.  Crea una variable llamada `datos_geocodificados` tomando como base los datos de `datos_acumulados` y reemplaza los valores vacíos (`NA`) con espacios en blanco(`""`) aplicando la función `str_replace_na` a las variables `"s2_nombre_de_la_vialidad"`, `"s2_numero_exterior"`, `"s2_tipo_y_nombre_del_asentamiento_humano"`, `"s2_localidad_colonia"`, `"s2_municipio_alcaldia"`, `"s2_entidad_federativa"` que contienen los datos de la dirección. Para ello, usa la función `mutate_at` que te permitirá aplicar la misma función `str_replace_na` a todas estas variables.
+3.  Usando la función `mutate`, crea una nueva variable llamada `direccion`, concatenando las variables `"s2_nombre_de_la_vialidad"`, `"s2_numero_exterior"`, `"s2_tipo_y_nombre_del_asentamiento_humano"`, `"s2_localidad_colonia"`, `"s2_municipio_alcaldia"`, `"s2_entidad_federativa"` con la función `str_c` y separando con espacios en blanco `" "` o comas `", "` conforme sea necesario. El paso anterior para sustituir los `NA` por espacios en blanco `""` es necesario para evitar que la dirección resulte en un `NA` al concatenar estas variables.
+4.  Selecciona con la función `select` únicamente las columnas `id` y `direccion` para evitar enviar toda la tabla completa al servicio de geocodificación.
+5.  Geocodifica los datos usando el servicio de Here mediante la función `geocode` usando los parámetros `address = "direccion"` para especificar al servicio que use como dirección la variable `direccion` y `method = "here"` para solicitar que el paquete `tidygeocoder` use el API de Here Maps.
+6.  Finalmente, visualiza el resultado de la geocodificación usando la función `glimpse`.
+
+```{r Geocodificar datos}
+# Leer los datos extraídos
+datos_acumulados <-
+  read_csv("Datos/inah_monumentos_historicos_00001-00050.csv",)
+
+# Concatenar textos para obtener la dirección en una sola variable y geocodificar
 datos_geocodificados <-
   datos_acumulados %>% 
   mutate_at(c("s2_nombre_de_la_vialidad",
@@ -1088,7 +1238,7 @@ datos_geocodificados <-
               "s2_municipio_alcaldia",
               "s2_entidad_federativa"),
             str_replace_na,
-            "") %>% 
+            "") %>% # Sustituir NA por espacios en blanco
   mutate(direccion = str_c(s2_nombre_de_la_vialidad,
                            " ",
                            s2_numero_exterior,
@@ -1098,19 +1248,69 @@ datos_geocodificados <-
                            s2_municipio_alcaldia,
                            ", ",
                            s2_entidad_federativa,
-                           ", México")) %>% 
-  select(id, direccion) %>%
-  slice_sample(n = 10) %>% 
-  geocode(address = "direccion")
+                           ", México")) %>% # Construir la dirección completa para enviar a Here
+  select(id, direccion) %>% # Seleccionar únicamente id y dirección
+  geocode(address = "direccion",
+          method = "here") %>% # Geocodificar usando Here
+  glimpse() # Visualizar el resultado
 ```
 
-```{r}
+Almacena una capa de inmuebles históricos en una variable llamada `inmuebles_historicos`, conviertiendo la tabla `datos_geocodificados` en geodatos o simple features (sf) usando la función `st_as_sf` y los parámetros `coords = c("long", "lat")` para usar las variables `long` y `lat` que regresó el servicio de geocodificación como coordenadas, `crs = 4326` para especificar que se usa la proyección geográfica WGS-84 ([EPSG: 4326](https://epsg.io/4326)), `remove = FALSE` para conservar las columnas `long` y `lat` de las coordenadas y `na.fail = FALSE` para permitir que haya registros sin geometría (aquellos que no se pudieron geocodificar).
+
+Visualiza y explora el sf obtenido usando la función `glimpse`:
+
+```{r Conversión de tabla en geodatos}
+# Convertir la tabla de datos a sf
+inmuebles_historicos <-
+  datos_geocodificados %>% 
+  st_as_sf(coords = c("long", "lat"), # Usar "long" y "lat" como coordenadas
+           crs = 4326, # Las coordenadas están expresadas en proyección geográfica WGS-84
+           remove = FALSE, # Conserva las columnas de las coordenadas
+           na.fail = FALSE) %>% # Permite registros con geometrías vacías
+  glimpse() # Visualiza el resultado
+```
+
+Usa el modo de visualización de mapas interactivos usando la función `tmap_mode("view")` y visualiza la capa resultante `inmuebles_historicos` en un mapa rápido usando la función `qtm`.
+
+```{r Visualizar en un mapa}
+# Usa mapas interactivos para visualizar los geodatos
 tmap_mode("view")
 
-datos_geocodificados %>% 
-  st_as_sf(coords = c("long", "lat"),
-           crs = 4326,
-           remove = FALSE,
-           na.fail = FALSE) %>% 
+# Visualiza en un mapa rápido
+qtm(inmuebles_historicos)
+```
+
+Guarda la capa `informacion_historica` en un archivo GeoPackage en la carpeta `Datos`. usando la función `st_write`. De manera similar al archivo CSV de datos que guardaste anteriormente, agrega como prefijo el rango de registros que vas a guardar (`id_inicio` e `id_final`) y especifica la extensión `.gpkg` para indicar que deseas usar este formato.
+
+```{r Guardar GPKG}
+# Guardar la capa como geopackage
+st_write(inmuebles_historicos,
+         str_c("Datos/inmuebles_historicos_", id_inicial, "-", id_final, ".gpkg"))
+```
+
+### Verificación de los datos geocodificados
+
+Es importante verificar la calidad de los datos geocodificados de manera automática. Para ello, podemos tomar una muestra aleatoria de puntos de ubicaciones de inmuebles y verificar visualmente en el mapa si la geocodificación fue adecuada para la mayoría de los datos de la muestra. Si la mayoría de los datos se ven correctos es posible inferir si el total de los datos geocodificados tienen una calidad aceptable o no.
+
+> En esta práctica tomaremos una muestra del 10% de los datos del ejemplo (en este caso 5 registros del total de 50 que se geocodificaron para ahorrar tiempo de procesamiento) que podría no ser significativa, pero se presenta el procedimiento únicamente para fines ilustrativos.
+
+Usa la función `slice_sample` con el parámetro `prop = 0.1` para tomar una muestra aleatoria del 10% de los puntos de la capa `inmuebles_historicos` y visualízalos en un mapa rápido usando la función `qtm`.
+
+```{r Verificar la geocodificación}
+# Toma una muestra aleatoria e inspecciona visualmente
+inmuebles_historicos %>% 
+  slice_sample(prop = 0.1) %>% 
   qtm()
 ```
+
+Revisa visualmente si los puntos están ubicados en los lugares adecuados de acuerdo con el mapa base y determina la calidad de la geocodificación.
+
+## Referencias
+
+-   Lovelace, R., Nowosad, J., & Muenchow, J. (2019), Geocomputation with R. <https://geocompr.robinlovelace.net>. CRC Press.
+-   Tennekes, M., Nowosad, J. (2018). tmap: Thematic Maps in R. Journal of Statistical Software. Recuperado el 8 de septiembre, 2021, from <https://www.researchgate.net/publication/324652152_tmap_Thematic_Maps_in_R/fulltext/5ad9e7eb0f7e9b28593cf867/tmap-Thematic-Maps-in-R.pdf>.
+-   Engel, C. (2019). Using Spatial Data with R. cengel.github.io. Recuperado el 8 de septiembre, 2021, desde [https://cengel.github.io/R-spatial/](https://cengel.github.io/R-spatial).
+-   Wickham H. (2022). rvest. Recuperado el 11 de junio, 2022 desde <https://rvest.tidyverse.org/index.html>.
+-   RSelenium. Recuperado el 11 de junio, 2022 desde <https://docs.ropensci.org/RSelenium/index.html>.
+-   Web Scraping Reference: Cheat Sheet for Web Scraping using R. Recuperado el 11 de junio, 2022 desde <https://github.com/yusuzech/r-web-scraping-cheat-sheet>
+-   tidygeocoder. Recuperado el 13 de mayo, 2024 desde <https://jessecambon.github.io/tidygeocoder/index.html>.
