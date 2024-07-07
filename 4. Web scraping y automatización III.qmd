@@ -6,23 +6,79 @@ editor: visual
 
 ## Introducción
 
-Se hará en estas etapas:
+Existen técnicas que nos permiten automatizar los procesos necesarios para extraer y procesar información de diversas fuentes, siendo una de las principales Internet. Aunque en ocasiones los datos que necesitamos están disponibles en páginas web de acceso abierto, el formato en que los consultamos no siempre es el más apropiado o sencillo de manejar.
 
-Observar cómo funciona la página de consulta
+En esta sesión, de la misma manera que en la anterior, se utilizarán dos técnicas para automatizar la extracción y geocodificación de datos provenientes de Internet. La primera técnica es el raspado web (*web scraping*), que permite extraer contenido de una página web programando el explorador para controlar y modificar los parámetros utilizados por las páginas de consulta. Esto nos permite obtener información automáticamente, evitando el trabajo repetitivo que requeriría hacerlo manualmente. La segunda técnica es la geocodificación automática, que consiste en obtener las coordenadas de una lista de direcciones de manera automatizada mediante un servicio web.
 
-Identificar la estructura de la página de consulta ylos elementos que se van a extraer
-
-Crear procedimientos para extraer los datos de cada sección de la página de consulta
-
-Automatizar para repetir el procedimiento de extracción de datos de cada ficha
-
-Acumular los registros extraídos en una misma tabla y limpiarla.
-
-Geocodificar las direcciones y guardar como capa geográfica.
+Es importante utilizar estas técnicas con discreción, ya que tienen implicaciones éticas y ciertos márgenes de imprecisión. Sin embargo, son herramientas muy útiles para adquirir datos difíciles de obtener por medios convencionales.
 
 ## Objetivo
 
+El objetivo de esta práctica es obtener una base de datos geográfica de inmuebles históricos en el país. La información oficial puede ser obtenida desde el sitio web del Catálogo Nacional de Monumentos Históricos Inmuebles del INAH ubicado en <https://catalogonacionalmhi.inah.gob.mx/>. Los datos son públicos, sin embargo, no existe ningún medio para poder descargarla en algún formato apropiado para construir la base de datos y sólo es posible hacer consultas de manera manual para obtener los datos en forma de fichas individuales.
+
+En el catálogo existen más de 98 mil registros y la descarga manual de los datos sería extremadamente laboriosa y requeriría mucho tiempo y trabajo para lograr recopilar todos los datos, por esta razón es que es necesario utilizar técnicas de automatización y *web scraping* para poder construir la base de datos deseada de una manera más sencilla y eficiente.
+
+Durante el transcurso de esta sesión, usarás Selenium y las funciones del paquete `RSelenium` para controlar el explorador Firefox y automatizar la consulta de información de múltiples registros de inmuebles en la página del INAH, y en combinación con el paquete `rvest` extraerás los datos obtenidos de cada consulta para acumularlos en una misma tabla resultante, la cual geocodificarás de manera automática usando el paquete `tidygeocoder` y los servicios de Here Maps para obtener las coordenadas a partir de las direcciones extraídas y finalmente, construirás una capa geográfica con la que se puedan realizar análisis geoespaciales usando el paquete `sf`.
+
+## ¿Cómo funciona la página web de consulta?
+
+Haz una revisión del sitio con el que trabajarás en esta práctica para conocerlo. Abre en tu explorador la página principal del Catálogo Nacional de Monumentos Históricos Inmuebles del INAH (<https://catalogonacionalmhi.inah.gob.mx/>), y observa que tiene un botón *Consulta Pública* que permite hacer la consulta de información:
+
+![Página de inicio del sitio](Imagenes/InicioCatalogo.png){fig-alt="Página de inicio del sitio" fig-align="center" width="468"}
+
+Al hacer clic en este botón el sitio te redirigirá a otra página donde puedes hacer búsquedas de información:
+
+![Página de consulta pública](Imagenes/PaginaConsulta.png){fig-alt="Página de consulta pública" fig-align="center" width="468"}
+
+Si haces clic en el botón *Búsqueda avanzada* aparecerán más opciones para incluir criterios de búsqueda:
+
+![Opciones de búsqueda avanzada](Imagenes/BusquedaAvanzada.png){fig-alt="Opciones de búsqueda avanzada" fig-align="center" width="449"}
+
+Haz una consulta al azar, selecciona al menos una *Entidad Federativa* y un *Municipio / Alcaldía* y presiona el botón *Buscar* para obtener los registros de los inmuebles correspondientes:
+
+![Resultados de la consulta](Imagenes/ResultadosConsulta.png){fig-alt="Resultados de la consulta" fig-align="center" width="400"}
+
+Da clic en la liga *Ver detalle* de cualquiera de los resultados. Se abrirá la página de la ficha correspondiente a ese inmueble, y encontrarás varias secciones de información, como *tipo de ficha, localización, identificación,* etc. que están contraídas. Presiona el botón *Expandir todos* para que los paneles de todas las secciones se abran y muestren toda la información disponible sobre el inmueble:
+
+![Ejemplo de una ficha de datos de inmueble.](Imagenes/ConsultaPublica.png){alt="Ejemplo de una ficha de datos de inmueble." fig-alt="Ejemplo de una ficha de datos de inmueble." fig-align="center" width="30%"}
+
+Ahora puedes ver en esta ficha todos los datos que deberás extraer. En la barra de direcciones de tu explorador, observa la dirección de la página web de la ficha de datos, debe ser un URL similar a este:
+
+<https://catalogonacionalmhi.inah.gob.mx/consulta_publica/detalle/82800>
+
+Normalmente, los sitios web de consulta se conectan a una base de datos para obtener los datos de cada registro, y utilizan un identificador único para recuperar la información solicitada. El número al final del URL anterior corresponde al identificador único de la ficha. Sustituye este número e intenta abrir esa dirección en el explorador, por ejemplo:
+
+[https://](https://catalogonacionalmhi.inah.gob.mx/consulta_publica/detalle/82800)[catalogonacionalmhi](https://catalogonacionalmhi.inah.gob.mx/consulta_publica/detalle/9000)[.inah.gob.mx/consulta_publica/detalle/9000](https://catalogonacionalmhi.inah.gob.mx/consulta_publica/detalle/82800)
+
+Se abrirá una ficha con los datos correspondientes a otro inmueble. Esto quiere decir que se puede modificar la dirección cambiando únicamente este identificador para obtener cada una de las fichas de todo el catálogo.
+
+Si agregas al URL un número de identificador que no existe en el catálogo, te enviará de vuelta a la página de inicio del sitio web. Mediante prueba y error, puedes determinar cuántas fichas hay en total en el catálogo; en este caso puedes determinar que existen 98,703 registros (qué es el número de identificador máximo que puedes usar sin que la URL te mande a la página inicial). En esta práctica prepararás el mecanismo de extracción de datos para cada una de estas fichas.
+
+Por otro lado, existen fichas que tienen diferentes datos dependiendo del tipo de inmueble. Estos se distinguen usando colores en el cintillo del número de captura.
+
+![Tipos de fichas](Imagenes/TiposFicha.png){fig-alt="Tipos de fichas" fig-align="center" width="532"}
+
+Será necesario asegurar que todos estos datos se guarden de manera ordenada en la base final, ya que existirán columnas con datos para algunos registros que pueden no existir en otros y viceversa. Esto se detalla más adelante en la práctica.
+
+## Metodología
+
+Antes de comenzar, es conveniente definir los pasos a seguir para realizar el procedimiento de extracción de datos en esta práctica:
+
+1.  Observar cómo funciona la página web de consulta.
+2.  Identificar la estructura de la página de consulta y los elementos que se van a extraer.
+3.  Los datos en la página están enmarcados en paneles de diferentes secciones de información, como datos generales, tipo de ficha, localización, identificación, etc. Será conveniente crear procedimientos para extraer los datos de cada sección de la página de consulta.
+4.  Programar las instrucciones necesarias para extraer (raspar) todos los datos de una ficha individual, como ejemplo.
+5.  Una vez programado el método de raspado para una ficha de ejemplo, se unen todas las instrucciones en una sola función que nos permita repetir el procedimiento de extracción de datos para todas fichas del catálogo.
+6.  Iterar el proceso para cada una de las 98,703 fichas de registro de inmuebles del sitio.
+7.  Acumular cada uno de los registros extraídos en una misma tabla, ordenarla y limpiarla.
+8.  Geocodificar las direcciones usando el servicio web de Here.
+9.  Convertir la tabla resultante de la geocodificación en una capa geográfica de inmuebles de tipo simple features (sf)*.*
+10. Visualizar una muestra aleatoria de los puntos de la capa de inmuebles geocodificada en un mapa interactivo y comprobar visualmente la precisión.
+11. Finalmente, guardar la capa de inmuebles en un archivo geopackage (.gpkg) como capa geográfica.
+
 ## Preparación del entorno
+
+Ejecuta el siguiente bloque para cargar los paquetes que usarás en esta sesión de trabajo:
 
 ```{r Cargar los paquetes}
 library(tidyverse)
@@ -36,24 +92,47 @@ library(tmap)
 
 ### Iniciar servidor de Selenium
 
+Utiliza la función `rsDriver` del paquete `RSelenium` para iniciar un servidor de Selenium y guarda el resultado en la variable `servidor_selenium`, indicando que vas a usar el explorador Firefox con el parámetro `browser = "firefox"` y omite la carga de los demás exploradores usando los parámetros `chromever = NULL, iedrver = NULL, phantomver = NULL`:
+
 ```{r Iniciar Selenium}
-servidor_selenium <- rsDriver(browser = "firefox")
+servidor_selenium <- rsDriver(browser = "firefox",
+                              chromever = NULL,
+                              iedrver = NULL,
+                              phantomver = NULL)
 ```
+
+El explorador Firefox se ha iniciado y en la barra de direcciones a la izquierda encontrarás un icono de robot. Esto indica que Selenium ya está conectado a Firefox y está listo para enviarle instrucciones. Ahora, crea un controlador para Selenium usando el atributo `client` de `servidor_selenium` y asígnalo a una instancia que se llame `controlador`:
 
 ```{r Crear el controlador del explorador web}
 controlador <- servidor_selenium$client
 ```
 
-### Identificación de los controles de la página
+## Procesamiento de una ficha de ejemplo
+
+### Abrir la página de la ficha
+
+Ahora que ya tienes el controlador, envía a Selenium la instrucción de abrir la página de detalle de la ficha agregando al URL un identificador único de prueba:
+
+1.  Asigna a la variable `pagina_fecha` la dirección base de la página web de la ficha (`"https://catalogonacionalmhi.inah.gob.mx/consulta_publica/detalle/"`).
+2.  Asigna a la variable `id_ficha` un valor de prueba, en este caso `9000`
+3.  Usa el método `controlador$navigate` para abrir la URL obtenida de concatenar `pagina_ficha` e `id_ficha` usando la función `str_c`.
 
 ```{r Abrir la página de descarga}
+# Define la URL base de la página de la ficha:
 pagina_ficha <- "https://catalogonacionalmhi.inah.gob.mx/consulta_publica/detalle/"
-id_ficha <- 9000 # ID de prueba
 
+# Identificador único de prueba:
+id_ficha <- 9000 
+
+# Abrir la página web con la dirección y el identificador combinados:
 controlador$navigate(str_c(pagina_ficha, id_ficha))
 ```
 
-Expandir todos los contenedores de la ficha:
+### Identificación de los controles de la página
+
+Usando el inspector web en la página de la ficha, determina la dirección *xPath* del botón *Expandir todos*, en este caso es `//*[@id="btnExpandir"]`.
+
+Ahora, crea un control para el botón que se llame `boton_expandir` usando la función `controlador$findElement` con los parámetros `using = "xpath"` y `value = '//*[@id="btnExpandir"]'`. Usa el control `boton_expandir_todos$clickElement()` para expandir todos los contenedores de la ficha y visualizar todos los datos:
 
 ```{r Expandir contenedores}
 # Crear una instancia del botón Expandir todos:
@@ -64,18 +143,34 @@ boton_expandir_todos <- controlador$findElement(using = "xpath",
 boton_expandir_todos$clickElement()
 ```
 
-Descargar el código fuente de la página:
+Guarda una copia de la página (su código fuente) en la variable `codigo_fuente` usando el método del controlador del explorador `controlador$getPageSource()` y usa la función `read_html` de `rvest` para leer la página copiada en `codigo_fuente[[1]]` (el primer elemento de la lista es el texto del código fuente), guarda el resultado de la lectura en la variable `html_ficha` de donde rasparás los datos:
 
 ```{r Guardar el código fuente de la ficha}
 # Guarda el contenido de la página en una variable
 codigo_fuente <- controlador$getPageSource()
 
-# Extraer con rvest el código fuente de la lista obtenida con Selenium:
+# Leer con rvest el código fuente de la lista obtenida con Selenium:
 html_ficha <- 
   read_html(codigo_fuente[[1]])
 ```
 
-### Extracción de los campos:
+### Extracción de los datos de cada sección
+
+Para obtener los datos de la ficha, será necesario considerar lo siguiente:
+
+1.  En la ficha, los datos se presentan usando el nombre de la variable, dos puntos y el valor correspondiente (por ejemplo `Nombre: Sepulcro de Manuel Escudero y Verdugo`).
+2.  Los datos se deberán extraer sección por sección como vector de texto con la convención anterior, si hay datos que no tienen un nombre de variable con `:` será necesario agregarlos.
+3.  De acuerdo con lo anterior, es posible construir una tabla con todos las variables y valores si todos tienen esta misma estructura y al final se separa en dos columnas usando `:` como separador.
+4.  Se obtendrá una tabla con dos columnas, la primera contendrá el nombre de las variables y la segunda sus valores correspondientes.
+5.  Será necesario transformar esta tabla de valores y variables para que las variables estén como columnas los valores representen un registro de fila. Para ello, será necesario hacer un *pivote,* es decir, pasar filas a columnas.
+6.  Una vez transpuestos, los datos se acumularán en
+
+Observa y ejecuta el siguiente bloque para realizar la manipulación de datos que te permitirá extraer los datos del panel de la primera sección de la ficha:
+
+1.  A partir de tu copia de la página en `html_ficha` busca el primer panel (con dirección *xPath* `//*[@id="encabezado"]`), usa la función `html_children` cuatro veces para identificar los elementos de texto (datos) que están en el cuarto nivel de la estructura web, extrae el texto sin HTML usando la función `html_text` y limpia el resultado eliminando saltos de página innecesarios con `str_remove_all("\n")` y los espacios en blanco antes y después de cada texto con `str_squish.`
+2.  
+
+> Recuerda que puedes ejecutar parcialmente el código para comprobar sus resultados poco a poco, si seleccionas un fragmento de código y presionas Ctrl+Enter.
 
 ```{r Extraer datos del encabezado}
 # Buscar los elementos donde están los datos, extraer y limpiar el texto
