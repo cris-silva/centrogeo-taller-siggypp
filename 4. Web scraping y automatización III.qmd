@@ -266,6 +266,8 @@ En este caso, hay un mapa de Google Maps incrustado en el panel, del cual es pos
 https://maps.google.com/?q=16.1183333333333,-92.0502777777778
 ```
 
+> Hasta este punto, podrías asumir que se pueden obtener las coordenadas del sitio extrayéndolas desde este URL y efectivamente, sería una buena estrategia para obtener datos georreferenciados. Sin embargo, si haces una revisión aleatoria de los registros encontrarás que el punto que se ilustra en el mapa de Google no coincide con la dirección que viene en la ficha, e incluso el mismo punto aparece en diferentes fichas. Esto puede ser una indicación de que, por alguna razón, los mapas de Google presentan información incorrecta. A pesar de esto, es conveniente conservar este dato para mantener la originalidad de la fuente y como referencia.
+
 Ejecuta el siguiente bloque de código para buscar y extraer esta dirección en la variable `datos_contenedor_mapa`, agrega el sufijo de la sección `S2_` y visualiza el valor extraído.
 
 ```{r Extraer URL del mapa}
@@ -1255,14 +1257,17 @@ datos_geocodificados <-
   glimpse() # Visualizar el resultado
 ```
 
-Almacena una capa de inmuebles históricos en una variable llamada `inmuebles_historicos`, conviertiendo la tabla `datos_geocodificados` en geodatos o simple features (sf) usando la función `st_as_sf` y los parámetros `coords = c("long", "lat")` para usar las variables `long` y `lat` que regresó el servicio de geocodificación como coordenadas, `crs = 4326` para especificar que se usa la proyección geográfica WGS-84 ([EPSG: 4326](https://epsg.io/4326)), `remove = FALSE` para conservar las columnas `long` y `lat` de las coordenadas y `na.fail = FALSE` para permitir que haya registros sin geometría (aquellos que no se pudieron geocodificar).
+Almacena una capa de inmuebles históricos en una variable llamada `inmuebles_historicos`, realizando la siguiente manipulación de datos:
 
-Visualiza y explora el sf obtenido usando la función `glimpse`:
+1.  Toma como base la tabla de datos completa `datos_acumulados` y adjúntale los datos de la tabla `datos_geocodificados` usando la función `left_join` para unir los registros donde coincide la columna `id`.
+2.  Ahora que `datos_acumulados` ya tiene las variables de las coordenadas obtenidas de Here Maps, convierte la tabla `datos_geocodificados` en geodatos o simple features (sf) usando la función `st_as_sf` y los parámetros `coords = c("long", "lat")` para usar las variables `long` y `lat` que regresó el servicio de geocodificación como coordenadas, `crs = 4326` para especificar que se usa la proyección geográfica WGS-84 ([EPSG: 4326](https://epsg.io/4326)), `remove = FALSE` para conservar las columnas `long` y `lat` de las coordenadas y `na.fail = FALSE` para permitir que haya registros sin geometría (aquellos que no se pudieron geocodificar).
+3.  Visualiza y explora el sf obtenido usando la función `glimpse`:
 
 ```{r Conversión de tabla en geodatos}
 # Convertir la tabla de datos a sf
 inmuebles_historicos <-
-  datos_geocodificados %>% 
+  datos_acumulados %>% # Tabla de datos completos
+  left_join(datos_geocodificados, by = "id") %>% # Une la tabla con las coordenadas donde coincide el id
   st_as_sf(coords = c("long", "lat"), # Usar "long" y "lat" como coordenadas
            crs = 4326, # Las coordenadas están expresadas en proyección geográfica WGS-84
            remove = FALSE, # Conserva las columnas de las coordenadas
@@ -1280,12 +1285,13 @@ tmap_mode("view")
 qtm(inmuebles_historicos)
 ```
 
-Guarda la capa `informacion_historica` en un archivo GeoPackage en la carpeta `Datos`. usando la función `st_write`. De manera similar al archivo CSV de datos que guardaste anteriormente, agrega como prefijo el rango de registros que vas a guardar (`id_inicio` e `id_final`) y especifica la extensión `.gpkg` para indicar que deseas usar este formato.
+Guarda la capa `informacion_historica` en un archivo GeoPackage en la carpeta `Datos` usando la función `st_write` y especifica la extensión `.gpkg` para indicar que deseas usar este formato.
 
 ```{r Guardar GPKG}
 # Guardar la capa como geopackage
 st_write(inmuebles_historicos,
-         str_c("Datos/inmuebles_historicos_", id_inicial, "-", id_final, ".gpkg"))
+         str_c("Datos/inmuebles_historicos.gpkg"),
+         delete_dsn = TRUE) # Sobreescribir si existe el archivo
 ```
 
 ### Verificación de los datos geocodificados
@@ -1294,7 +1300,7 @@ Es importante verificar la calidad de los datos geocodificados de manera automá
 
 > En esta práctica tomaremos una muestra del 10% de los datos del ejemplo (en este caso 5 registros del total de 50 que se geocodificaron para ahorrar tiempo de procesamiento) que podría no ser significativa, pero se presenta el procedimiento únicamente para fines ilustrativos.
 
-Usa la función `slice_sample` con el parámetro `prop = 0.1` para tomar una muestra aleatoria del 10% de los puntos de la capa `inmuebles_historicos` y visualízalos en un mapa rápido usando la función `qtm`.
+Usa la función `slice_sample` con el parámetro `prop = 0.1` para tomar una muestra aleatoria del 10% de los puntos de la capa `inmuebles_historicos` y visualízalos en un mapa rápido usando la función `qtm`. Cambia el mapa base a *OpenStreetMap* para que tengas más información de referencia.
 
 ```{r Verificar la geocodificación}
 # Toma una muestra aleatoria e inspecciona visualmente
