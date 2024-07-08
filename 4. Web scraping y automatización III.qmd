@@ -41,7 +41,7 @@ Haz una consulta al azar, selecciona al menos una *Entidad Federativa* y un *Mun
 
 Da clic en la liga *Ver detalle* de cualquiera de los resultados. Se abrirá la página de la ficha correspondiente a ese inmueble, y encontrarás varias secciones de información, como *tipo de ficha, localización, identificación,* etc. que están contraídas. Presiona el botón *Expandir todos* para que los paneles de todas las secciones se abran y muestren toda la información disponible sobre el inmueble:
 
-![Ejemplo de una ficha de datos de inmueble.](Imagenes/ConsultaPublica.png){alt="Ejemplo de una ficha de datos de inmueble." fig-alt="Ejemplo de una ficha de datos de inmueble." width="30%"}
+![Ejemplo de una ficha de datos de inmueble.](Imagenes/ConsultaPublica.png){fig-alt="Ejemplo de una ficha de datos de inmueble." width="30%"}
 
 Ahora puedes ver en esta ficha todos los datos que deberás extraer. En la barra de direcciones de tu explorador, observa la dirección de la página web de la ficha de datos, debe ser un URL similar a este:
 
@@ -63,7 +63,7 @@ Será necesario asegurar que todos estos datos se guarden de manera ordenada en 
 
 Utiliza el inspector web para identificar las direcciones xPath de los paneles de cada sección de datos de la ficha.
 
-![Identificación de secciones con el inspector web](Imagenes/InspectorWebPanel.png){alt="Identificación de secciones con el inspector web" fig-alt="Identificación de secciones con el inspector web" width="519"}
+![Identificación de secciones con el inspector web](Imagenes/InspectorWebPanel.png){fig-alt="Identificación de secciones con el inspector web" width="519"}
 
 Las direcciones de los paneles de cada sección son las siguientes:
 
