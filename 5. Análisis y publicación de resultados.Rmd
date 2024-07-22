@@ -122,7 +122,7 @@ rezago_social_ageb <-
   ***()
 ```
 
-> Ignora la advertencia \`value for "which" not specified, defaulting to c("rows", "cols")\`, sólo es un aviso de que la función \`remove_empty\` elimina por defecto filas como columnas completamente vacíos.
+> Ignora la advertencia `value for "which" not specified, defaulting to c("rows", "cols")`, sólo es un aviso de que la función `remove_empty` elimina por defecto filas como columnas completamente vacíos.
 
 #### Puntos de venta de leche Liconsa
 
@@ -174,7 +174,7 @@ agebs_con_datos %>%
       fill.palette = "***")
 ```
 
-> Observa que las AGEBs coloreadas en gris se clasifican automáticamente como "Missing" e indican las AGEBs para las que no se determinó un grado de rezago social.
+> Observa que las AGEBs coloreadas en gris se clasifican automáticamente como `"Missing"` e indican las AGEBs para las que no se determinó un grado de rezago social.
 
 Para visualizar si los puntos de venta de leche Liconsa están en las AGEBs con mayor GRS, será necesario conocer el número de puntos de venta por cada AGEB para hacer la comparación. Debido a que en los datos de `puntos_venta_liconsa` no se especifica a qué AGEB pertenece cada punto, será necesario hacer un cruce de datos espaciales para determinar en qué polígono de la capa `agebs_con_datos` se intersecta cada uno de los puntos de las ubicaciones de los `puntos_venta_liconsa`.
 
@@ -220,9 +220,9 @@ Un modo de representar la cantidad de puntos de venta de leche en cada AGEB es s
 
 Para lograr esto, necesitarás convertir los polígonos de la capa de AGEBs en puntos. Un medio para hacer esto es determinando los centroides de cada polígono y unirles los datos de puntos de venta por AGEB.
 
-Realiza la siguiente manipulación de datos para obtener la capa necesaria y guárdala en una nueva variable llamada `ageb_centroides`:
+Realiza la siguiente manipulación de datos para obtener la capa necesaria y guárdala en una nueva variable llamada `agebs_con_puntos_de_venta`:
 
-1.  Toma como base la capa `agebs_con_puntos_de_venta`.
+1.  Toma como base la capa `agebs_con_datos`.
 2.  Convierte la capa de polígonos en puntos determinando sus centroides, usa la función `st_centroid`.
 3.  Agrega los datos de la tabla `puntos_venta_por_ageb` donde coincidan las claves de AGEB (`by = "cvegeo"`).
 4.  Visualiza la estructura de la capa transformada usando la función `glimpse`.
