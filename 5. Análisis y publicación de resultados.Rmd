@@ -122,9 +122,7 @@ rezago_social_ageb <-
   ***()
 ```
 
-```         
-Ignora la advertencia `value for "which" not specified, defaulting to c("rows", "cols")`, sólo es un aviso de que la función `remove_empty` elimina por defecto filas como columnas completamente vacíos.
-```
+> Ignora la advertencia \`value for "which" not specified, defaulting to c("rows", "cols")\`, sólo es un aviso de que la función \`remove_empty\` elimina por defecto filas como columnas completamente vacíos.
 
 #### Puntos de venta de leche Liconsa
 
@@ -176,9 +174,7 @@ agebs_con_datos %>%
       fill.palette = "***")
 ```
 
-```         
-Observa que las AGEBs coloreadas en gris se clasifican automáticamente como "Missing" e indican las AGEBs para las que no se determinó un grado de rezago social.
-```
+> Observa que las AGEBs coloreadas en gris se clasifican automáticamente como "Missing" e indican las AGEBs para las que no se determinó un grado de rezago social.
 
 Para visualizar si los puntos de venta de leche Liconsa están en las AGEBs con mayor GRS, será necesario conocer el número de puntos de venta por cada AGEB para hacer la comparación. Debido a que en los datos de `puntos_venta_liconsa` no se especifica a qué AGEB pertenece cada punto, será necesario hacer un cruce de datos espaciales para determinar en qué polígono de la capa `agebs_con_datos` se intersecta cada uno de los puntos de las ubicaciones de los `puntos_venta_liconsa`.
 
@@ -197,9 +193,7 @@ puntos_venta_con_agebs <-
   ***() # Visualizar la estructura resultante
 ```
 
-```         
-Observa que después de la intersección tienes 544 filas en la nueva capa, cuando originalmente tenías 546. Esto se debe a que hay dos puntos de venta que están ubicados en lugares donde no está definida una AGEB y se excluyeron durante al final del cruce de datos.
-```
+> Observa que después de la intersección tienes 544 filas en la nueva capa, cuando originalmente tenías 546. Esto se debe a que hay dos puntos de venta que están ubicados en lugares donde no está definida una AGEB y se excluyeron durante al final del cruce de datos.
 
 Ya cuentas con una capa de puntos de venta de leche que tiene una variable `cvegeo` que indica la AGEB en la que se ubica. El siguiente paso es contar el número de puntos de venta por cada AGEB. Para ello realiza la siguiente manipulación de datos y asigna el resultado a una nueva variable llamada `puntos_venta_por_ageb`:
 
@@ -293,9 +287,7 @@ agebs_con_puntos_de_venta %>%
   ***(grado_de_rezago_social_clases_latentes) # Agrupar las cifras por GRS
 ```
 
-```         
-Observa que `tabyl` cuenta el número de registros por cada `grado_de_rezago_social_clases_latentes` incluyendo aquellos que se ubican en AGEBs que no tienen un GRS definido (se identifican como `<NA>`). Además calcula el porcentaje de participación para cada GRS contando aquellos casos donde no hay un GRS definido en la variable `percent` y omitiéndolos en la variable `valid_percent`.
-```
+> Observa que `tabyl` cuenta el número de registros por cada `grado_de_rezago_social_clases_latentes` incluyendo aquellos que se ubican en AGEBs que no tienen un GRS definido (se identifican como `<NA>`). Además calcula el porcentaje de participación para cada GRS contando aquellos casos donde no hay un GRS definido en la variable `percent` y omitiéndolos en la variable `valid_percent`.
 
 A partir de los datos obtenidos, podemos observar que el **93.8% de los puntos de venta de leche se ubican en AGEBs de bajo grado de rezago social**, mientras que únicamente el **4.6% de los puntos de venta de leche se encuentran en AGEBs con un grado de rezago social medio o alto**.
 
