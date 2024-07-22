@@ -2,11 +2,8 @@
 title: "5. Caso práctico"
 author: "Ana J. Alegre (jalegre@centrogeo.edu.mx), Cristian Silva (csilva@centrogeo.edu.mx)"
 date: '2022-06-17'
-output:
-  html_document: default
-    toc: true
-  pdf_document: default
-  always_allow_html: true
+output: pdf_document
+always_allow_html: true
 ---
 
 ```{r setup, include=FALSE}
@@ -41,6 +38,7 @@ Para esta sesión nos aseguraremos de tener instalados y actualizados todos los 
 #                    "tmap",
 #                    "DT",
 #                    "RMarkdown",
+#                    "webshot2",
 #                    "tinytex"))
 ```
 
